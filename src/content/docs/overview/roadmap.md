@@ -1,100 +1,100 @@
 ---
 title: Roadmap
-description: Cyntex v1 发布路线图：POC → Alpha → Beta → GA
+description: Cyntex v1 release roadmap — POC → Alpha → Beta → GA
 sidebar:
   order: 3
 ---
 
 import { Badge } from '@astrojs/starlight/components';
 
-Cyntex v1 分四个发布阶段，每段独立可 demo、跑真实数据、可写 e2e。
+Cyntex v1 is divided into four release phases, each independently demo-able, runnable against real data, and covered by e2e tests.
 
-## 发布阶段
+## Release Phases
 
-### POC <Badge text="当前" variant="tip" />
+### POC <Badge text="Current" variant="tip" />
 
-**目标：** 骨架可运行，单节点 CDC 全链路跑通
+**Goal:** Skeleton is runnable; single-node CDC full pipeline works end-to-end
 
-| 交付物 | 状态 |
+| Deliverable | Status |
 |---|---|
-| Maven mono 仓骨架（enforcer + ArchUnit + `${revision}`） | ✅ 完成 |
-| native CLI 选型 spike（GraalVM 21，启动 ~10ms） | ✅ 完成 |
-| DSL 全语法模块（core-model / core-dsl / core-schema） | 🔄 进行中 |
-| 全量连接器 catalog 构建管道（60+ 连接器） | 🔄 进行中 |
-| 离线 CLI（validate / new / explain，native 二进制） | 🔄 进行中 |
-| PDK 加载 + 单节点基础 CDC（MySQL → MongoDB） | ⏳ 待开始 |
-| control core（CRUD + 生命周期）+ 认证基础 | ⏳ 待开始 |
+| Maven mono-repo skeleton (enforcer + ArchUnit + `${revision}`) | ✅ Done |
+| Native CLI tooling spike (GraalVM 21, startup ~10ms) | ✅ Done |
+| Full DSL grammar module (core-model / core-dsl / core-schema) | 🔄 In progress |
+| Full connector catalog build pipeline (60+ connectors) | 🔄 In progress |
+| Offline CLI (validate / new / explain, native binary) | 🔄 In progress |
+| PDK loading + single-node basic CDC (MySQL → MongoDB) | ⏳ Not started |
+| Control core (CRUD + lifecycle) + basic auth | ⏳ Not started |
 
-**退出条件：** CLI 注册连接器 + YAML 单表任务（全量 / 基础 CDC）跑通 + 查状态
+**Exit criteria:** CLI registers a connector + YAML single-table task (full snapshot / basic CDC) runs through + status query works
 
 ---
 
-### Alpha（~4 周，软发布）
+### Alpha (~4 weeks, soft release)
 
-**目标：** FDM→MDM 基础同步 pipeline 可演示，最小 AI 接入
+**Goal:** FDM→MDM basic sync pipeline demoable; minimal AI integration
 
-| 交付物 |
+| Deliverable |
 |---|
-| CDC 连接器（直接引入） |
-| 基础处理节点（rename / JS-GraalVM / typeFilter / unwind / date / 行级 WHERE） |
-| **最小 MCP**（只读 + scaffold/explain，BYO-agent） |
-| e2e 测试框架（声明式 YAML 规约 + Java 执行器，DSL schema 锁定后开建） |
-| OTel 指标 / 日志 |
+| CDC connectors (directly included) |
+| Basic processing nodes (rename / JS-GraalVM / typeFilter / unwind / date / row-level WHERE) |
+| **Minimal MCP** (read-only + scaffold/explain, BYO-agent) |
+| e2e test framework (declarative YAML spec + Java runner; built after DSL schema is locked) |
+| OTel metrics / logging |
 
-**退出条件：** 跑通带基础处理算子的 FDM→MDM 同步任务
+**Exit criteria:** FDM→MDM sync task with basic processing operators runs end-to-end
 
 ---
 
-### Beta（~8 周，OSS 核心完备）
+### Beta (~8 weeks, OSS core complete)
 
-**目标：** 分布式 CDC + 合并/join + 编排 + 监控；CLI + Basic UI 双前端
+**Goal:** Distributed CDC + merge/join + orchestration + monitoring; CLI + Basic UI dual frontend
 
-| 交付物 |
+| Deliverable |
 |---|
-| Hz 分布式（升级 5.7.0 fork + 集群 + quorum + 心跳） |
-| 分布式 CDC + 共享挖掘（Ringbuffer 多消费者）+ offset 持久化/断点续传 |
-| 缓存管理（Caffeine + Hz IMap L2 + CacheRegistry） |
-| **DuckDB join 节点** |
-| **主从合并算子（MERGE 家族）** |
-| DDL / Schema Drift |
-| 多任务依赖编排（task-of-tasks） |
-| **完整 MCP 工具集**（可变 CRUD + 生命周期全集） |
-| **Basic UI（开源）** |
-| OpenLineage 字段级溯源（Beta 引入） |
+| Hz distributed cluster (upgrade to 5.7.0 fork + cluster + quorum + heartbeat) |
+| Distributed CDC + shared log mining (Ringbuffer multi-consumer) + offset persistence / resume |
+| Cache management (Caffeine + Hz IMap L2 + CacheRegistry) |
+| **DuckDB join node** |
+| **Master-detail merge operator (MERGE family)** |
+| DDL / Schema Drift handling |
+| Multi-task dependency orchestration (task-of-tasks) |
+| **Complete MCP toolset** (mutable CRUD + full lifecycle operations) |
+| **Basic UI (open source)** |
+| OpenLineage field-level lineage (introduced in Beta) |
 
 ---
 
-### GA（~8 周，企业就绪）
+### GA (~8 weeks, enterprise-ready)
 
-**目标：** 对外 API + 外接数据湖 + 自动 HA + 闭源企业插件接入
+**Goal:** External API + external data lake + automatic HA + closed-source enterprise plugin integration
 
-| 交付物 |
+| Deliverable |
 |---|
-| **apiserver（role=api）+ API 管理** — OSS 开放 |
-| 自定义节点 |
-| Debezium 集成 |
-| **Paimon 增量数据湖**（外部存储，末位接入） |
-| 自动任务 HA（failover） |
-| 容器化 + 端口收敛 |
-| 企业 UI |
-| **闭源插件（Tentatively Enterprise）**：RBAC / LDAP / Lineage&Tracing / 企业连接器（DB2/Sybase/MSSQL/PG/Oracle agent） |
+| **apiserver (role=api) + API management** — OSS open |
+| Custom nodes |
+| Debezium integration |
+| **Paimon incremental data lake** (external storage, added at end of GA) |
+| Automatic task HA (failover) |
+| Containerization + port consolidation |
+| Enterprise UI |
+| **Closed-source plugins (Tentatively Enterprise)**: RBAC / LDAP / Lineage & Tracing / enterprise connectors (DB2/Sybase/MSSQL/PG/Oracle agent) |
 
 ---
 
-## 关键设计决策
+## Key Design Decisions
 
-已锁定的不变量（见 [Architecture Decisions](/reference/adr/)）：
+Locked invariants (see [Architecture Decisions](/reference/adr/)):
 
-- **YAML-only authoring**：SQL 取消 authoring 形态，仅作 DuckDB 节点内嵌值
-- **BYO-agent，无内置 LLM**：MCP server 不含模型
-- **无 auto-fix**：AI 监控/预警只读，可变操作人在环
-- **开放核心**：无 license 门禁，闭源 = SPI 插件
-- **单二进制 + `--role`**：小规模合并部署，大规模角色分离
+- **YAML-only authoring**: SQL is removed as an authoring format; it appears only as an embedded value inside DuckDB nodes
+- **BYO-agent, no bundled LLM**: MCP server contains no model
+- **No auto-fix**: AI monitoring/alerting is read-only; mutable operations require human in the loop
+- **Open core**: No license gating; closed-source = SPI plugins
+- **Single binary + `--role`**: Merged deployment for small scale; role-separated for large scale
 
-## 当前阻塞项
+## Current Blockers
 
-| ADR | 内容 | 影响 |
+| ADR | Topic | Impact |
 |---|---|---|
-| ADR-0002 | 进程合并形态（Proposed，待 Accept） | gate POC 完整 server 侧 |
-| ADR-0017 | 测试策略（Proposed，待 Accept） | gate e2e 框架开建 |
-| ADR-0006 | PDK 兼容性边界（未写） | gate 连接器 adapter 层 |
+| ADR-0002 | Process merge form (Proposed, pending Accept) | Gates full server-side POC |
+| ADR-0017 | Testing strategy (Proposed, pending Accept) | Gates e2e framework construction |
+| ADR-0006 | PDK compatibility boundary (not written) | Gates connector adapter layer |

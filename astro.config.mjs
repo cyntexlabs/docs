@@ -56,6 +56,20 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Connector Reference',
+          items: [
+            { label: 'All Connectors', slug: 'connectors' },
+            { label: 'MySQL', slug: 'connectors/mysql' },
+            { label: 'PostgreSQL', slug: 'connectors/postgresql' },
+            { label: 'Oracle', slug: 'connectors/oracle' },
+            { label: 'SQL Server', slug: 'connectors/sqlserver' },
+            { label: 'MongoDB', slug: 'connectors/mongodb' },
+            { label: 'MongoDB Atlas', slug: 'connectors/mongodb-atlas' },
+            { label: 'Kafka', slug: 'connectors/kafka' },
+          ],
+          collapsed: false,
+        },
+        {
           label: 'Architecture Decisions',
           autogenerate: { directory: 'reference/adr' },
           collapsed: true,

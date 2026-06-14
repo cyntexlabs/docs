@@ -1,23 +1,23 @@
 ---
 title: What is Cyntex?
-description: Cyntex 是面向 Agentic AI 时代的数据集成平台，TapData 的下一代重构
+description: Cyntex is a data integration platform designed for the Agentic AI era — the next-generation rebuild of TapData
 sidebar:
   order: 1
 ---
 
-Cyntex 是 **TapData** 的下一代重构，面向 Agentic AI 时代设计的**数据集成平台**。
+Cyntex is the next-generation rebuild of **TapData** — a **data integration platform** designed for the Agentic AI era.
 
-它做三件事：
+It does three things:
 
-1. **采集**（Capture）— 从任意源系统持续同步数据变更（CDC / 全量 / API 拉取）
-2. **建模**（Model）— 对数据流做 join、merge、过滤、转换，建立统一的业务视图
-3. **发布**（Serve）— 把处理后的数据发布为 API、事件流或物化视图
+1. **Capture** — Continuously sync data changes from any source system (CDC / full snapshot / API pull)
+2. **Model** — Join, merge, filter, and transform data streams to build unified business views
+3. **Serve** — Publish processed data as APIs, event streams, or materialized views
 
-## 核心差异化
+## Core Differentiators
 
-### YAML-first，AI-native
+### YAML-first, AI-native
 
-任务描述语言（DSL）是 YAML，文件扩展名 `.cyn.yml`。**没有 SQL→DAG 前端，没有画布拖拽**——所有数据管道都通过 YAML 声明，由 AI agent 或人类工程师编写。
+The task description language (DSL) is YAML, with file extension `.cyn.yml`. **No SQL→DAG frontend, no drag-and-drop canvas** — all data pipelines are declared in YAML, authored by an AI agent or human engineer.
 
 ```yaml title="my-pipeline.cyn.yml"
 apiVersion: cyntex/v1
@@ -36,40 +36,40 @@ sync:
       collection: user_profiles
 ```
 
-一份 JSON Schema 同源驱动：authoring 补全 / validate 报错 / e2e 测试 / MCP 工具生成——**投入一次，四处受益**。
+A single JSON Schema drives everything from the same source: authoring completion / validation errors / e2e tests / MCP tool generation — **invest once, benefit everywhere**.
 
-### BYO-agent，模型无关
+### BYO-agent, model-agnostic
 
-Cyntex **不内置任何 LLM**。你带来自己的 AI agent（Claude、GPT-4o、Gemini……），通过以下三层接入：
+Cyntex **does not bundle any LLM**. You bring your own AI agent (Claude, GPT-4o, Gemini, …) and integrate via three layers:
 
-| 层 | 形态 | 能力 |
+| Layer | Form | Capability |
 |---|---|---|
-| **Skill** | 离线，导入 agent | 理解 DSL 语法，生成 `.cyn.yml` |
-| **MCP server** | 进程内嵌，HTTP transport | 实时 CRUD + 生命周期控制 |
-| **CLI** | 独立 native 二进制 | 验证 / scaffold / 离线 REPL |
+| **Skill** | Offline, imported into agent | Understands DSL syntax, generates `.cyn.yml` |
+| **MCP server** | In-process, HTTP transport | Real-time CRUD + lifecycle control |
+| **CLI** | Standalone native binary | Validate / scaffold / offline REPL |
 
-AI 可以：创建/编辑/删除连接和任务，启停任务，查询运行状态、延迟、错误；**不可以** auto-fix（人在环）。
+AI can: create/edit/delete connections and tasks, start/stop tasks, query run status, lag, and errors. AI **cannot**: auto-fix (human in the loop).
 
-### 开放核心（Open Core）
+### Open Core
 
-核心完全开源（Apache 2.0）。闭源部分仅限企业级插件（RBAC / LDAP / 企业连接器），以 SPI 接口接入，**没有 license 门禁**。
+The core is fully open source (Apache 2.0). Closed-source components are limited to enterprise-grade plugins (RBAC / LDAP / enterprise connectors), plugged in via SPI interface — **no license gating**.
 
-## 适用场景
+## Use Cases
 
-| 场景 | 示例 |
+| Scenario | Example |
 |---|---|
-| **FDM → MDM 主数据同步** | MySQL / PostgreSQL → MongoDB 统一客户视图 |
-| **多源 CDC 实时流** | 多库 → Hazelcast 内存 → 下游消费 |
-| **数据发布 API** | 同步后的数据直接发布为 REST API（GA 阶段） |
-| **AI-driven 数据管道** | 对话 → YAML → 一键部署 |
+| **FDM → MDM master data sync** | MySQL / PostgreSQL → MongoDB unified customer view |
+| **Multi-source CDC real-time streaming** | Multiple databases → Hazelcast in-memory → downstream consumers |
+| **Data publishing API** | Synced data published directly as a REST API (GA phase) |
+| **AI-driven data pipeline** | Conversation → YAML → one-click deploy |
 
-## 不做什么
+## What Cyntex Does Not Do
 
-- **不是 ETL 批处理工具**（不替代 Spark / Flink 批作业）
-- **不是数据仓库**（不存储历史分析数据，Paimon 增量数据湖在 GA 末位外接）
-- **不内置 AI 模型**（BYO-agent，模型成本由用户侧承担）
-- **不做多租户隔离**（v1 不含，GA 后随企业版 RBAC 补入）
+- **Not an ETL batch processing tool** (does not replace Spark / Flink batch jobs)
+- **Not a data warehouse** (does not store historical analytics data; Paimon incremental data lake is an external add-on at the end of GA)
+- **Does not include AI models** (BYO-agent; model costs are on the user's side)
+- **No multi-tenant isolation** (not in v1; added with enterprise RBAC after GA)
 
-## 当前状态
+## Current Status
 
-Cyntex 处于 **POC 阶段**，正在实现首个子切片（DSL 全语法模块 + 离线 CLI native 二进制）。详见[路线图](/overview/roadmap/)。
+Cyntex is in the **POC phase**, implementing the first sub-slice (full DSL grammar module + offline CLI native binary). See the [Roadmap](/overview/roadmap/) for details.

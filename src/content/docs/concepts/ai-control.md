@@ -1,66 +1,66 @@
 ---
 title: AI Control Layer
-description: Cyntex 的 AI 接入机制：control core + CLI + MCP + skill 分层
+description: Cyntex AI integration mechanism — control core + CLI + MCP + skill layer hierarchy
 sidebar:
   order: 3
 ---
 
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Cyntex 的 AI 接入遵循**分层原则**：一个 control core，多个薄前端，BYO-agent（Bring Your Own Agent）。
+Cyntex's AI integration follows a **layered principle**: one control core, multiple thin frontends, BYO-agent (Bring Your Own Agent).
 
 ```
-用户 AI Agent（Claude / GPT-4o / Gemini …）
+User AI Agent (Claude / GPT-4o / Gemini …)
         │
-        ├─ Skill（离线导入，教领域知识）
-        ├─ MCP server（进程内，实时操作）
-        └─ CLI（独立 native 二进制，人/脚本/AI 通用）
+        ├─ Skill (imported offline; teaches domain knowledge)
+        ├─ MCP server (in-process; real-time operations)
+        └─ CLI (standalone native binary; usable by humans, scripts, and AI alike)
                 │
-                └─ control core（进程内，不对外暴露）
-                        ├─ 连接/任务 CRUD
-                        ├─ 生命周期控制
-                        └─ 只读运行时（状态/指标/lag）
+                └─ control core (in-process; not exposed externally)
+                        ├─ Connection/task CRUD
+                        ├─ Lifecycle control
+                        └─ Read-only runtime (status / metrics / lag)
 ```
 
 ## Control Core
 
-进程内核心，提供**操作注册表**，每个操作带：
+The in-process core provides an **operation registry** where each operation carries:
 
-- `scope`：`read` | `write` | `admin`
-- `exposure`：哪些前端可见（CLI / MCP / API）
-- 审计 hook：每次可变操作必须落审计日志
+- `scope`: `read` | `write` | `admin`
+- `exposure`: which frontends can see it (CLI / MCP / API)
+- Audit hook: every mutable operation must be written to the audit log
 
-**token 权限模型：**
+**Token permission model:**
 
-| token | 默认能力 |
+| Token | Default capabilities |
 |---|---|
-| 人（JWT） | read（默认）；write 需 opt-in；admin 需 opt-in |
-| 机器（token） | read（默认）；write 需 scope 声明 |
+| Human (JWT) | read (default); write requires opt-in; admin requires opt-in |
+| Machine (token) | read (default); write requires scope declaration |
 
-localhost 启动时零配置（bootstrap token 自动生成，仅本机可用）。
+Zero-configuration when starting on localhost (bootstrap token auto-generated; valid only on the local machine).
 
 ## CLI
 
-Cyntex 的**主要用户界面**（人类和 AI agent 都用它）。
+Cyntex's **primary user interface** — used by both humans and AI agents.
 
-- 独立 native-image 二进制，启动 < 200ms
-- 双模：`cyntex`（无参）= 离线 REPL；子命令 = 一次性执行（适合脚本/AI）
-- 离线动词（无需连接服务）：`validate` / `new` / `explain`
-- 连接态动词（需 `--server`）：`apply` / `run` / `start` / `stop` / `export` / `diff`
+- Standalone native-image binary, startup < 200ms
+- Dual mode: `cyntex` (no args) = offline REPL; subcommands = one-shot execution (suitable for scripts/AI)
+- Offline verbs (no server connection needed): `validate` / `new` / `explain`
+- Connected verbs (requires `--server`): `apply` / `run` / `start` / `stop` / `export` / `diff`
 
 ```bash
-# 离线使用
+# Offline usage
 cyntex validate my-pipeline.cyn.yml
-cyntex new                          # 问答向导，产出 .cyn.yml
-cyntex explain pipeline.sync        # 字段文档（schema 同源）
+cyntex new                          # Interactive wizard; produces .cyn.yml
+cyntex explain pipeline.sync        # Field documentation (schema-derived)
 
-# 连接服务
+# Connected to server
 cyntex apply my-pipeline.cyn.yml --server localhost:7777
 cyntex start user-profile-sync
 cyntex status user-profile-sync
 ```
 
-**REPL 模式：**
+**REPL mode:**
 
 ```
 $ cyntex
@@ -74,71 +74,71 @@ error_policy: Controls behavior when a record fails processing.
 
 ## MCP Server
 
-嵌入 Cyntex 进程，HTTP transport，**不含任何模型**。
+Embedded in the Cyntex process, HTTP transport, **contains no model whatsoever**.
 
-用户 AI agent 通过 MCP 协议连接，获得对运行中 Cyntex 实例的实时操作能力。
+The user's AI agent connects via the MCP protocol to gain real-time operational access to the running Cyntex instance.
 
-**Alpha 阶段（只读 + scaffold）：**
+**Alpha phase (read-only + scaffold):**
 
-| MCP 工具 | 说明 |
+| MCP Tool | Description |
 |---|---|
-| `list_sources` | 列出所有已注册的 source |
-| `list_pipelines` | 列出所有 pipeline 及状态 |
-| `get_pipeline_status` | 查询指定 pipeline 的运行状态、lag、错误率 |
-| `scaffold_pipeline` | 根据连接器和表名生成 pipeline YAML 草稿 |
-| `explain_field` | 查询 DSL 字段文档 |
-| `validate_yaml` | 验证一段 YAML |
+| `list_sources` | List all registered sources |
+| `list_pipelines` | List all pipelines and their status |
+| `get_pipeline_status` | Query the runtime status, lag, and error rate of a specific pipeline |
+| `scaffold_pipeline` | Generate a pipeline YAML draft from a connector and table name |
+| `explain_field` | Look up documentation for a DSL field |
+| `validate_yaml` | Validate a YAML snippet |
 
-**Beta 阶段（完整工具集）：**
+**Beta phase (complete toolset):**
 
-所有 control core 操作 = 对应 MCP 工具（CRUD + 生命周期全集）。
+All control core operations become corresponding MCP tools (full CRUD + full lifecycle operations).
 
 <Aside type="caution">
-  MCP server 当前计划在 **Alpha 阶段**启用。POC 阶段只有离线 CLI。
+  The MCP server is planned to be enabled in the **Alpha phase**. The POC phase has only the offline CLI.
 </Aside>
 
 ## Authoring Skill
 
-用户把 Cyntex skill 导入自己的 AI agent（例如 Claude Projects），用自然语言对话生成 `.cyn.yml`：
+Users import the Cyntex skill into their own AI agent (e.g., Claude Projects) and use natural language conversation to generate `.cyn.yml`:
 
-> "帮我创建一个从 MySQL users 表同步到 MongoDB 的 CDC 任务，过滤掉 deleted_at 不为空的记录"
+> "Create a CDC task to sync the MySQL users table to MongoDB, filtering out records where deleted_at is not null"
 
-skill 内包含：
-- Cyntex DSL 领域知识
-- 关键场景示例（from ADR-0016 §14 语料库）
-- `validate` 使用方式
-- 常见错误解决方案
+The skill contains:
+- Cyntex DSL domain knowledge
+- Key scenario examples (from ADR-0016 §14 corpus)
+- How to use `validate`
+- Common error solutions
 
-与 MCP **互补组合**：skill 教 agent 写对 YAML，MCP 给 agent 实时操作的"手"。
+**Complementary combination with MCP**: the skill teaches the agent to write correct YAML; MCP gives the agent "hands" to operate in real time.
 
-## 能力边界
+## Capability Boundary
 
-<Aside type="danger" title="AI 不可以 auto-fix">
-  Cyntex v1 不支持 AI 自动修复数据管道。诊断止于只读监控/预警；所有可变操作需人在环确认。
-  数据平台操作失误 = 丢/坏数据，这条线不妥协。
+<Aside type="danger" title="AI cannot auto-fix">
+  Cyntex v1 does not support AI automatic repair of data pipelines. Diagnostics are limited to read-only monitoring and alerting; all mutable operations require human-in-the-loop confirmation.
+  Mistakes in data platform operations mean lost or corrupted data — this line is non-negotiable.
 </Aside>
 
-**AI 可以做：**
-- ✅ 生成、验证 `.cyn.yml`
-- ✅ 创建/编辑/删除 source 和 pipeline（write scope）
-- ✅ 启动/停止/重启任务
-- ✅ 查询运行状态、延迟、错误日志
-- ✅ Schema 发现（连接器有哪些表、字段）
+**AI can:**
+- ✅ Generate and validate `.cyn.yml`
+- ✅ Create/edit/delete sources and pipelines (write scope)
+- ✅ Start/stop/restart tasks
+- ✅ Query runtime status, lag, and error logs
+- ✅ Schema discovery (which tables and fields a connector exposes)
 
-**AI 不可以做：**
-- ❌ 自动修改正在运行的任务参数
-- ❌ API 发布/取消发布（随 apiserver GA 后点亮）
-- ❌ 多租户操作（v1 不含）
-- ❌ 绕过 write/admin scope 的鉴权
+**AI cannot:**
+- ❌ Automatically modify parameters of a running task
+- ❌ Publish/unpublish APIs (enabled after apiserver GA)
+- ❌ Multi-tenant operations (not in v1)
+- ❌ Bypass write/admin scope authorization
 
-## 一份 Schema 四处复用
+## One Schema, Four Uses
 
 ```
-core-schema（JSON Schema，全生成）
-        ├─ CLI validate / explain / Tab 补全
-        ├─ MCP 工具参数 schema（自动生成）
-        ├─ e2e 测试语料（golden files）
-        └─ IDE / authoring skill 的 DSL 补全源
+core-schema (JSON Schema, fully generated)
+        ├─ CLI validate / explain / Tab completion
+        ├─ MCP tool parameter schema (auto-generated)
+        ├─ e2e test corpus (golden files)
+        └─ DSL completion source for IDE / authoring skill
 ```
 
-这是 Cyntex 的核心工程原则：**投入一次，四处受益，零漂移**。
+This is Cyntex's core engineering principle: **invest once, benefit everywhere, zero drift**.

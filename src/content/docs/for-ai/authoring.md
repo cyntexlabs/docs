@@ -1,83 +1,83 @@
 ---
 title: Authoring with AI
-description: 用 AI agent 编写 Cyntex DSL——skill + MCP 组合工作流
+description: Writing Cyntex DSL with an AI agent — skill + MCP combined workflow
 sidebar:
   order: 3
 ---
 
-## 推荐工作流
+## Recommended Workflow
 
 ```
-1. 导入 Cyntex skill → AI 理解 DSL 语法
-2. 对话生成 .cyn.yml → AI 输出 YAML
-3. cyntex validate → 本地三层校验
-4. cyntex apply → 部署到运行中的 Cyntex
-5. （可选）MCP 实时监控运行状态
+1. Import the Cyntex skill → AI learns DSL syntax
+2. Describe your need in conversation → AI outputs YAML
+3. cyntex validate → local three-layer validation
+4. cyntex apply → deploy to running Cyntex
+5. (optional) MCP real-time monitoring of runtime status
 ```
 
-## 第一步：让 AI 理解 Cyntex
+## Step 1: Help the AI Understand Cyntex
 
-将以下 URL 提供给你的 AI：
+Provide the following URL to your AI:
 
 ```
 https://docs.cyntex.io/llms.txt
 ```
 
-或直接把 `llms.txt` 内容粘贴到对话中。AI 即可理解 Cyntex 的核心概念和 DSL 语法。
+Or paste the contents of `llms.txt` directly into the conversation. The AI will then understand Cyntex's core concepts and DSL syntax.
 
-## 第二步：描述你的需求
+## Step 2: Describe Your Requirements
 
 ```
-我有一个 MySQL 数据库，需要：
-- 实时同步 users 表到 MongoDB（CDC 模式）
-- 过滤掉 deleted_at 不为空的记录
-- 把 user_id 字段重命名为 id
+I have a MySQL database and I need to:
+- Sync the users table to MongoDB in real time (CDC mode)
+- Filter out records where deleted_at is not null
+- Rename the user_id field to id
 
-请生成对应的 .cyn.yml 文件
+Please generate the corresponding .cyn.yml files
 ```
 
-## 第三步：验证生成的 YAML
+## Step 3: Validate the Generated YAML
 
 ```bash
 cyntex validate user-sync.cyn.yml
 ```
 
-AI 生成的 YAML 可能有小错误，validate 会给出精确的错误位置和说明。把报错反馈给 AI 让它修正：
+AI-generated YAML may have minor errors. `validate` gives precise error locations and explanations. Feed the errors back to the AI for correction:
 
 ```
-validate 报错：
+validate error:
   Error: Unknown field 'write_strategy' at sync[0].options
   Did you mean 'write_mode'?
 
-请修正这个字段名
+Please fix this field name
 ```
 
-## 最佳实践
+## Best Practices
 
-**给 AI 的提示技巧：**
+**Tips for prompting AI:**
 
-- 说清楚源和目标的类型（MySQL CDC → MongoDB）
-- 说明需要哪些变换（过滤、重命名、enrichment）
-- 提到是否需要处理 DDL 变更（`ddl: apply`）
-- 一次只描述一个 pipeline，复杂场景拆分多个对话
+- Clearly state the type of source and target (MySQL CDC → MongoDB)
+- Specify which transforms are needed (filter, rename, enrichment)
+- Mention whether DDL changes need to be handled (`ddl: apply`)
+- Describe one pipeline at a time; split complex scenarios across multiple conversations
 
-**验证后再部署：**
+**Validate before deploying:**
 
-`cyntex validate` 是免费的——总在 apply 前跑一次，尤其是 AI 生成的内容。
+`cyntex validate` is free — always run it before `apply`, especially for AI-generated content.
 
-**使用 explain 理解字段：**
+**Use explain to understand fields:**
 
 ```bash
 cyntex explain pipeline.sync.options.write_mode
-# 输出字段文档、合法值、默认值
+# Outputs field documentation, valid values, and defaults
 ```
 
-## 与 MCP 组合
+## Combining with MCP
 
-Alpha 阶段后，AI 不仅能生成 YAML，还能直接通过 MCP 部署和监控：
+After the Alpha phase, AI can not only generate YAML but also deploy and monitor directly via MCP:
 
 ```
-用户：帮我检查一下 user-sync 任务的延迟
-AI：[调用 get_pipeline_status("user-sync")]
-    当前 lag: 1.2s，过去 1 小时平均 0.8s，状态正常
+User: Check the lag on the user-sync task
+AI: [calls get_pipeline_status("user-sync")]
+    Current lag: 1.2s, past 1-hour average: 0.8s — status normal
 ```

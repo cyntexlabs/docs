@@ -1,51 +1,51 @@
 ---
 title: LLM Context Files
-description: 给 AI 模型使用的 Cyntex 结构化上下文文件（llms.txt 标准）
+description: Structured Cyntex context files for AI models (llms.txt standard)
 sidebar:
   order: 1
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-Cyntex 提供标准 [llms.txt](https://llmstxt.org/) 文件，让任何 LLM 快速理解 Cyntex。
+Cyntex provides standard [llms.txt](https://llmstxt.org/) files so any LLM can quickly understand Cyntex.
 
-## 快速使用
+## Quick Start
 
-把以下 URL 提供给你的 AI 模型，它即可理解 Cyntex 并帮你编写 `.cyn.yml`：
+Provide the following URLs to your AI model so it can understand Cyntex and help you write `.cyn.yml`:
 
-| 文件 | URL | 用途 |
+| File | URL | Purpose |
 |---|---|---|
-| `llms.txt` | `https://docs.cyntex.io/llms.txt` | 精简版（概念 + 快速参考），适合大多数场景 |
-| `llms-full.txt` | `https://docs.cyntex.io/llms-full.txt` | 完整版（含所有 DSL 语法细节），适合复杂任务 |
+| `llms.txt` | `https://docs.cyntex.io/llms.txt` | Condensed version (concepts + quick reference); suitable for most scenarios |
+| `llms-full.txt` | `https://docs.cyntex.io/llms-full.txt` | Full version (all DSL syntax details); suitable for complex tasks |
 
-### 在 Claude 中使用
+### Using with Claude
 
 ```
-请阅读 https://docs.cyntex.io/llms.txt 然后帮我创建一个从 MySQL CDC 到 MongoDB 的同步任务
+Please read https://docs.cyntex.io/llms.txt and then help me create a CDC sync task from MySQL to MongoDB
 ```
 
-### 在 ChatGPT / GPT-4o 中使用
+### Using with ChatGPT / GPT-4o
 
-使用"浏览"功能获取 `https://docs.cyntex.io/llms.txt`，然后提问。
+Use the "Browse" feature to fetch `https://docs.cyntex.io/llms.txt`, then ask your question.
 
-### 在任意支持 URL 的 AI 中使用
+### Using with Any AI That Supports URLs
 
-直接在对话中粘贴 URL，大多数现代 LLM 都能获取并理解文件内容。
+Paste the URL directly into the conversation. Most modern LLMs can fetch and understand file content.
 
 ---
 
 ## JSON Schema
 
-Cyntex 的 DSL schema 对 AI 特别友好——全字段含 `description` 和 `examples`，从代码同源生成：
+Cyntex's DSL schema is particularly AI-friendly — every field includes `description` and `examples`, generated from the same source as the code:
 
 ```
 https://docs.cyntex.io/schema/v1/pipeline.json
 https://docs.cyntex.io/schema/v1/source.json
 ```
 
-### IDE 集成
+### IDE Integration
 
-在 VS Code 的 `settings.json` 中添加：
+Add the following to your VS Code `settings.json`:
 
 ```json
 {
@@ -57,24 +57,24 @@ https://docs.cyntex.io/schema/v1/source.json
 
 ---
 
-## 示例语料库
+## Example Corpus
 
 `https://docs.cyntex.io/examples/`
 
-包含 ADR-0016 §14 定义的全部场景的合法 `.cyn.yml` 样例，可直接作为 few-shot 示例提供给 AI。
+Contains valid `.cyn.yml` samples covering all scenarios defined in ADR-0016 §14, ready to be provided directly to an AI as few-shot examples.
 
 ---
 
-## MCP 接入
+## MCP Integration
 
 <Aside type="note">
-  MCP server 在 **Alpha 阶段**启用。POC 阶段只有离线 CLI。
+  The MCP server is enabled in the **Alpha phase**. The POC phase has only the offline CLI.
 </Aside>
 
-当 Cyntex 服务运行时，AI agent 可通过 MCP 协议直接操作：
+When the Cyntex service is running, an AI agent can operate directly via the MCP protocol:
 
 ```
 mcp://localhost:7778
 ```
 
-这让 AI 不仅能**写** `.cyn.yml`，还能**部署、启动、监控**任务。详见 [MCP Integration](/for-ai/mcp/)。
+This lets the AI not only **write** `.cyn.yml` but also **deploy, start, and monitor** tasks. See [MCP Integration](/for-ai/mcp/).

@@ -1,20 +1,20 @@
 ---
 title: serve
-description: 数据发布（serve / push）参考——GA 阶段
+description: Data publishing (serve / push) reference — GA phase
 sidebar:
   order: 5
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title="GA 阶段">
-  `serve` 作为独立资源类型（`kind: serve`）在 **GA 阶段**随 apiserver 一起落地。
-  当前版本（POC/Alpha）中，数据发布通过 pipeline 的 `push:` 字段实现事件流输出。
+<Aside type="caution" title="GA Phase">
+  `serve` as a standalone resource type (`kind: serve`) lands in the **GA phase** together with the apiserver.
+  In the current version (POC/Alpha), data publishing is implemented via the `push:` field in a pipeline for event stream output.
 </Aside>
 
-## 当前可用：pipeline push
+## Currently Available: pipeline push
 
-通过 pipeline 的 `push` 字段将数据发布为事件流：
+Publish data as an event stream using the `push` field in a pipeline:
 
 ```yaml
 apiVersion: cyntex/v1
@@ -24,33 +24,33 @@ source: mysql-prod
 
 push:
   - source: orders
-    topic: order-events          # 省略 = 使用表名
-    format: cyntex               # 默认 cyntex TapEvent 信封
+    topic: order-events          # omitted = uses table name
+    format: cyntex               # default: cyntex TapEvent envelope
     options:
       start_from: latest
 
   - source: /returns_.*/
     topic: return-events
     format: "{'id': record.id, 'amount': record.amount, 'ts': record.updated_at}"
-    # format 为 CEL 投影 = 自定义事件结构
+    # format as a CEL projection = custom event structure
 ```
 
-## GA 阶段：apiserver + DSL serve 资源
+## GA Phase: apiserver + DSL serve Resource
 
-GA 阶段，apiserver（`role=api`）落地后，DSL 将支持 `kind: serve` 资源，直接将同步数据发布为 REST API：
+In the GA phase, after the apiserver (`role=api`) lands, the DSL will support `kind: serve` resources to publish synced data directly as a REST API:
 
 ```yaml
-# GA 阶段预览（语法未最终确定）
+# GA phase preview (syntax not yet finalized)
 apiVersion: cyntex/v1
 kind: serve
 id: user-api
-source: user_profiles    # 引用已同步的集合
+source: user_profiles    # references an already-synced collection
 path: /api/v1/users
 auth: jwt
 ```
 
-**apiserver 是 OSS 开放**（非闭源），GA 里程碑发布。
+**The apiserver is OSS open** (not closed-source), released in the GA milestone.
 
-## DSL 预留
+## DSL Reserved Extension Points
 
-当前 DSL 已为数据发布预留扩展点，apiserver 落地时不需要返工现有 pipeline。
+The current DSL already reserves extension points for data publishing. When the apiserver lands, no rework of existing pipelines will be needed.

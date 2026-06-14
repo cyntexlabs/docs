@@ -1,15 +1,15 @@
 ---
 title: transforms
-description: pipeline transforms 节点类型完整参考
+description: Complete reference for pipeline transform node types
 sidebar:
   order: 4
 ---
 
-`transforms` 是 pipeline 中的处理节点列表，按声明顺序执行。每个节点有一个 `name` 和若干处理字段。
+`transforms` is the list of processing nodes in a pipeline, executed in declaration order. Each node has a `name` and one or more processing fields.
 
-## 节点类型
+## Node Types
 
-### filter — 行过滤
+### filter — Row Filtering
 
 ```yaml
 transforms:
@@ -17,11 +17,11 @@ transforms:
     filter: "record.status == 'active' && record.deleted_at == null"
 ```
 
-- 使用 **CEL 表达式**，不满足条件的行丢弃
-- validate 时编译 + 类型检查（不求值）
-- `record` 为当前行对象
+- Uses a **CEL expression**; rows not satisfying the condition are discarded
+- Compiled + type-checked at validate time (not evaluated)
+- `record` is the current row object
 
-### js — JavaScript 变换
+### js — JavaScript Transform
 
 ```yaml
 transforms:
@@ -29,14 +29,14 @@ transforms:
     js: |
       record.tier = record.spend > 1000 ? 'premium' : 'standard';
       record.processed_at = new Date().toISOString();
-      return record;   // null = 丢弃该行
+      return record;   // null = discard this row
 ```
 
-- GraalVM JS 运行时（与 Java 同进程，无子进程开销）
-- `return null` = 丢弃该行
-- 返回数组 = 一行变多行（fan-out）
+- GraalVM JS runtime (same process as Java; no subprocess overhead)
+- `return null` = discard this row
+- Returning an array = one row becomes multiple rows (fan-out)
 
-### rename — 字段重命名
+### rename — Field Renaming
 
 ```yaml
 transforms:
@@ -47,7 +47,7 @@ transforms:
       full_name: name
 ```
 
-### typeFilter — 按数据类型过滤
+### typeFilter — Filter by Data Type
 
 ```yaml
 transforms:
@@ -55,19 +55,19 @@ transforms:
     type_filter: insert    # insert | update | delete
 ```
 
-仅保留指定操作类型的 CDC 事件。
+Retains only CDC events of the specified operation type.
 
-### unwind — 数组展平
+### unwind — Array Flattening
 
 ```yaml
 transforms:
   - name: flatten-tags
-    unwind: tags           # 数组字段名
+    unwind: tags           # array field name
 ```
 
-将数组字段展平：一条记录 → N 条记录（N = 数组长度）。
+Flattens an array field: one record → N records (N = array length).
 
-### nest — 主从合并（Beta）
+### nest — Master-Detail Merge (Beta)
 
 ```yaml
 transforms:
@@ -76,15 +76,15 @@ transforms:
       into: users
       from: orders
       by: user_id
-      as: orders           # 嵌入字段名
+      as: orders           # embedded field name
       mode: array          # array | object
 ```
 
 :::caution
-`nest` 在 **Beta 阶段**可用，POC/Alpha 不含。
+`nest` is available in the **Beta phase**; not included in POC/Alpha.
 :::
 
-## 节点组合示例
+## Node Combination Example
 
 ```yaml
 transforms:
@@ -102,4 +102,4 @@ transforms:
       return record;
 ```
 
-节点按顺序执行，上一个节点的输出是下一个节点的输入。
+Nodes execute in order; the output of each node is the input to the next.

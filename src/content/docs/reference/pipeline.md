@@ -1,70 +1,70 @@
 ---
 title: pipeline
-description: kind:pipeline 完整字段参考
+description: Complete field reference for kind:pipeline
 sidebar:
   order: 3
 ---
 
-`pipeline` 定义一条数据管道：引用 source，可选变换，输出到 sync 或 push。
+`pipeline` defines a data pipeline: references a source, applies optional transforms, and outputs to sync or push.
 
 ```yaml
 apiVersion: cyntex/v1
 kind: pipeline
 id: <string>
 
-source: <source-id>       # 引用 kind:source 的 id
+source: <source-id>       # references the id of a kind:source
 
-tables:                   # 可选，进一步过滤 source 的表集合
+tables:                   # optional; further filters the source's table set
   - name: <string> | /<regex>/
 
-transforms:               # 可选，按顺序执行
+transforms:               # optional; executed in order
   - name: <string>
-    filter: <CEL>         # 过滤，不满足条件的行丢弃
-    js: <脚本>            # GraalVM JS 逐行处理
-    rename:               # 字段重命名
+    filter: <CEL>         # filter; rows not satisfying the condition are discarded
+    js: <script>          # GraalVM JS row-by-row processing
+    rename:               # field renaming
       <old>: <new>
-    # ... 更多节点类型见 transforms 参考
+    # ... more node types: see transforms reference
 
-sync:                     # 写入目标存储（全量/CDC）
-  - source: <表名>
+sync:                     # write to target storage (full snapshot / CDC)
+  - source: <table name>
     target:
-      collection: <目标集合名>
+      collection: <target collection name>
     options:
       write_mode: upsert | append
       ddl: apply | ignore | fail
       auto_create_table: true
 
-push:                     # 发布为事件流（Kafka 等）
-  - source: <表名>
-    topic: <string>       # 省略 = 使用表名
-    format: cyntex        # 默认 cyntex 信封；自定义 = CEL 投影
+push:                     # publish as event stream (Kafka, etc.)
+  - source: <table name>
+    topic: <string>       # omitted = uses table name
+    format: cyntex        # default: cyntex envelope; custom = CEL projection
 
 settings:
-  error_policy: fail | skip | dlq   # 默认 fail
+  error_policy: fail | skip | dlq   # default: fail
   batch_size: 1000
   parallelism: 1
-  schedule: <cron>                  # 仅有界任务
+  schedule: <cron>                  # bounded tasks only
 
 metadata:
   labels:
     <key>: <value>
 ```
 
-## 生命周期
+## Lifecycle
 
 ```
-文件草稿 → apply → MongoDB（id upsert）→ start → running
+File draft → apply → MongoDB (id upsert) → start → running
                                           ↓
                                         stop / restart
 ```
 
-`run` = 隐含 apply + start（apply 失败则 run 不执行）。
+`run` = implicit apply + start (if apply fails, run does not execute).
 
 ## sync vs push
 
 | | `sync` | `push` |
 |---|---|---|
-| 语义 | 表模型同步（结构化写入） | 事件流输出（无结构承诺） |
-| 目标 | 数据库 collection | 消息队列 topic |
+| Semantics | Table model sync (structured write) | Event stream output (no structure guarantee) |
+| Target | Database collection | Message queue topic |
 | write_mode | upsert / append | — |
-| DDL | 可配置 | — |
+| DDL | Configurable | — |

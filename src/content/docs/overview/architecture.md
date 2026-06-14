@@ -1,111 +1,111 @@
 ---
 title: Architecture Overview
-description: Cyntex 的六环模块布局、进程形态、存储层次与 AI 控制分层
+description: Cyntex's six-ring module layout, process roles, storage tiers, and AI control layer hierarchy
 sidebar:
   order: 2
 ---
 
-## 六环模块布局
+## Six-Ring Module Layout
 
-Cyntex 主仓采用**端口-适配器**架构，模块按环（ring）组织，依赖方向严格单向（外环依赖内环，内环零框架依赖）：
+The Cyntex main repository uses a **ports-and-adapters** architecture. Modules are organized into rings, with strictly unidirectional dependencies (outer rings depend on inner rings; inner rings have zero framework dependencies):
 
 ```
-core          ← 领域模型、DSL 链路、生命周期契约（零 Spring / 零框架）
-  └─ spi      ← 扩展点接口（PDK / connector SPI）
-       └─ adapters   ← 具体实现（connector adapter、DuckDB adapter）
-            └─ runtime      ← 任务执行引擎（Hz Ringbuffer 消费、调度）
-                 └─ control  ← 控制面（CRUD、生命周期、状态读）
-                      └─ 表面环  ← CLI / REST API / MCP server / Web UI
+core          ← Domain model, DSL pipeline, lifecycle contracts (zero Spring / zero frameworks)
+  └─ spi      ← Extension point interfaces (PDK / connector SPI)
+       └─ adapters   ← Concrete implementations (connector adapter, DuckDB adapter)
+            └─ runtime      ← Task execution engine (Hz Ringbuffer consumer, scheduler)
+                 └─ control  ← Control plane (CRUD, lifecycle, status reads)
+                      └─ surface ring  ← CLI / REST API / MCP server / Web UI
 ```
 
-**强制规则（ArchUnit + enforcer 双闸）：**
-- `core` 环：禁止引入任何业务框架（Spring、Quarkus 等），仅允许白名单第三方（snakeyaml、cel-java、jackson-annotations）
-- 依赖只能从外环指向内环，禁止反向
-- `cli` 模块只依赖 `core` 环
+**Enforced rules (ArchUnit + enforcer dual gates):**
+- `core` ring: no business frameworks allowed (Spring, Quarkus, etc.); only whitelisted third-parties (snakeyaml, cel-java, jackson-annotations)
+- Dependencies flow outward to inward only; reverse direction is prohibited
+- `cli` module depends only on the `core` ring
 
-## 核心模块
+## Core Modules
 
-| 模块 | 职责 |
+| Module | Responsibility |
 |---|---|
-| `core/core-model` | 资源模型（source / pipeline / transform / view / serve）+ canonical form |
-| `core/core-dsl` | YAML 解析、validate、CEL 表达式编译 |
-| `core/core-schema` | JSON Schema 同源生成（全字段含 description，零手维护） |
-| `tools/catalog-gen` | 构建期全量连接器 spec 抽取 → bundled catalog |
-| `cli/` | 离线 REPL + validate / new / explain + native-image 发行 |
-| `arch-tests/` | ArchUnit 规则（reactor 末位，CI 必跑） |
+| `core/core-model` | Resource model (source / pipeline / transform / view / serve) + canonical form |
+| `core/core-dsl` | YAML parsing, validation, CEL expression compilation |
+| `core/core-schema` | JSON Schema generation from the same source (all fields include descriptions; zero manual maintenance) |
+| `tools/catalog-gen` | Build-time full connector spec extraction → bundled catalog |
+| `cli/` | Offline REPL + validate / new / explain + native-image distribution |
+| `arch-tests/` | ArchUnit rules (last reactor module; mandatory in CI) |
 
-## 进程形态
+## Process Roles
 
-单二进制 + 角色标志（`--role`）：
+Single binary with a role flag (`--role`):
 
 ```bash
-cyntex-server --role=all          # 单节点开发（TM + Engine + API 同进程）
-cyntex-server --role=tm,engine    # 控制面 + 数据面合并
-cyntex-server --role=api          # 纯 API 网关（GA 阶段）
+cyntex-server --role=all          # Single-node development (TM + Engine + API in one process)
+cyntex-server --role=tm,engine    # Control plane + data plane combined
+cyntex-server --role=api          # Pure API gateway (GA phase)
 ```
 
-> **ADR-0002（Proposed）** 正在讨论三方合并细节（TM + iEngine + apiserver）。当前 POC 阶段为单进程全角色。
+> **ADR-0002 (Proposed)** — Details of the three-way merge (TM + iEngine + apiserver) are under discussion. The current POC phase runs as a single process with all roles.
 
-## 存储三级
+## Three-Tier Storage
 
 ```
 ┌─────────────────────────────────┐
-│  Hazelcast 5.7.0（分布式内存）   │  ← 任务状态、Ringbuffer CDC 流
+│  Hazelcast 5.7.0 (distributed in-memory)  │  ← Task state, Ringbuffer CDC stream
 ├─────────────────────────────────┤
-│  MongoDB（replica set）          │  ← 唯一运行真相：连接/任务定义、偏移量、日志
+│  MongoDB (replica set)           │  ← Single source of truth: connection/task definitions, offsets, logs
 ├─────────────────────────────────┤
-│  Paimon（增量数据湖）[GA 末位]   │  ← 金融级历史审计（外接，不进首次落地）
+│  Paimon (incremental data lake) [end of GA]  │  ← Finance-grade historical audit (external; not in initial rollout)
 └─────────────────────────────────┘
 ```
 
-**DSL artifact 双层模型（ADR-0021）：**
-- **本地文件**（`.cyn.yml`）= authoring 草稿，系统无感知
-- **MongoDB**（`cyntex.resources`）= 正式库，唯一运行真相
+**DSL artifact dual-layer model (ADR-0021):**
+- **Local file** (`.cyn.yml`) = authoring draft; the system is unaware of it
+- **MongoDB** (`cyntex.resources`) = the official store; single source of truth
 
-`apply` 命令执行：validate → canonical 化 → 按 `id` upsert（hash 相同 = no-op）
+`apply` command executes: validate → canonicalize → upsert by `id` (same hash = no-op)
 
-## Hazelcast 集群
+## Hazelcast Cluster
 
-- 使用 **5.7.0 自 fork 版**（剥除 `hazelcast-sql` / HCL 扩展 → 纯 Apache 2.0）
-- **⚠️ CP Subsystem（FencedLock / 选主）自 5.5 起从 OSS 整体删除**，仅 EE 可用
-- 任务 HA 方案：**MongoDB 文档 CAS 租约 + 单调 fencing epoch + 心跳自杀**（替代 CP Subsystem）
-- 集群管理完全委托 Hz；任务调度 = Hz 信号原语 + 薄胶水 + MongoDB 为真相源
+- Uses **5.7.0 custom fork** (strips `hazelcast-sql` / HCL extensions → pure Apache 2.0)
+- **⚠️ CP Subsystem (FencedLock / leader election) removed from OSS entirely since 5.5** — EE only
+- Task HA strategy: **MongoDB document CAS lease + monotonic fencing epoch + heartbeat suicide** (replaces CP Subsystem)
+- Cluster management fully delegated to Hz; task scheduling = Hz signaling primitives + thin glue layer + MongoDB as source of truth
 
-## AI 控制分层（ADR-0019）
+## AI Control Layer (ADR-0019)
 
 ```
-用户 AI Agent（Claude / GPT / Gemini …）
+User AI Agent (Claude / GPT / Gemini …)
         │
-        ├── Skill（离线，导入 agent）── 理解 DSL，生成 YAML
+        ├── Skill (offline, imported into agent) ── Understands DSL, generates YAML
         │
-        ├── MCP server（进程内，HTTP transport）
-        │       └── 操作注册表（scope: read|write|admin）
-        │                └── control core（CRUD + 生命周期 + 只读运行时）
+        ├── MCP server (in-process, HTTP transport)
+        │       └── Operation registry (scope: read|write|admin)
+        │                └── control core (CRUD + lifecycle + read-only runtime)
         │
-        └── CLI（独立 native 二进制，离线 REPL）
+        └── CLI (standalone native binary, offline REPL)
 ```
 
-**一份 JSON Schema 同源**驱动所有前端：validate / explain / Tab 补全 / MCP 工具 schema / e2e 语料。
+**A single JSON Schema** drives all frontends: validate / explain / Tab completion / MCP tool schema / e2e corpus.
 
-**能力边界：**
-- ✅ 可以：连接/任务 CRUD、生命周期控制（start/stop/restart）、只读状态/监控
-- ❌ 不可以：auto-fix、多租户操作（v1 不含）、api 发布操作（随 apiserver GA 后点亮）
+**Capability boundary:**
+- ✅ Allowed: connection/task CRUD, lifecycle control (start/stop/restart), read-only status/monitoring
+- ❌ Not allowed: auto-fix, multi-tenant operations (not in v1), API publishing (enabled after apiserver GA)
 
-## 连接器生态
+## Connector Ecosystem
 
-- 继承 tapdata-connectors，60+ 官方连接器（MySQL、PostgreSQL、MongoDB、Kafka 等）
-- **PDK（Plugin Development Kit）**：连接器扩展接口，API level 相容机制（japicmp CI 闸）
-- 构建期全量 spec → bundled catalog（CLI 离线可用），运行时按需从 MongoDB GridFS 分发 jar
+- Inherits tapdata-connectors — 60+ official connectors (MySQL, PostgreSQL, MongoDB, Kafka, etc.)
+- **PDK (Plugin Development Kit)**: connector extension interface with API-level compatibility mechanism (japicmp CI gate)
+- Build-time full spec → bundled catalog (CLI works offline); runtime distributes jars on demand via MongoDB GridFS
 
-## 技术栈摘要
+## Technology Stack Summary
 
-| 项目 | 选型 |
+| Item | Choice |
 |---|---|
-| 语言 | Java 21 |
-| 发行形态 | GraalVM native-image（Oracle GraalVM 21.0.11，CLI）|
-| 构建 | Maven + enforcer + ArchUnit + flatten `${revision}` |
-| DSL 表达式 | CEL（dev.cel 0.10.1） |
-| YAML 解析 | snakeyaml 2.4 |
-| CLI 框架 | picocli 4.7.7 + JLine 3.26.3 |
-| 单测 | JUnit 5 + AssertJ + ArchUnit |
-| 坐标 | `io.cyntex` |
+| Language | Java 21 |
+| Distribution | GraalVM native-image (Oracle GraalVM 21.0.11, CLI) |
+| Build | Maven + enforcer + ArchUnit + flatten `${revision}` |
+| DSL expressions | CEL (dev.cel 0.10.1) |
+| YAML parsing | snakeyaml 2.4 |
+| CLI framework | picocli 4.7.7 + JLine 3.26.3 |
+| Unit testing | JUnit 5 + AssertJ + ArchUnit |
+| Group ID | `io.cyntex` |
