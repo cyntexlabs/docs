@@ -1,46 +1,47 @@
 # cyntex-docs
 
-Cyntex 文档站源码，托管于 [docs.cyntex.io](https://docs.cyntex.io)。
+Source code for the Cyntex documentation site, hosted at [docs.cyntex.io](https://docs.cyntex.io).
 
-基于 [Starlight](https://starlight.astro.build/)（Astro）构建。
+Built with [Starlight](https://starlight.astro.build/) (Astro).
 
-## 本地开发
+## Local Development
 
 ```bash
 npm install
 npm run dev       # http://localhost:4321
 ```
 
-## 构建
+## Build
 
 ```bash
-npm run build     # 产物在 dist/
-npm run preview   # 预览构建产物
+npm run build     # output in dist/
+npm run preview   # preview the build output
 ```
 
-## 内容结构
+## Content Structure
 
 ```
 src/content/docs/
-├── overview/         # 产品概述、架构、路线图
-├── concepts/         # 核心概念（DSL、连接器、AI 控制层、存储）
-├── reference/        # DSL 完整语法参考 + ADR 索引
-└── for-ai/           # LLM 接入指南（llms.txt、MCP、authoring）
+├── overview/         # Product overview, architecture, roadmap
+├── concepts/         # Core concepts (DSL, connectors, AI control layer, storage)
+├── connectors/       # Per-connector DSL configuration reference
+├── reference/        # Full DSL syntax reference + ADR index
+└── for-ai/           # LLM integration guide (llms.txt, MCP, authoring)
 
 public/
-├── llms.txt          # LLM 精简上下文（llmstxt.org 标准）
-└── llms-full.txt     # LLM 完整上下文
+├── llms.txt          # Condensed LLM context (llmstxt.org standard)
+└── llms-full.txt     # Full LLM context
 ```
 
-## 内容更新原则
+## Content Update Policy
 
-- `reference/dsl-grammar.md` 跟随 [ADR-0016](https://github.com/cyntex/cyntex/blob/main/docs/adr/0016-dsl-grammar.md) 更新
-- `overview/roadmap.md` 跟随 [ADR-0018](https://github.com/cyntex/cyntex/blob/main/docs/adr/0018-first-landing-scope-replan.md) 更新
-- `public/llms.txt` 每个里程碑完成后更新一次
-- **不手动维护**与 JSON Schema 重复的内容——schema 是唯一真值源
+- `reference/dsl-grammar.md` — updated with [ADR-0016](https://github.com/cyntex/cyntex/blob/main/docs/adr/0016-dsl-grammar.md)
+- `overview/roadmap.md` — updated with [ADR-0018](https://github.com/cyntex/cyntex/blob/main/docs/adr/0018-first-landing-scope-replan.md)
+- `public/llms.txt` — updated once per milestone
+- **Do not manually maintain** content that duplicates the JSON Schema — the schema is the single source of truth
 
-## 部署
+## Deployment
 
-推荐 Cloudflare Pages 或 Vercel，连接 GitHub 仓库自动部署：
-- 构建命令：`npm run build`
-- 输出目录：`dist`
+Recommended: Cloudflare Pages or Vercel, connected to the GitHub repo for automatic deployment:
+- Build command: `npm run build`
+- Output directory: `dist`
