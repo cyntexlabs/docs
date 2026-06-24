@@ -1,111 +1,171 @@
 ---
 title: Architecture Overview
-description: Cyntex's six-ring module layout, process roles, storage tiers, and AI control layer hierarchy
+description: Cyntex's four-layer runtime architecture — Engine, Store, Serve, and Manager
 sidebar:
   order: 2
 ---
 
-## Six-Ring Module Layout
+![Cyntex Runtime Architecture](../../../assets/architecture-diagram.svg)
 
-The Cyntex main repository uses a **ports-and-adapters** architecture. Modules are organized into rings, with strictly unidirectional dependencies (outer rings depend on inner rings; inner rings have zero framework dependencies):
+Cyntex is organized into four cooperating layers: **Engine** (data movement), **Store** (persistence), **Serve** (data access), and **Manager** (control plane). Each layer has a clear responsibility boundary and communicates through well-defined interfaces.
 
-```
-core          ← Domain model, DSL pipeline, lifecycle contracts (zero Spring / zero frameworks)
-  └─ spi      ← Extension point interfaces (PDK / connector SPI)
-       └─ adapters   ← Concrete implementations (connector adapter, DuckDB adapter)
-            └─ runtime      ← Task execution engine (Hz Ringbuffer consumer, scheduler)
-                 └─ control  ← Control plane (CRUD, lifecycle, status reads)
-                      └─ surface ring  ← CLI / REST API / MCP server / Web UI
-```
+---
 
-**Enforced rules (ArchUnit + enforcer dual gates):**
-- `core` ring: no business frameworks allowed (Spring, Quarkus, etc.); only whitelisted third-parties (snakeyaml, cel-java, jackson-annotations)
-- Dependencies flow outward to inward only; reverse direction is prohibited
-- `cli` module depends only on the `core` ring
+## Cyntex Manager
 
-## Core Modules
+The top-most layer provides the control plane and observability surface. It is accessible via the **Web Console** and **CLI**, and exposes all operational capabilities through the **MCP server** so AI agents can operate Cyntex programmatically.
 
-| Module | Responsibility |
+| Capability | Description |
 |---|---|
-| `core/core-model` | Resource model (source / pipeline / transform / view / serve) + canonical form |
-| `core/core-dsl` | YAML parsing, validation, CEL expression compilation |
-| `core/core-schema` | JSON Schema generation from the same source (all fields include descriptions; zero manual maintenance) |
-| `tools/catalog-gen` | Build-time full connector spec extraction → bundled catalog |
-| `cli/` | Offline REPL + validate / new / explain + native-image distribution |
-| `arch-tests/` | ArchUnit rules (last reactor module; mandatory in CI) |
+| **MCP** | In-process MCP server; AI agents (Claude, GPT-4o, …) connect and issue CRUD + lifecycle commands |
+| **Observability** | Task status, throughput, lag, error rates — real-time and historical |
+| **Lineage & Data Trace** | Field-level lineage tracking from source to materialized view or API output |
+| **Validation** | Three-layer DSL validation: structural → reference closure → connector capability matrix |
+| **Security** | Auth, token management, RBAC (enterprise plugin, post-GA) |
 
-## Process Roles
+The Manager issues control signals to the Engine via a downward interface — it does **not** sit in the data path.
 
-Single binary with a role flag (`--role`):
+---
 
-```bash
-cyntex-server --role=all          # Single-node development (TM + Engine + API in one process)
-cyntex-server --role=tm,engine    # Control plane + data plane combined
-cyntex-server --role=api          # Pure API gateway (GA phase)
+## Cyntex Engine
+
+The Engine is the data-movement core. All data captured from source systems flows through this layer before reaching storage or consumers.
+
+### CDC Capture
+
+The entry point for all source data. Cyntex reads the **database transaction log** (binlog for MySQL, WAL for PostgreSQL, oplog for MongoDB) directly — no polling, no triggers. This gives sub-second latency and zero impact on the source database's query workload.
+
+Supported capture modes:
+
+| Mode | Mechanism | When to use |
+|---|---|---|
+| `cdc` | Continuous log tailing | Real-time sync; any transactional database |
+| `batch` | Full snapshot scan | One-time initial load; databases without log access |
+| `api` | Polling / webhook | SaaS sources (Salesforce, HubSpot, etc.) |
+| `file` | File scanning | S3, SFTP, local directory |
+
+### Change Log Buffer
+
+The central in-memory buffer for all captured change events. Built on **Hazelcast Ringbuffer**, it:
+
+- Decouples capture throughput from downstream processing speed
+- Fans out to multiple consumers (Transform, Materialize) without re-reading the source
+- Persists the change log to **Change Log Store** for durability and replay
+- Syncs a replica to **Source Replica Store** for join lookups
+
+The buffer is the single coordination point that allows Transform and Materialize to operate independently at their own pace.
+
+### Lookup Cache
+
+An in-memory cache populated from the **Source Replica Store**. When a pipeline needs to join or enrich a change event with data from another table (e.g., enrich an `orders` event with the matching `customer` record), the engine performs a **join lookup** against this cache rather than querying the source database.
+
+This design is critical for CDC performance: source databases are never queried during steady-state processing.
+
+### Transform
+
+A stateless processing stage that applies row-level operations to the change stream:
+
+- **filter** — CEL predicate; rows not matching are discarded
+- **rename** — field renaming map
+- **js** — GraalVM JavaScript for arbitrary row transformation
+- **typeFilter** — retain only INSERT / UPDATE / DELETE events
+- **unwind** — array field flattening (one row → N rows)
+
+Transform nodes execute in declaration order, as defined in the pipeline's `transforms:` block.
+
+### Materialize
+
+The stateful aggregation stage. Where Transform works row-by-row, Materialize maintains an updated view of the data across multiple source tables:
+
+- Applies upsert / delete semantics to the **Materialized View Store**
+- Handles DDL changes (schema drift) according to the pipeline's `ddl:` policy
+- Supports the **MERGE family** operators (Beta phase) for master-detail embedding
+
+---
+
+## Cyntex Store
+
+The persistence layer sits below the Engine and provides three purpose-built stores plus a unified backup surface.
+
+### Change Log Store
+
+Durable log of all captured change events in the order they were received. Used for:
+- Offset persistence — pipelines can resume from any point without re-scanning the source
+- Replay — re-process a historical time window without touching the source database
+- Audit — compliance record of every change
+
+### Source Replica Store
+
+A queryable replica of the source tables, kept up-to-date by the Change Log Buffer. Serves the Lookup Cache for join operations. Allows inspecting source data at any point in time without accessing the source database.
+
+### Materialized View Store
+
+The output of the Materialize stage — pre-joined, pre-filtered, always-current views of your data. This is what downstream applications and AI agents typically read.
+
+### Queryable Backup Store
+
+A unified, queryable backup spanning all three stores. Backed by **MongoDB** (single source of truth for offsets, task definitions, and metadata). In the GA phase, **Paimon** integration adds an external incremental data lake layer for finance-grade historical audit and analytics.
+
+---
+
+## Cyntex Serve
+
+The data-access layer exposes processed data to consumers. There are two server roles:
+
+### Push Context Server
+
+Actively pushes change events to event-driven consumers:
+
+| Target | Protocol |
+|---|---|
+| **Kafka** | Standard Kafka producer; topic name and message format configurable via DSL |
+| **LakeHouse** | Writes to external data lakes (e.g., Apache Iceberg, Delta Lake) |
+| **Webhook** | HTTP push to any endpoint; payload format as CEL projection |
+
+Push is configured via the `push:` block in a pipeline definition. Output format defaults to the Cyntex TapEvent envelope; custom formats use a CEL expression.
+
+### Query Context Server
+
+Serves data to pull-based consumers:
+
+| Access method | Consumer |
+|---|---|
+| **MCP** | AI agents (Claude, GPT-4o, Gemini …) — read schema, query materialized views, inspect pipeline status |
+| **REST** | Applications, dashboards, microservices |
+| **GraphQL** | Flexible query interface for frontend clients (GA phase) |
+
+The Query Context Server is backed directly by the **Materialized View Store** — queries never touch the source database.
+
+---
+
+## Code-Level Module Layout
+
+At the source code level, Cyntex uses a **ports-and-adapters** architecture with strictly unidirectional dependencies across six rings:
+
+```
+core          ← Domain model, DSL pipeline, lifecycle contracts (zero frameworks)
+  └─ spi      ← Extension point interfaces (PDK / connector SPI)
+       └─ adapters   ← Connector implementations, DuckDB adapter
+            └─ runtime      ← Task execution engine (Hz Ringbuffer, scheduler)
+                 └─ control  ← CRUD, lifecycle management, status reads
+                      └─ surface   ← CLI / REST API / MCP server / Web UI
 ```
 
-> **ADR-0002 (Proposed)** — Details of the three-way merge (TM + iEngine + apiserver) are under discussion. The current POC phase runs as a single process with all roles.
+Enforced by **ArchUnit + Maven enforcer** on every CI run — no accidental coupling allowed.
 
-## Three-Tier Storage
+---
 
-```
-┌─────────────────────────────────┐
-│  Hazelcast 5.7.0 (distributed in-memory)  │  ← Task state, Ringbuffer CDC stream
-├─────────────────────────────────┤
-│  MongoDB (replica set)           │  ← Single source of truth: connection/task definitions, offsets, logs
-├─────────────────────────────────┤
-│  Paimon (incremental data lake) [end of GA]  │  ← Finance-grade historical audit (external; not in initial rollout)
-└─────────────────────────────────┘
-```
+## Technology Stack
 
-**DSL artifact dual-layer model (ADR-0021):**
-- **Local file** (`.cyn.yml`) = authoring draft; the system is unaware of it
-- **MongoDB** (`cyntex.resources`) = the official store; single source of truth
-
-`apply` command executes: validate → canonicalize → upsert by `id` (same hash = no-op)
-
-## Hazelcast Cluster
-
-- Uses **5.7.0 custom fork** (strips `hazelcast-sql` / HCL extensions → pure Apache 2.0)
-- **⚠️ CP Subsystem (FencedLock / leader election) removed from OSS entirely since 5.5** — EE only
-- Task HA strategy: **MongoDB document CAS lease + monotonic fencing epoch + heartbeat suicide** (replaces CP Subsystem)
-- Cluster management fully delegated to Hz; task scheduling = Hz signaling primitives + thin glue layer + MongoDB as source of truth
-
-## AI Control Layer (ADR-0019)
-
-```
-User AI Agent (Claude / GPT / Gemini …)
-        │
-        ├── Skill (offline, imported into agent) ── Understands DSL, generates YAML
-        │
-        ├── MCP server (in-process, HTTP transport)
-        │       └── Operation registry (scope: read|write|admin)
-        │                └── control core (CRUD + lifecycle + read-only runtime)
-        │
-        └── CLI (standalone native binary, offline REPL)
-```
-
-**A single JSON Schema** drives all frontends: validate / explain / Tab completion / MCP tool schema / e2e corpus.
-
-**Capability boundary:**
-- ✅ Allowed: connection/task CRUD, lifecycle control (start/stop/restart), read-only status/monitoring
-- ❌ Not allowed: auto-fix, multi-tenant operations (not in v1), API publishing (enabled after apiserver GA)
-
-## Connector Ecosystem
-
-- Inherits tapdata-connectors — 60+ official connectors (MySQL, PostgreSQL, MongoDB, Kafka, etc.)
-- **PDK (Plugin Development Kit)**: connector extension interface with API-level compatibility mechanism (japicmp CI gate)
-- Build-time full spec → bundled catalog (CLI works offline); runtime distributes jars on demand via MongoDB GridFS
-
-## Technology Stack Summary
-
-| Item | Choice |
+| Component | Technology |
 |---|---|
 | Language | Java 21 |
-| Distribution | GraalVM native-image (Oracle GraalVM 21.0.11, CLI) |
-| Build | Maven + enforcer + ArchUnit + flatten `${revision}` |
+| Native binary | GraalVM native-image (Oracle GraalVM 21.0.11) |
+| Build | Maven mono-repo + enforcer + `${revision}` flatten |
+| In-memory buffer | Hazelcast 5.7.0 (custom fork, pure Apache 2.0) |
+| Source of truth DB | MongoDB (replica set) |
 | DSL expressions | CEL (dev.cel 0.10.1) |
-| YAML parsing | snakeyaml 2.4 |
+| JavaScript runtime | GraalVM JS (in-process, no subprocess) |
 | CLI framework | picocli 4.7.7 + JLine 3.26.3 |
-| Unit testing | JUnit 5 + AssertJ + ArchUnit |
-| Group ID | `io.cyntex` |
+| External data lake | Apache Paimon (GA phase) |
+| Testing | JUnit 5 + AssertJ + ArchUnit |
