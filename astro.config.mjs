@@ -25,6 +25,8 @@ export default defineConfig({
           items: [
             { label: 'What is Cyntex?', slug: 'overview/what-is-cyntex' },
             { label: 'Architecture', slug: 'overview/architecture' },
+            { label: 'Use Cases', slug: 'overview/use-cases' },
+            { label: 'Cyntex vs. The Streaming Stack', slug: 'overview/vs-streaming-stack' },
             { label: 'Roadmap', slug: 'overview/roadmap' },
           ],
         },
