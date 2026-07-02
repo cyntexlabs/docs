@@ -1,0 +1,70 @@
+---
+title: Cyntex Docs
+description: Product guides, DSL reference, connector setup, and AI integration for Cyntex.
+---
+
+import { LinkCard, CardGrid } from '@/components/mdx';
+
+# Cyntex Docs
+
+Cyntex is an Operational Data Hub for real-time CDC, YAML-defined data flows, connector-driven ingestion,
+and AI-native control surfaces. Use this documentation to understand the product model, write valid
+`.cyn.yml` resources, configure connectors, and connect AI agents through MCP.
+
+## Start Here
+
+<CardGrid>
+  <LinkCard
+    title="What is Cyntex?"
+    description="Product positioning, data freshness gap, and the Operational Data Hub model."
+    href="/docs/overview/what-is-cyntex"
+  />
+  <LinkCard
+    title="Architecture"
+    description="Engine, Store, Serve, and Manager layers with the runtime architecture diagram."
+    href="/docs/overview/architecture"
+  />
+  <LinkCard
+    title="DSL Grammar"
+    description="Complete .cyn.yml syntax, resource kinds, validation layers, and examples."
+    href="/docs/reference/dsl-grammar"
+  />
+  <LinkCard
+    title="Connector Reference"
+    description="Connector IDs, supported modes, prerequisites, and configuration guidance."
+    href="/docs/connectors"
+  />
+</CardGrid>
+
+## AI Integration
+
+<CardGrid>
+  <LinkCard
+    title="LLM Context Files"
+    description="Use llms.txt and llms-full.txt to give assistants concise Cyntex context."
+    href="/docs/for-ai/llms"
+  />
+  <LinkCard
+    title="MCP Integration"
+    description="Let AI agents operate Cyntex through the MCP control surface."
+    href="/docs/for-ai/mcp"
+  />
+</CardGrid>
+
+## Product Stage
+
+The current documentation reflects Cyntex POC and Alpha planning. Start with the Roadmap when you need
+release scope, and use the DSL Reference when you need implementation-level authoring details.
+
+<CardGrid>
+  <LinkCard
+    title="Roadmap"
+    description="POC, Alpha, Beta, and GA milestones with phase-specific deliverables."
+    href="/docs/overview/roadmap"
+  />
+  <LinkCard
+    title="Authoring with AI"
+    description="Recommended workflow for using an AI assistant to draft and validate Cyntex YAML."
+    href="/docs/for-ai/authoring"
+  />
+</CardGrid>

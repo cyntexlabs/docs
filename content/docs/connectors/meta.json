@@ -1,0 +1,13 @@
+{
+  "title": "Connector Reference",
+  "pages": [
+    "index",
+    "mysql",
+    "postgresql",
+    "oracle",
+    "sqlserver",
+    "mongodb",
+    "mongodb-atlas",
+    "kafka"
+  ]
+}
