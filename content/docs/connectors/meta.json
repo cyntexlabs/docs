@@ -2,6 +2,7 @@
   "title": "Connector Reference",
   "pages": [
     "index",
+    "catalog",
     "mysql",
     "postgresql",
     "oracle",
