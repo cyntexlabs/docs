@@ -1,8 +1,6 @@
 ---
 title: AI Control Layer
 description: Current AI-assisted authoring and the planned TapState runtime control surface
-sidebar:
-  order: 3
 ---
 
 import { Aside } from '@/components/mdx';
@@ -37,8 +35,8 @@ An assistant can draft and repair resources, but offline validation does not con
 
 The target architecture adds a server-side operation registry and thin CLI, API, and MCP frontends. Operations are intended to carry explicit read, write, or administrative scopes and to share validation and audit behavior.
 
-<Aside type="caution" title="Not in the current open-source release">
-  Live source discovery, apply, run, start, stop, status, logs, lag metrics, and MCP lifecycle tools require a TapState server. Current server-dependent CLI verbs exit with code `3`.
+<Aside type="note" title="Arrives with the runtime">
+  Live source discovery, apply, run, start, stop, status, logs, lag metrics, and MCP lifecycle tools require a TapState server. See [Release Status](/docs/overview/release-status) for the current boundary.
 </Aside>
 
 ## Human-in-the-loop boundary

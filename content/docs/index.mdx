@@ -1,71 +1,71 @@
 ---
 title: Documentation
-description: Author and validate TapState data-integration resources, then explore the product direction.
+description: TapState turns database change into live operational state — capture, transform, and serve in one data path.
 ---
 
 import { LinkCard, CardGrid } from '@/components/mdx';
 
 # Documentation
 
-TapState is being built to capture operational changes, transform them in flight, and serve continuously fresh state through one deployable data path. The current open-source release delivers the offline authoring layer: create, inspect, and validate declarative `.cyn.yml` resources without a server or database connection.
+**Kafka moves events. Warehouses analyze history. TapState turns database truth into live operational state.**
+
+TapState captures changes from operational databases, transforms them in flight, and serves continuously fresh state through one deployable data path — replacing the CDC tool + broker + stream processor + cache assembly project. The current open-source release ships the offline authoring layer: create, inspect, and validate declarative `.cyn.yml` resources with deterministic guardrails ([release status](/docs/overview/release-status)).
 
 ## Get started
 
 <CardGrid>
   <LinkCard
-    title="Quickstart"
-    description="Build or use the CLI, create a source and pipeline, then validate the workspace."
-    href="/docs/overview/quickstart"
-  />
-  <LinkCard
     title="What is TapState?"
-    description="Understand the product direction, current release, and code-backed value."
+    description="The problem, the three-stage data path, who it's for, and what ships today."
     href="/docs/overview/what-is-tapstate"
   />
   <LinkCard
+    title="Quickstart"
+    description="Create a source and pipeline, then validate the workspace — in about five minutes."
+    href="/docs/overview/quickstart"
+  />
+  <LinkCard
     title="Connectors"
-    description="Prepare systems and use catalog-backed connector IDs, modes, and fields."
+    description="Prepare source systems and use catalog-backed connector IDs, modes, and fields."
     href="/docs/connectors"
   />
   <LinkCard
     title="DSL Grammar"
-    description="Look up the current v1 resource model and validation rules."
+    description="The v1 resource model and validation rules."
     href="/docs/reference/dsl-grammar"
   />
 </CardGrid>
 
 ## Why TapState
 
-The current CLI already establishes several foundations for the broader product:
-
-- **One declarative contract:** sources, pipelines, transforms, views, and serving intent are ordinary, reviewable files.
-- **Guardrails before deployment:** structure, references, connector fields, and capability combinations can be checked offline.
-- **Built for people and agents:** deterministic scaffolding, JSON/YAML output, coded diagnostics, JSON Schema, and an embedded connector catalog reduce guesswork.
-- **A path beyond the assembly stack:** the target architecture brings capture, transformation, and queryable operational state into one product boundary.
+- **One declarative contract:** sources, pipelines, transforms, and serving intent are ordinary, reviewable files that work with Git, editors, and automation.
+- **Guardrails before deployment:** structure, references, connector fields, and capability combinations are checked offline, with stable diagnostic codes and suggested fixes.
+- **Built for people and agents:** deterministic scaffolding, JSON/YAML output, JSON Schema, and an embedded connector catalog remove guesswork for humans and AI assistants alike.
+- **One product boundary instead of an assembly stack:** the target architecture unifies capture, transformation, and queryable operational state.
 
 <CardGrid>
   <LinkCard
     title="Architecture"
-    description="See the target Capture–Transform–Serve architecture and what is implemented today."
+    description="The four-layer Capture–Transform–Serve runtime: Engine, Store, Serve, and Manager."
     href="/docs/overview/architecture"
   />
   <LinkCard
     title="Use Cases"
-    description="Evaluate operational-data patterns without confusing product direction with current runtime support."
+    description="Operational-data patterns TapState is designed for, with what's available today."
     href="/docs/overview/use-cases"
   />
   <LinkCard
     title="Compare Approaches"
-    description="Decide when a unified data path or a composable Kafka/Flink stack is the better fit."
+    description="When a unified data path or a composable Kafka/Flink stack is the better fit."
     href="/docs/overview/vs-streaming-stack"
   />
   <LinkCard
-    title="Roadmap"
-    description="Separate the current offline authoring release from later runtime milestones."
-    href="/docs/overview/roadmap"
+    title="Release Status & Roadmap"
+    description="Exactly what is shipped today, and the path to the full runtime."
+    href="/docs/overview/release-status"
   />
 </CardGrid>
 
 ## AI-readable documentation
 
-Use [`llms.txt`](/llms.txt) for discovery and page-level Markdown for canonical content. AI agents can author and repair resources today through the CLI and schema; live lifecycle control remains a later runtime capability.
+Use [`llms.txt`](/llms.txt) for discovery and page-level Markdown for canonical content. AI agents can author and repair resources today through the CLI and schema; live lifecycle control arrives with the runtime.

@@ -1,0 +1,103 @@
+---
+title: What is TapState?
+description: TapState turns database change into live operational state — one data path for capture, transform, and serve
+---
+
+import { Aside, LinkCard, CardGrid } from '@/components/mdx';
+
+> **Kafka moves events. Warehouses analyze history. TapState turns database truth into live operational state.**
+
+TapState is an open-source data platform built around one idea: **Capture. Transform. Serve. One deployable.** It taps your production databases with log-based change data capture, reshapes change streams in flight, and serves continuously fresh, queryable state to applications, APIs, and AI agents — one product boundary instead of a four-system assembly project.
+
+<Aside type="note" title="Where the product is today">
+  The current open-source release ships the offline authoring layer: a CLI that creates, inspects, and validates the declarative resources the runtime executes. See [Release Status](/docs/overview/release-status) for exactly what is shipped versus in progress.
+</Aside>
+
+## The problem: the assembly project
+
+Keeping operational data fresh today usually means assembling and operating four separate systems:
+
+```text
+The assembly project:
+[Source DBs] → [CDC tool] → [Kafka] → [Flink] → [Redis/Mongo] → [Apps & Agents]
+                4 systems · 4 failure surfaces · a team gluing them together
+
+The TapState way:
+[Source DBs] ──────────────→ [ TapState ] ──────────────→ [Apps & Agents]
+                      capture · transform · serve
+```
+
+Each layer in the assembled stack is good software. The cost is the glue: offsets, retries, schema drift, serialization, upgrades, and dashboards duplicated across every hop — an integration project that exists only to move your own data.
+
+Composable stacks remain the right choice for some workloads; [TapState and the Streaming Stack](/docs/overview/vs-streaming-stack) gives an honest decision guide. TapState targets the common case: teams whose dominant problem is keeping operational state current, not building bespoke stream topologies.
+
+## One data path, three depths
+
+TapState is not three features — it is one road with three depths of adoption. Most teams enter at Capture; each stage makes the next one a configuration change instead of a new system.
+
+### Capture — CDC you can bet the database on
+
+Log-based change capture from transaction logs (MySQL binlog, PostgreSQL WAL, MongoDB oplog, and more), plus snapshot, stream, API, and file modes — all behind connector-defined contracts. Initial load and continuous sync are the same pipeline, not two tools.
+
+### Transform — reshape data in flight, not in batch
+
+Filter, rename, enrich, join, and route change streams inside the same engine, so downstream consumers receive answer-shaped data instead of raw tables plus a to-do list. No separate processing cluster to size, deploy, and babysit.
+
+### Serve — fresh state, queryable now
+
+Pipelines terminate in an endpoint, not another queue: materialized, always-current views of your business — accounts, orders, inventory, entitlements — served to applications and agents, and pushed onward to Kafka, lakes, or webhooks when other teams need the stream.
+
+## Who it's for
+
+TapState is built for operational data that loses value when it goes stale: fintech operations and fraud/risk, e-commerce inventory, logistics tracking, operational-cache replacement, cross-system customer/account views, and internal copilots or AI agents that need the latest system-of-record state. [Use Cases](/docs/overview/use-cases) walks through each pattern.
+
+## Why fresh state matters more now
+
+For thirty years the consumer of enterprise data was a human reading a dashboard, and humans tolerate staleness. AI moves consumption to software that *acts* — agents approving refunds, adjusting inventory, answering customers. When the consumer acts instead of reads, stale data doesn't mean an outdated chart; it means wrong actions. TapState is not "AI-native" — it is the infrastructure that AI adoption stresses. Vector search gives agents semantic memory; TapState's job is committed business truth.
+
+## Provenance
+
+TapState is built on the engine behind [Tapdata](https://tapdata.io), a log-based CDC and live-data platform running production workloads for enterprises across APAC. This is not a demo built for the AI era — it is production-hardened infrastructure being brought to open source. You will notice the heritage in the code: resources use the `cyntex/v1` schema and the CLI binary is `cyntex`, the engine's original project codename.
+
+## What ships today
+
+The current release delivers the authoring layer of that data path, and it stands on its own:
+
+- **A reviewable data contract.** Sources and pipelines are ordinary `.cyn.yml` files that work with Git review, environment-variable substitution, and automated generation:
+
+  ```text
+  tapstate-work/
+  ├── source/
+  └── pipeline/
+  ```
+
+- **Deterministic offline guardrails.** A complete `new → edit → ls / desc / explain → validate` loop checks resource structure, reference closure, connector configuration rules, and mode combinations — with stable diagnostic codes, locations, suggested fixes, and JSON/YAML output.
+
+- **Connector-aware authoring.** The CLI embeds the connector catalog, scaffolds exact config keys, and rejects unsupported mode/config combinations.
+
+- **Built for people and agents.** JSON Schema for editors, non-interactive scaffolding for automation, structured output for CI, and [`llms.txt`](/llms.txt) for AI discovery. No LLM is bundled — you bring your own assistant; validation stays deterministic.
+
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="Quickstart"
+    description="Create a source and pipeline, then validate the workspace — in about five minutes."
+    href="/docs/overview/quickstart"
+  />
+  <LinkCard
+    title="Architecture"
+    description="The target Capture–Transform–Serve runtime and how its four layers fit together."
+    href="/docs/overview/architecture"
+  />
+  <LinkCard
+    title="Release Status"
+    description="Exactly what is shipped today versus in progress."
+    href="/docs/overview/release-status"
+  />
+  <LinkCard
+    title="Roadmap"
+    description="The POC → Alpha → Beta → GA path to the full runtime."
+    href="/docs/overview/roadmap"
+  />
+</CardGrid>

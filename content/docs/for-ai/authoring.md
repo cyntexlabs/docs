@@ -50,7 +50,7 @@ Use `--dry-run` when the assistant should preview canonical YAML without writing
 ## Validate and repair
 
 ```bash
-cyntex validate --workdir cyn-work --output json
+cyntex validate --workdir tapstate-work --output json
 ```
 
 On failure, give the assistant the diagnostic `code`, location, message, and solution. Ask it to change only the reported resource, then validate again. Exit code `0` proves the offline resource contract, not database connectivity or runtime execution.

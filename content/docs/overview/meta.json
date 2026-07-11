@@ -1,11 +1,12 @@
 {
-  "title": "Overview",
+  "title": "Understand TapState",
   "pages": [
     "what-is-tapstate",
     "quickstart",
-    "architecture",
     "use-cases",
+    "architecture",
     "vs-streaming-stack",
+    "release-status",
     "roadmap"
   ]
 }

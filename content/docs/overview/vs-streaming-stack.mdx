@@ -1,37 +1,39 @@
 ---
 title: TapState and the Streaming Stack
 description: Decide between a unified operational-data path and a composable Kafka and Flink architecture
-sidebar:
-  order: 3
 ---
 
-Debezium, Kafka, Flink, and purpose-built serving stores form a proven, composable real-time stack. TapState is pursuing a different tradeoff: capture, transformation, and fresh operational state within one product boundary.
+import { Aside } from '@/components/mdx';
 
-This is currently a comparison of architectural direction. The open-source TapState repository ships the offline authoring layer, not the complete runtime described below.
+Debezium, Kafka, Flink, and purpose-built serving stores form a proven, composable real-time stack. TapState pursues a different tradeoff: capture, transformation, and fresh operational state within one product boundary.
+
+<Aside type="note" title="Release status">
+  This page compares architectural approaches. The current TapState release ships the authoring layer of that unified path — see [Release Status](/docs/overview/release-status).
+</Aside>
 
 ## Two valid approaches
 
-| Decision | Composable streaming stack | TapState direction |
+| Decision | Composable streaming stack | TapState |
 |---|---|---|
 | Product boundary | Separate capture, broker, processing, and serving systems | One governed Capture–Transform–Serve data path |
 | Flexibility | Choose and replace every layer independently | Use an integrated model and connector contract |
 | Operations | Tune, upgrade, observe, and recover each layer | Reduce handoffs and duplicated configuration |
 | Processing depth | Mature windowing, event-time, and arbitrary stateful computation | Focus on common integration, reshaping, joins, and materialized state |
 | Authoring | Connector configs, topics, jobs, and sink definitions | Declarative `.cyn.yml` resources |
-| Current implementation | Mature ecosystem with production runtimes | Offline scaffolding, schema, catalog, inspection, and validation |
+| Maturity | Mature ecosystem with production runtimes | Shipped authoring layer; runtime in phased delivery |
 
-## Code-backed TapState foundations
+## What TapState already demonstrates
 
-The current repository already demonstrates:
+The current release backs the unified-authoring half of the argument with working code:
 
-- one resource model for sources, pipelines, transforms, views, and serving intent;
+- one resource model for sources, pipelines, transforms, and serving intent;
 - deterministic scaffolding and canonical YAML;
 - an embedded connector catalog and capability checks;
 - reference closure across workspace resources;
 - coded diagnostics and machine-readable results;
 - JSON Schema and field-level `explain` output.
 
-These foundations reduce authoring ambiguity. They do not yet prove runtime simplicity, throughput, source impact, recovery semantics, or total cost of ownership.
+These foundations remove authoring ambiguity today. Runtime simplicity, throughput, source impact, and recovery semantics are proven by the runtime as it lands.
 
 ## Choose a composable stack when
 
@@ -39,18 +41,18 @@ These foundations reduce authoring ambiguity. They do not yet prove runtime simp
 - Kafka is already the organizational backbone;
 - independent scaling and replacement of each layer is a requirement;
 - the team already operates the stack reliably;
-- current production maturity matters more than a unified future operating model.
+- current production maturity matters more than a unified operating model.
 
 ## Evaluate TapState when
 
 - the dominant problem is keeping operational state current across systems;
 - duplicated connector, schema, and pipeline configuration creates delivery friction;
 - a reviewable YAML contract and offline guardrails are valuable now;
-- the team wants to explore a unified Capture–Transform–Serve path as the runtime matures;
+- the team wants a unified Capture–Transform–Serve path as the runtime matures;
 - AI-assisted authoring is useful, but deterministic validation must remain the authority.
 
-## Use both when
+## Use both
 
-The approaches are not mutually exclusive. A future TapState runtime can provide a governed operational path and publish selected streams to Kafka, while Flink continues to handle advanced event processing and analytical features.
+The approaches are not mutually exclusive. TapState can provide a governed operational path and publish selected streams to Kafka, while Flink continues to handle advanced event processing and analytical workloads.
 
-Avoid fixed infrastructure counts, staffing savings, latency, or percentage-TCO claims until both architectures are measured under the same workload and availability requirements.
+TapState publishes cost, latency, and operational comparisons only when both architectures have been measured under the same workload and availability requirements — no hand-waved percentages.
