@@ -1,6 +1,5 @@
 {
-  "title": "For AI / LLMs",
-  "root": true,
+  "title": "AI & agents",
   "pages": [
     "llms",
     "mcp",

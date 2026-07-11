@@ -7,6 +7,7 @@ ai:
   kind: connector
   id: mysql
   maturity: ga
+  availability: available
   useAs: [source, target]
   modes: [snapshot, cdc]
   aliases: [mysql snapshot, mysql full load, mysql cdc, mysql binlog, mysql source, mysql target]
@@ -20,6 +21,7 @@ Connect MySQL to TapState for point-in-time snapshots, real-time change capture,
 <ConnectorProfile
   maturity="GA"
   maturityLabel="Production ready"
+  availability="Available for authoring"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Schema discovery, DDL capture, DDL apply"
   compatibility="MySQL 5.0–9.x · Single node and primary-replica"

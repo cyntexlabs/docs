@@ -99,7 +99,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <PrimaryLink href="/docs">Open documentation</PrimaryLink>
               <PrimaryLink href="/docs/reference/dsl-grammar" variant="secondary">
-                DSL Reference
+                Reference
               </PrimaryLink>
             </div>
           </div>

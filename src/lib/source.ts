@@ -45,6 +45,7 @@ function renderConnectorProfileForLLM(attrs: string) {
 | Signal | What it means |
 |---|---|
 | Maturity | ${field('maturity')} — ${field('maturityLabel')} |
+| TapState availability | ${field('availability')} |
 | Works as | ${field('worksAs')} |
 | Capabilities | ${field('capabilities')} |
 | Compatibility | ${field('compatibility')} |`;
@@ -103,6 +104,7 @@ type AIPageMetadata = {
   kind: 'connector' | 'concept' | 'reference' | 'guide';
   id: string;
   maturity: 'experimental' | 'preview' | 'ga' | 'deprecated';
+  availability?: 'available' | 'catalog-pending';
   useAs?: Array<'source' | 'target'>;
   modes?: string[];
   aliases?: string[];
@@ -130,6 +132,7 @@ function renderAgentMetadata(page: (typeof source)['$inferPage']) {
     ['Content type', ai.kind],
     ['Identifier', ai.id],
     ['Maturity', ai.maturity],
+    ['Availability', ai.availability],
     ['Use as', ai.useAs?.join(', ')],
     ['Modes', ai.modes?.join(', ')],
     ['Aliases', ai.aliases?.join(', ')],

@@ -1,11 +1,10 @@
 {
   "title": "Documentation",
   "pages": [
-    "index",
     "overview",
     "concepts",
-    "reference",
     "connectors",
+    "reference",
     "for-ai"
   ]
 }

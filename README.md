@@ -77,6 +77,8 @@ public/assets/       Logos and architecture assets
 - `/llms-full.txt` — combined canonical documentation context
 - `/llms.mdx/docs/<page>/content.md` — page-level Markdown for AI readers
 - `/og/docs/<page>/image.png` — generated social preview images
+- `/sitemap.xml` — canonical reader-page discovery for search engines
+- `/robots.txt` — crawler policy and sitemap location
 
 Do not edit generated files under `out/`. Update the MDX source or LLM conversion code and rebuild.
 

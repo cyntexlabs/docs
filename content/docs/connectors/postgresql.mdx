@@ -1,36 +1,89 @@
 ---
 title: PostgreSQL
-description: PostgreSQL connector catalog alignment status
+description: Review PostgreSQL connector capabilities and the current TapState availability boundary
 sidebar:
   order: 3
+ai:
+  kind: connector
+  id: postgres
+  maturity: ga
+  availability: catalog-pending
+  useAs: [source, target]
+  modes: [snapshot, cdc]
+  aliases: [postgresql snapshot, postgresql cdc, postgres wal, postgresql source, postgresql target]
 ---
 
-import { ConnectorProfile } from '@/components/mdx';
+import { Aside, ConnectorProfile } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
-The current TapState catalog contains the connector ID `postgres`, but it does not expose a source mode or target capability. A previous version of this page used the unregistered ID `postgresql` and described Snapshot/CDC behavior that the current catalog cannot validate.
+The reused PostgreSQL connector is GA for snapshots, CDC, DDL capture, target writes, and DDL apply. TapState does not yet expose a complete PostgreSQL catalog contract for authoring.
 
 <ConnectorProfile
-  maturity="Pending"
-  maturityLabel="Catalog contract incomplete"
-  worksAs="Not available"
-  capabilities="Catalog entry only"
-  compatibility="Upstream PostgreSQL baseline · Not enabled in TapState"
+  maturity="GA"
+  maturityLabel="GA in the reused connector"
+  availability="Catalog contract pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, DDL capture, DDL apply"
+  compatibility="PostgreSQL 9.4–16"
 />
 
-## Current status
+<Aside type="caution" title="Not yet configurable in TapState">
+  The current `postgres` catalog entry has no source modes and is not target-capable. The preparation below is the verified upstream baseline for planning; it is not an executable TapState setup path yet.
+</Aside>
 
-Do not create production resources from this page yet. The connector contract must first define:
+## Before you begin
 
-- the final connector ID;
-- supported source modes;
-- target capability and write semantics;
-- required and conditional config fields;
-- the supported logical-decoding paths.
+### Source
 
-## Upstream baseline
+<SourceModeTabs label="Choose the PostgreSQL source read mode">
+<SourceModeTab value="snapshot">
 
-The reused PostgreSQL connector includes preparation concepts such as schema permissions, logical WAL, replication slots, `pgoutput`, `wal2json`, `decoderbufs`, and `REPLICA IDENTITY`. These are upstream technical inputs, not confirmed TapState product behavior until the catalog and runtime expose them.
+Use **Snapshot** to copy the rows that exist now.
 
-## Next documentation step
+1. Create a dedicated login with `CONNECT` access to the database.
+2. Grant `USAGE` on selected schemas and `SELECT` on selected tables.
+3. Grant access to future tables when table discovery must include objects created later.
 
-After the catalog contract is corrected, migrate the upstream PostgreSQL page using the same structure as MySQL: role-specific preparation, complete Snapshot and CDC paths, current CLI/YAML, offline validation, limitations, and a compact field reference.
+Snapshot does not require logical WAL, a replication slot, or a decoding plugin.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** to copy existing rows and then follow WAL changes.
+
+1. Grant the Snapshot permissions plus replication access.
+2. Set `wal_level = logical` and size `max_replication_slots` and `max_wal_senders` for the planned tasks.
+3. Choose the supported decoding path—`pgoutput`, `wal2json`, or `decoderbufs`—and install it when required.
+4. Set `REPLICA IDENTITY` appropriately for tables whose updates or deletes must include enough key data.
+5. For DDL capture, prepare the event-trigger and audit-table permissions described by the reused connector.
+
+</SourceModeTab>
+</SourceModeTabs>
+
+### Target
+
+Prepare a dedicated writer with schema usage, table creation when TapState may create targets, and the required `INSERT`, `UPDATE`, and `DELETE` privileges. Add DDL privileges only when DDL apply is allowed.
+
+## Create a connection
+
+Do not create a production `.cyn.yml` resource from this page yet. TapState must first publish the PostgreSQL config fields, modes, sink semantics, and supported logical-decoding choices in its catalog.
+
+## Validate the configuration
+
+The current offline CLI cannot validate a complete PostgreSQL connection contract. Validation becomes meaningful only after the catalog exposes its modes, conditional fields, and target capability.
+
+## Limitations
+
+- GA describes the reused connector's certification level, not current TapState runtime availability.
+- Replication slots retain WAL; monitor disk growth and remove abandoned slots through an approved operational process.
+- Tables without a suitable replica identity can produce incomplete update or delete keys.
+- SSL and advanced node settings remain pending until the TapState catalog exposes their fields.
+
+## Reference
+
+| Signal | Upstream GA baseline | Current TapState state |
+|---|---|---|
+| Source modes | Snapshot and CDC | Catalog contract pending |
+| Target | Data write and DDL apply | Not target-capable in current catalog |
+| DDL | Capture and apply | Product mapping pending |
+| Versions | PostgreSQL 9.4–16 | Runtime verification pending |

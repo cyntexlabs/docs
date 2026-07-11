@@ -66,6 +66,7 @@ export function Badge({ text, children }: { text?: ReactNode; children?: ReactNo
 type ConnectorProfileProps = {
   maturity: string;
   maturityLabel: string;
+  availability: string;
   worksAs: string;
   capabilities: string;
   compatibility: string;
@@ -156,6 +157,7 @@ function ConnectorProfileTags({ value }: { value: string }) {
 export function ConnectorProfile({
   maturity,
   maturityLabel,
+  availability,
   worksAs,
   capabilities,
   compatibility,
@@ -176,6 +178,22 @@ export function ConnectorProfile({
               {maturity}
             </span>
             <span className={maturityTone.label}>{maturityLabel}</span>
+          </span>
+        </ConnectorProfileRow>
+        <ConnectorProfileRow label="TapState availability">
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-semibold leading-5 ${
+              availability.toLowerCase().startsWith('available')
+                ? 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950/45 dark:text-blue-200'
+                : 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/45 dark:text-amber-200'
+            }`}
+          >
+            {availability.toLowerCase().startsWith('available') ? (
+              <CircleCheck aria-hidden="true" className="size-3.5" strokeWidth={2.25} />
+            ) : (
+              <CircleAlert aria-hidden="true" className="size-3.5" strokeWidth={2.25} />
+            )}
+            {availability}
           </span>
         </ConnectorProfileRow>
         <ConnectorProfileRow label="Works as">

@@ -7,6 +7,7 @@ const aiSchema = z.object({
   kind: z.enum(['connector', 'concept', 'reference', 'guide']),
   id: z.string().regex(/^[a-z0-9][a-z0-9_-]*$/),
   maturity: z.enum(['experimental', 'preview', 'ga', 'deprecated']),
+  availability: z.enum(['available', 'catalog-pending']).optional(),
   useAs: z.array(z.enum(['source', 'target'])).min(1).optional(),
   modes: z.array(z.string().min(1)).optional(),
   aliases: z.array(z.string().min(1)).optional(),

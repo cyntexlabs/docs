@@ -1,30 +1,89 @@
 ---
 title: SQL Server
-description: SQL Server connector catalog alignment status
+description: Review SQL Server connector capabilities and the current TapState availability boundary
 sidebar:
   order: 5
+ai:
+  kind: connector
+  id: sqlserver
+  maturity: ga
+  availability: catalog-pending
+  useAs: [source, target]
+  modes: [snapshot, cdc]
+  aliases: [sql server snapshot, sql server cdc, mssql cdc, sql server source, sql server target]
 ---
 
-import { ConnectorProfile } from '@/components/mdx';
+import { Aside, ConnectorProfile } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
-SQL Server is not exposed by the current TapState connector catalog. The previous page described an unregistered `sqlserver` resource and runtime CDC behavior that the current open-source release cannot validate.
+The reused SQL Server connector is GA for snapshots, CDC, DDL capture, target writes, and DDL apply. SQL Server is not yet exposed by the TapState connector catalog.
 
 <ConnectorProfile
-  maturity="Unavailable"
-  maturityLabel="Not in the current catalog"
-  worksAs="Not available"
-  capabilities="Contract pending"
-  compatibility="Upstream SQL Server baseline · Not enabled in TapState"
+  maturity="GA"
+  maturityLabel="GA in the reused connector"
+  availability="Not in the current catalog"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, DDL capture, DDL apply"
+  compatibility="SQL Server 2008–2022"
 />
 
-## Current status
+<Aside type="caution" title="Not yet configurable in TapState">
+  The preparation below is the verified upstream baseline. TapState has not published a SQL Server connector ID, config schema, CDC contract, or sink contract in its current catalog.
+</Aside>
 
-Do not create production resources from this page yet. The connector contract must define the final ID, Snapshot/CDC support, target capability, connection fields, and SQL Server CDC behavior.
+## Before you begin
 
-## Upstream baseline
+### Source
 
-The reused connector documentation includes SQL Server Agent, database/table CDC enablement, retention, and schema-change constraints. Treat these as upstream preparation inputs rather than current TapState behavior.
+<SourceModeTabs label="Choose the SQL Server source read mode">
+<SourceModeTab value="snapshot">
 
-## Next documentation step
+Use **Snapshot** to copy the rows that exist now.
 
-After the catalog is available, migrate the source and target paths separately and verify all commands against the exact connector version and supported SQL Server editions.
+1. Create a dedicated SQL Server login and database user.
+2. Grant `CONNECT` and read access to the selected schemas or tables.
+3. Ensure the future TapState runtime can reach the SQL Server listener and database.
+
+Snapshot does not require SQL Server Agent or database/table CDC.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** to copy existing rows and then follow SQL Server CDC changes.
+
+1. Grant the Snapshot permissions plus access to the CDC metadata and change tables required by the reused connector.
+2. Ensure SQL Server Agent is running.
+3. Enable CDC on the database and every participating table.
+4. Set CDC cleanup retention longer than the longest expected interruption.
+5. Prepare DDL-capture permissions only when schema changes must be collected.
+
+</SourceModeTab>
+</SourceModeTabs>
+
+### Target
+
+Prepare a dedicated writer with database access and the required `INSERT`, `UPDATE`, and `DELETE` privileges. Add object-creation and alteration privileges only when TapState is allowed to create or evolve target tables.
+
+## Create a connection
+
+Do not create a production `.cyn.yml` resource from this page yet. The catalog must first expose SQL Server connection fields, modes, CDC behavior, and target semantics.
+
+## Validate the configuration
+
+The current offline CLI cannot validate a SQL Server connection because the connector is absent from the TapState catalog. It also cannot inspect SQL Server Agent, database/table CDC, credentials, or retention.
+
+## Limitations
+
+- GA describes the reused connector's certification level, not current TapState runtime availability.
+- CDC must be enabled and retained for every participating table; expired change-table positions require a new snapshot.
+- SQL Server edition and deployment constraints must be verified against the eventual TapState runtime.
+- SSL and advanced node settings remain pending until the TapState catalog exposes their fields.
+
+## Reference
+
+| Signal | Upstream GA baseline | Current TapState state |
+|---|---|---|
+| Source modes | Snapshot and CDC | Connector absent from catalog |
+| Target | Data write and DDL apply | Connector absent from catalog |
+| DDL | Capture and apply | Product mapping pending |
+| Versions | SQL Server 2008, 2008 R2, 2012, 2014, 2016, 2017, 2019, 2022 | Runtime verification pending |

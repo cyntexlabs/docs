@@ -1,80 +1,49 @@
 ---
-title: LLM Context Files
-description: Structured TapState context files for AI models (llms.txt standard)
+title: AI-readable documentation
+description: Canonical TapState documentation surfaces for search engines, agents, and language models
 sidebar:
   order: 1
 ---
 
 import { Aside } from '@/components/mdx';
 
-TapState provides standard [llms.txt](https://llmstxt.org/) files so any LLM can quickly understand TapState.
+TapState publishes reader HTML and AI-readable Markdown from the same source tree. The [llms.txt proposal](https://llmstxt.org/) provides a compact discovery layer, but it does not replace canonical HTML, page metadata, or the sitemap.
 
-## Quick Start
+## Discovery surfaces
 
-Provide the following URLs to your AI model so it can understand TapState and help you write `.cyn.yml`:
+Use the smallest surface that answers the task:
 
-| File | URL | Purpose |
+| Surface | URL | Purpose |
 |---|---|---|
-| `llms.txt` | `https://tapstate.com/llms.txt` | Condensed version (concepts + quick reference); suitable for most scenarios |
-| `llms-full.txt` | `https://tapstate.com/llms-full.txt` | Full version (all DSL syntax details); suitable for complex tasks |
+| Canonical documentation | `https://tapstate.com/docs` | Primary human and crawler surface with canonical metadata and structured data. |
+| `llms.txt` | `https://tapstate.com/llms.txt` | Compact index with page links and descriptions. |
+| `llms-full.txt` | `https://tapstate.com/llms-full.txt` | Combined documentation context for tools that need a single file. |
+| Page Markdown | `https://tapstate.com/llms.mdx/docs/<page>/content.md` | Canonical page body plus explicit agent metadata and expanded tabs. |
+| Sitemap | `https://tapstate.com/sitemap.xml` | Canonical reader-page discovery for search engines and crawlers. |
 
-### Using with Claude
+## Give an assistant context
 
-```
-Please read https://tapstate.com/llms.txt and then help me create a CDC sync task from MySQL to MongoDB
-```
+For product discovery, start with `llms.txt`. For a connector or DSL decision, provide the page-level Markdown so the assistant receives the exact maturity, TapState availability, modes, limitations, and every tab body.
 
-### Using with ChatGPT / GPT-4o
-
-Use the "Browse" feature to fetch `https://tapstate.com/llms.txt`, then ask your question.
-
-### Using with Any AI That Supports URLs
-
-Paste the URL directly into the conversation. Most modern LLMs can fetch and understand file content.
-
----
-
-## JSON Schema
-
-TapState's DSL schema is particularly AI-friendly — every field includes `description` and `examples`, generated from the same source as the code:
-
-```
-https://tapstate.com/schema/v1/pipeline.json
-https://tapstate.com/schema/v1/source.json
+```text
+Read https://tapstate.com/llms.mdx/docs/connectors/mysql/content.md,
+then help me prepare a MySQL Snapshot + CDC source.
 ```
 
-### IDE Integration
+The public site does not currently expose standalone JSON Schema or example-corpus URLs. Use the DSL reference and current CLI validation until those routes are published and verified.
 
-Add the following to your VS Code `settings.json`:
+## Content contract
 
-```json
-{
-  "yaml.schemas": {
-    "https://tapstate.com/schema/v1/pipeline.json": "*.cyn.yml"
-  }
-}
-```
+- Reader HTML is canonical and includes canonical URLs, breadcrumb data, and article structured data.
+- Connector frontmatter is a compact discovery index; the page body remains the authoritative explanation.
+- Interactive tabs expand into labeled sections in Page Markdown and `llms-full.txt`.
+- Maturity and TapState availability are separate signals. Do not infer current product availability from upstream connector maturity.
+- Unsupported UI, runtime, TLS, and connection-test behavior is not inferred from upstream documentation.
 
----
+## MCP integration
 
-## Example Corpus
-
-`https://tapstate.com/examples/`
-
-Contains valid `.cyn.yml` samples covering all scenarios defined in ADR-0016 §14, ready to be provided directly to an AI as few-shot examples.
-
----
-
-## MCP Integration
-
-<Aside type="note">
-  The MCP server is enabled in the **Alpha phase**. The POC phase has only the offline CLI.
+<Aside type="note" title="Planned for a later runtime phase">
+  The current release supports offline CLI authoring and validation. It does not expose a live MCP control endpoint.
 </Aside>
 
-When the TapState service is running, an AI agent can operate directly via the MCP protocol:
-
-```
-mcp://localhost:7778
-```
-
-This lets the AI not only **write** `.cyn.yml` but also **deploy, start, and monitor** tasks. See [MCP Integration](/for-ai/mcp/).
+When a future TapState runtime exposes MCP, an AI agent will be able to operate it through the published protocol endpoint. See [MCP Integration](/docs/for-ai/mcp) for the planned boundary.

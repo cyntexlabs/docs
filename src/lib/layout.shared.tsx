@@ -1,15 +1,5 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import Link from 'next/link';
-import type { ComponentProps } from 'react';
 import { appName } from './shared';
-
-function MobileDocsTitle({ className, href, ...props }: ComponentProps<'a'>) {
-  return (
-    <Link href={href ?? '/'} className={`${className ?? ''} md:hidden`} {...props}>
-      TapState
-    </Link>
-  );
-}
 
 export function baseOptions(): BaseLayoutProps {
   return {
@@ -46,8 +36,8 @@ export function docsOptions(): BaseLayoutProps {
   return {
     ...baseOptions(),
     nav: {
-      title: MobileDocsTitle,
-      url: '/',
+      title: appName,
+      url: '/docs',
     },
     links: [],
   };
