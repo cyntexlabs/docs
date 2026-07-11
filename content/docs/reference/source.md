@@ -39,7 +39,7 @@ experimental: {}       # experimental field zone; no compatibility guarantee
 Globally unique identifier. Rules: letters, digits, and hyphens only; no `.`; unique within the workspace.
 
 ### `connector`
-Connector id from the bundled catalog. `cyntex validate` verifies that it exists.
+Connector ID from the bundled catalog. The current offline validator applies catalog rules when it recognizes the ID, but it does not yet reject every unknown connector ID.
 
 ### `mode`
 
@@ -54,7 +54,7 @@ Connector id from the bundled catalog. `cyntex validate` verifies that it exists
 Valid `connector × mode` combinations are verified by the capability matrix and intercepted at the third validate layer for invalid combinations.
 
 ### `config`
-Connector-specific fields defined in the connector's `spec.json`. `cyntex validate` checks required fields and types.
+Connector-specific fields defined in the connector's `spec.json`. Offline validation checks known required fields and types when the catalog contract is available.
 
 Sensitive fields support `${ENV_VAR}` externalization (treated as a valid string at validate time; expanded at runtime).
 

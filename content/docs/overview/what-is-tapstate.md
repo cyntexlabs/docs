@@ -46,7 +46,7 @@ cyn-work/
 └── serve/
 ```
 
-They work with Git review, environment-variable substitution, editor tooling, and automated generation. Implementation identifiers remain `cyntex`, `.cyn.yml`, and `version: cyntex/v1` while the public brand is TapState.
+They work with Git review, environment-variable substitution, editor tooling, and automated generation. The Quickstart and DSL reference preserve the current executable command and resource spellings.
 
 ### Deterministic offline guardrails
 

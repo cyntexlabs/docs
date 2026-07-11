@@ -11,8 +11,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://tapstate.com'),
   title: {
-    default: 'TapState Docs',
-    template: '%s | TapState Docs',
+    default: 'TapState',
+    template: '%s | TapState',
   },
 };
 

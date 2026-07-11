@@ -1,4 +1,4 @@
-import { docsSource, getPageImage, getPageMarkdownUrl } from '@/lib/source';
+import { source, getPageImage, getPageMarkdownUrl } from '@/lib/source';
 import {
   DocsBody,
   DocsDescription,
@@ -20,7 +20,7 @@ type DocsPageProps = {
 
 export default async function Page(props: DocsPageProps) {
   const params = await props.params;
-  const page = docsSource.getPage(params.slug ?? []);
+  const page = source.getPage(params.slug ?? []);
   if (!page) notFound();
 
   const MDX = page.data.body;
@@ -37,7 +37,7 @@ export default async function Page(props: DocsPageProps) {
       <DocsBody>
         <MDX
           components={getMDXComponents({
-            a: createRelativeLink(docsSource, page),
+            a: createRelativeLink(source, page),
           })}
         />
       </DocsBody>
@@ -46,12 +46,12 @@ export default async function Page(props: DocsPageProps) {
 }
 
 export async function generateStaticParams() {
-  return docsSource.generateParams();
+  return source.generateParams();
 }
 
 export async function generateMetadata(props: DocsPageProps): Promise<Metadata> {
   const params = await props.params;
-  const page = docsSource.getPage(params.slug ?? []);
+  const page = source.getPage(params.slug ?? []);
   if (!page) notFound();
 
   return {

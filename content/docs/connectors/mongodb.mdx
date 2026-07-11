@@ -12,22 +12,76 @@ ai:
   aliases: [mongodb snapshot, mongodb full load, mongodb cdc, mongodb oplog, mongodb source, mongodb target]
 ---
 
+import { ConnectorProfile } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
+
 Connect MongoDB replica set or sharded cluster deployments as a TapState source or target for snapshots and CDC through the Oplog.
 
-Supported versions: MongoDB 4.0 and above.
-
-Supported modes: `snapshot`, `cdc`.
+<ConnectorProfile
+  maturity="GA"
+  maturityLabel="Production ready"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, Schema discovery"
+  compatibility="MongoDB 4.0+ · Replica sets and sharded clusters"
+/>
 
 ## Before you begin
 
-**Source database must be a replica set or sharded cluster.** Standalone instances do not expose an Oplog. To convert a standalone to a single-member replica set, see the [MongoDB documentation](https://www.mongodb.com/docs/manual/tutorial/convert-standalone-to-replica-set/).
+### Source
 
-**Ensure the Oplog is large enough** to cover at least 24 hours of data changes. See [Change the Size of the Oplog](https://www.mongodb.com/docs/manual/tutorial/change-oplog-window/).
+Choose the outcome you need. Each tab includes the complete source preparation path for that mode.
 
-**Create a user and grant permissions:**
+<SourceModeTabs label="Choose the MongoDB source read mode">
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** when you need one copy of the documents that exist now. Snapshot reads the selected collections and does not require Oplog access.
+
+**1. Create a dedicated reader**
 
 ```js
-// Grant read access to a specific database (source)
+use admin
+db.createUser({
+  user: "tapstate",
+  pwd: "your_password",
+  roles: [
+    { role: "read", db: "your_database" },
+    { role: "clusterMonitor", db: "admin" }
+  ]
+})
+```
+
+Use `readAnyDatabase` only when one connection must discover and read multiple databases.
+
+```js
+use admin
+db.createUser({
+  user: "tapstate",
+  pwd: "your_password",
+  roles: [
+    { role: "readAnyDatabase", db: "admin" },
+    { role: "clusterMonitor", db: "admin" }
+  ]
+})
+```
+
+**2. Prepare sharded snapshots**
+
+For a sharded cluster, stop the Balancer during the snapshot and clean up orphaned documents before the run. Chunk migrations and orphaned documents can produce inconsistent counts or `_id` conflicts.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** when the target must begin with existing documents and then stay current with ongoing MongoDB changes.
+
+**1. Use a replica set or sharded cluster**
+
+Standalone MongoDB does not expose the Oplog required for CDC. Convert it to a single-member replica set before using this mode.
+
+**2. Create a CDC reader**
+
+Grant access to the application database plus the `local` and `config` databases used by the reused Oplog reader.
+
+```js
 use admin
 db.createUser({
   user: "tapstate",
@@ -39,35 +93,35 @@ db.createUser({
     { role: "clusterMonitor", db: "admin" }
   ]
 })
+```
 
-// Or grant read access to all databases (source — broader access)
+**3. Size the Oplog recovery window**
+
+Keep enough Oplog history to cover the longest expected interruption; the upstream baseline recommends at least 24 hours. Verify the actual window and monitor it as the write rate changes. See [Change the Size of the Oplog](https://www.mongodb.com/docs/manual/tutorial/change-oplog-window/).
+
+**4. Prepare sharded CDC**
+
+- Stop the Balancer during the initial snapshot.
+- Clean up orphaned documents before the run.
+- Create equivalent users on the primary of every shard.
+
+</SourceModeTab>
+</SourceModeTabs>
+
+### Target
+
+Grant write access only to the destination database. `clusterMonitor` is needed only when a later product workflow performs cluster-level validation.
+
+```js
 use admin
 db.createUser({
   user: "tapstate",
   pwd: "your_password",
   roles: [
-    { role: "readAnyDatabase", db: "admin" },
-    { role: "clusterMonitor", db: "admin" }
-  ]
-})
-
-// Grant write access (target)
-use admin
-db.createUser({
-  user: "tapstate",
-  pwd: "your_password",
-  roles: [
-    { role: "readWrite", db: "your_database" },
-    { role: "clusterMonitor", db: "admin" }
+    { role: "readWrite", db: "your_database" }
   ]
 })
 ```
-
-**Sharded cluster extra steps (source only):**
-
-- Stop the Balancer before running a full sync to avoid data inconsistency from chunk migrations.
-- Clean up orphaned documents to avoid `_id` conflicts.
-- Create equivalent users with the same permissions on the primary node of each individual shard.
 
 ## Create a connection
 

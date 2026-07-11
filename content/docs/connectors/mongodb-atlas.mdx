@@ -12,39 +12,86 @@ ai:
   aliases: [mongodb atlas snapshot, mongodb atlas cdc, atlas oplog, atlas source, atlas target]
 ---
 
+import { ConnectorProfile } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
+
 Connect a MongoDB Atlas cluster as a TapState source or target for snapshots and CDC through the Atlas-managed Oplog.
 
-Supported versions: MongoDB Atlas 5.0.15 and above.
-
-Supported modes: `snapshot`, `cdc`.
+<ConnectorProfile
+  maturity="GA"
+  maturityLabel="Production ready"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, Schema discovery"
+  compatibility="MongoDB Atlas 5.0.15+ · SRV and standard URI"
+/>
 
 ## Before you begin
 
-**1. Configure network access in Atlas:**
+### Source
+
+Choose the outcome you need. Atlas manages the replica set, but Snapshot and Snapshot + CDC have different operational requirements.
+
+<SourceModeTabs label="Choose the MongoDB Atlas source read mode">
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** when you need one copy of the documents that exist now.
+
+**1. Allow the TapState runtime network**
 
 - In the Atlas left sidebar, click **Network Access**.
 - Click **Add IP Address**.
-- Enter the public IP of your TapState agent in CIDR notation (e.g., `203.0.113.42/32`) and click **Confirm**.
+- Enter the future TapState runtime egress IP in CIDR notation, for example `203.0.113.42/32`, and confirm it.
 
-**2. Create a database user in Atlas:**
+**2. Create a read-only database user**
 
 - In the Atlas left sidebar, click **Database Access**.
 - Click **Add New Database User**.
 - Select **Password** authentication.
-- Set the built-in role:
-  - As a **source**: `Read Any Database`
-  - As a **target**: `Read and Write to Any Database`
+- Select `Read Any Database`, or a narrower custom read role for the selected database.
 - Click **Add User**.
 
-**3. Retrieve the connection URI:**
+**3. Copy an application URI with a database path**
 
 - In the Atlas left sidebar, click **Database**.
 - Locate your cluster and click **Connect**.
 - Select **Connect your application** and copy the connection string.
-- The URI includes your username and password and looks like:
-  ```
-  mongodb+srv://<username>:<password>@cluster0.example.mongodb.net/<database>?retryWrites=true&w=majority
-  ```
+- Add the source database name to the URI path.
+
+```text
+mongodb+srv://<username>:<password>@cluster0.example.mongodb.net/<database>?retryWrites=true&w=majority
+```
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** when the target must start with existing documents and continue following Atlas-managed Oplog changes.
+
+**1. Allow the TapState runtime network**
+
+- In Atlas, open **Network Access** and add the future runtime egress IP in CIDR notation.
+- Avoid `0.0.0.0/0` for production deployments.
+
+**2. Create a CDC reader**
+
+- In **Database Access**, create a password user.
+- Select `Read Any Database`, or a custom role that can read the selected database and the Oplog path required by the reused connector.
+
+**3. Copy an application URI with a database path**
+
+```text
+mongodb+srv://<username>:<password>@cluster0.example.mongodb.net/<database>?retryWrites=true&w=majority
+```
+
+**4. Check the Oplog recovery window**
+
+Atlas manages the underlying replica set, but retention still depends on the cluster tier and workload. Keep the Oplog window longer than the longest expected interruption; otherwise CDC cannot resume from an expired position.
+
+</SourceModeTab>
+</SourceModeTabs>
+
+### Target
+
+Add the future runtime egress IP under **Network Access**, then create a database user with `Read and Write to Any Database` or a narrower custom `readWrite` role for the destination database. Copy an application URI that includes the destination database name in its path.
 
 ## Create a connection
 

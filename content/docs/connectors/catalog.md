@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-This page is generated from the TapState connector catalog and is used by Docs AI Agent to verify connector documentation completeness. Edit the upstream catalog first when a connector capability changes, then regenerate this page.
+This page is generated from the TapState connector catalog and supports automated connector-documentation checks. Edit the upstream catalog first when a connector capability changes, then regenerate this page.
 
 | Connector | CDC | Target capable |
 |---|---|---|

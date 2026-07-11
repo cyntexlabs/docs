@@ -97,7 +97,7 @@ export default function HomePage() {
               AI-native control surfaces designed for human review and agent-assisted operation.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <PrimaryLink href="/docs">Open Docs</PrimaryLink>
+              <PrimaryLink href="/docs">Open documentation</PrimaryLink>
               <PrimaryLink href="/docs/reference/dsl-grammar" variant="secondary">
                 DSL Reference
               </PrimaryLink>

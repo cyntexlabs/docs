@@ -27,7 +27,7 @@ Use `npm install` only when intentionally changing dependencies and updating the
 npm run dev
 ```
 
-Open [http://localhost:3000/docs](http://localhost:3000/docs). The root route also provides a documentation landing page.
+Open [http://localhost:3000/docs](http://localhost:3000/docs). The root route is the product landing page.
 
 ## Validate and build
 
@@ -35,6 +35,7 @@ Run the same gates used for documentation changes:
 
 ```bash
 git diff --check
+npm run brand:check
 npm run types:check
 npm run build
 ```

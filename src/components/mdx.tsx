@@ -31,26 +31,6 @@ export function Aside({
   );
 }
 
-export function Card({
-  children,
-  title,
-  href,
-}: {
-  children?: ReactNode;
-  title: ReactNode;
-  href?: string;
-  icon?: string;
-}) {
-  const body = (
-    <div className="h-full rounded-lg border bg-card p-4 text-card-foreground transition-colors hover:bg-accent/40">
-      <p className="mb-2 font-semibold">{title}</p>
-      {children ? <div className="text-sm text-muted-foreground [&>*:first-child]:mt-0">{children}</div> : null}
-    </div>
-  );
-
-  return href ? <Link href={href}>{body}</Link> : body;
-}
-
 export function LinkCard({
   title,
   description,
@@ -91,6 +71,29 @@ type ConnectorProfileProps = {
   compatibility: string;
 };
 
+function connectorMaturityTone(maturity: string) {
+  const normalized = maturity.trim().toLowerCase();
+
+  if (normalized === 'ga') {
+    return {
+      badge: 'border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/45 dark:text-emerald-300',
+      label: 'text-emerald-800/80 dark:text-emerald-200/80',
+    };
+  }
+
+  if (normalized === 'deprecated' || normalized === 'unavailable') {
+    return {
+      badge: 'border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-800 dark:bg-rose-950/45 dark:text-rose-300',
+      label: 'text-rose-800/80 dark:text-rose-200/80',
+    };
+  }
+
+  return {
+    badge: 'border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/45 dark:text-amber-200',
+    label: 'text-amber-900/80 dark:text-amber-200/80',
+  };
+}
+
 function ConnectorProfileRow({
   label,
   children,
@@ -118,6 +121,12 @@ function ConnectorProfileTags({ value }: { value: string }) {
     }
     if (key === 'cdc') {
       return 'border-cyan-200 bg-cyan-50 text-cyan-800 dark:border-cyan-800 dark:bg-cyan-950/45 dark:text-cyan-200';
+    }
+    if (key === 'stream read' || key === 'stream write') {
+      return 'border-cyan-200 bg-cyan-50 text-cyan-800 dark:border-cyan-800 dark:bg-cyan-950/45 dark:text-cyan-200';
+    }
+    if (key === 'schema registry') {
+      return 'border-indigo-200 bg-indigo-50 text-indigo-800 dark:border-indigo-800 dark:bg-indigo-950/45 dark:text-indigo-200';
     }
     if (key === 'ddl capture') {
       return 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/45 dark:text-amber-200';
@@ -151,6 +160,8 @@ export function ConnectorProfile({
   capabilities,
   compatibility,
 }: ConnectorProfileProps) {
+  const maturityTone = connectorMaturityTone(maturity);
+
   return (
     <section
       aria-label="Connector profile"
@@ -160,11 +171,11 @@ export function ConnectorProfile({
       <dl className="divide-y divide-fd-border">
         <ConnectorProfileRow label="Maturity">
           <span className="flex flex-wrap items-center gap-2.5">
-            <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-semibold leading-5 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/45 dark:text-emerald-300">
+            <span className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-semibold leading-5 ${maturityTone.badge}`}>
               <BadgeCheck aria-hidden="true" className="size-3.5" strokeWidth={2.25} />
               {maturity}
             </span>
-            <span className="text-emerald-800/80 dark:text-emerald-200/80">{maturityLabel}</span>
+            <span className={maturityTone.label}>{maturityLabel}</span>
           </span>
         </ConnectorProfileRow>
         <ConnectorProfileRow label="Works as">
@@ -221,7 +232,6 @@ export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
     Aside,
-    Card,
     CardGrid,
     LinkCard,
     Badge,

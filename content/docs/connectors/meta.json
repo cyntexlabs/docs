@@ -1,5 +1,6 @@
 {
   "title": "Connector Reference",
+  "root": true,
   "pages": [
     "index",
     "catalog",

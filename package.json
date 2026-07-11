@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "brand:check": "node scripts/check-brand.mjs",
     "preview": "serve out",
     "start": "serve out",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",

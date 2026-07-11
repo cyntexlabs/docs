@@ -12,11 +12,17 @@ ai:
   aliases: [apache kafka, confluent kafka, kafka stream, kafka source, kafka target, kafka enhanced]
 ---
 
+import { ConnectorProfile } from '@/components/mdx';
+
 Use the catalog ID `kafka_enhanced` for current Kafka connections. The legacy `kafka` catalog entry is deprecated.
 
-Supported versions: Kafka 2.3.x and above.
-
-Supported mode: `stream`.
+<ConnectorProfile
+  maturity="GA"
+  maturityLabel="Production ready"
+  worksAs="Source, Target"
+  capabilities="Stream read, Stream write, Schema Registry"
+  compatibility="Kafka 2.3+ · Confluent-compatible clients"
+/>
 
 ## Before you begin
 

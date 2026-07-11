@@ -5,7 +5,17 @@ sidebar:
   order: 3
 ---
 
+import { ConnectorProfile } from '@/components/mdx';
+
 The current TapState catalog contains the connector ID `postgres`, but it does not expose a source mode or target capability. A previous version of this page used the unregistered ID `postgresql` and described Snapshot/CDC behavior that the current catalog cannot validate.
+
+<ConnectorProfile
+  maturity="Pending"
+  maturityLabel="Catalog contract incomplete"
+  worksAs="Not available"
+  capabilities="Catalog entry only"
+  compatibility="Upstream PostgreSQL baseline · Not enabled in TapState"
+/>
 
 ## Current status
 

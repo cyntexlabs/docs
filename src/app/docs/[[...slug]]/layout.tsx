@@ -1,12 +1,21 @@
-import { docsSource } from '@/lib/source';
+import { source } from '@/lib/source';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
-import { baseOptions } from '@/lib/layout.shared';
+import { docsOptions } from '@/lib/layout.shared';
 import type { ReactNode } from 'react';
+import { DocsTopNav } from '@/components/docs-top-nav';
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <DocsLayout tree={docsSource.getPageTree()} {...baseOptions()}>
-      {children}
-    </DocsLayout>
+    <div className="tapstate-docs-shell">
+      <DocsTopNav />
+      <DocsLayout
+        tree={source.getPageTree()}
+        tabs={false}
+        containerProps={{ className: 'tapstate-docs-layout' }}
+        {...docsOptions()}
+      >
+        {children}
+      </DocsLayout>
+    </div>
   );
 }

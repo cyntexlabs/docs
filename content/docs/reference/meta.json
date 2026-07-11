@@ -1,5 +1,6 @@
 {
   "title": "DSL Reference",
+  "root": true,
   "pages": [
     "dsl-grammar",
     "dsl-fields",

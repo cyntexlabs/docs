@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-This page is generated from the TapState DSL JSON Schema and is used by Docs AI Agent to verify field completeness and field facts. Edit the upstream schema first when a DSL field changes, then regenerate this page.
+This page is generated from the TapState DSL JSON Schema and supports automated field-completeness checks. Edit the upstream schema first when a DSL field changes, then regenerate this page.
 
 | Field | Type | Required | Default | Enum |
 |---|---|---|---|---|

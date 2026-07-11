@@ -9,14 +9,20 @@ import {
   TabsTrigger,
 } from 'fumadocs-ui/components/tabs';
 
-export function SourceModeTabs({ children }: { children: ReactNode }) {
+export function SourceModeTabs({
+  children,
+  label = 'Choose the source read mode',
+}: {
+  children: ReactNode;
+  label?: string;
+}) {
   return (
     <Tabs
       defaultValue="snapshot"
       className="not-prose my-5 gap-0 overflow-hidden rounded-xl border border-fd-border bg-fd-card"
     >
       <TabsList
-        aria-label="Choose the MySQL source read mode"
+        aria-label={label}
         className="grid w-full grid-cols-2 gap-1 border-b border-fd-border bg-fd-muted/35 p-1.5"
       >
         <TabsTrigger

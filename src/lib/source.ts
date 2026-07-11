@@ -15,12 +15,6 @@ export const source = loader({
   plugins: [],
 });
 
-export const docsSource = loader({
-  baseUrl: '/docs',
-  source: docs.toFumadocsSource(),
-  plugins: [],
-});
-
 export function getPageImage(page: (typeof source)['$inferPage']) {
   const segments = [...page.slugs, 'image.png'];
 
@@ -64,7 +58,7 @@ function cleanMdxForLLM(markdown: string) {
     })
     .replace(/<Tab\s+[^>]*value="([^"]+)"[^>]*>\n?/g, '\n### $1\n\n')
     .replace(/<\/Tab>\n?/g, '')
-    .replace(/<SourceModeTabs>([\s\S]*?)<\/SourceModeTabs>/g, (_match, body: string) => {
+    .replace(/<SourceModeTabs(?:\s[^>]*)?>([\s\S]*?)<\/SourceModeTabs>/g, (_match, body: string) => {
       return body.replace(/^ {4}/gm, '');
     })
     .replace(/<SourceModeTab\s+value="([^"]+)">\n?/g, (_match, value: string) => {
@@ -76,11 +70,6 @@ function cleanMdxForLLM(markdown: string) {
     .replace(/<\/div>\n?/g, '')
     .replace(/<CardGrid>\n?/g, '')
     .replace(/<\/CardGrid>\n?/g, '')
-    .replace(/<Card\s+([^>]*)>\n?/g, (_match, attrs: string) => {
-      const title = readAttribute(attrs, 'title');
-      return title ? `\n### ${title}\n\n` : '\n';
-    })
-    .replace(/<\/Card>\n?/g, '\n')
     .replace(/<LinkCard\s+([\s\S]*?)\/>/g, (_match, attrs: string) => {
       const title = readAttribute(attrs, 'title') ?? 'Untitled';
       const href = readAttribute(attrs, 'href') ?? '#';
@@ -183,7 +172,7 @@ export async function getLLMFullText() {
   const scanned = await Promise.all(source.getPages().map(getLLMText));
 
   return [
-    '# TapState Docs — complete agent context',
+    '# TapState documentation — complete agent context',
     '',
     '> Generated from the canonical documentation source.',
     '',

@@ -1,5 +1,6 @@
 {
   "title": "Overview",
+  "root": true,
   "pages": [
     "what-is-tapstate",
     "quickstart",
