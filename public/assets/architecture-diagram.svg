@@ -14,11 +14,11 @@
   <text x="556" y="27" text-anchor="middle" fill="#444" font-size="13.5">CLI</text>
 
   <!-- ═══════════════════════════════════════
-       CYNTEX MANAGER
+       TAPSTATE MANAGER
   ═══════════════════════════════════════ -->
   <rect x="82" y="36" width="836" height="108" rx="6"
         fill="#daeef8" stroke="#7bbde0" stroke-width="1.8" stroke-dasharray="7,4"/>
-  <text x="97" y="56" font-size="13" font-weight="600" fill="#1a4f80">Cyntex Manager</text>
+  <text x="97" y="56" font-size="13" font-weight="600" fill="#1a4f80">TapState Manager</text>
   <rect x="102" y="63" width="796" height="64" rx="5"
         fill="#b2d5ef" stroke="#5fa8d8" stroke-width="1.1"/>
   <text x="500" y="100" text-anchor="middle" font-size="13" font-weight="600" fill="#0d3560">
@@ -30,11 +30,11 @@
   <line x1="645" y1="144" x2="645" y2="180" stroke="#666" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#a)"/>
 
   <!-- ═══════════════════════════════════════
-       CYNTEX ENGINE  (outer box)
+       TAPSTATE ENGINE  (outer box)
   ═══════════════════════════════════════ -->
   <rect x="82" y="180" width="648" height="578" rx="6"
         fill="#daeef8" stroke="#7bbde0" stroke-width="1.8" stroke-dasharray="7,4"/>
-  <text x="97" y="200" font-size="13" font-weight="600" fill="#1a4f80">Cyntex Engine</text>
+  <text x="97" y="200" font-size="13" font-weight="600" fill="#1a4f80">TapState Engine</text>
 
   <!-- ── Database Cylinder ── -->
   <!-- body -->
@@ -94,7 +94,7 @@
         stroke="#1a7a40" stroke-width="1.4" fill="none" stroke-dasharray="5,3" marker-end="url(#aG)"/>
   <text x="494" y="452" text-anchor="middle" font-size="11" fill="#1a6032">Join lookup</text>
 
-  <!-- ── Cyntex Store inner border ── -->
+  <!-- ── TapState Store inner border ── -->
   <rect x="100" y="478" width="614" height="258" rx="5"
         fill="#c5e8e1" stroke="#45b09a" stroke-width="1.3" stroke-dasharray="5,3"/>
 
@@ -136,8 +136,8 @@
   <rect x="116" y="592" width="566" height="60" rx="7" fill="#27ae60" stroke="#1a8042" stroke-width="1.6"/>
   <text x="480" y="628" text-anchor="middle" font-size="14" fill="white" font-weight="700">Queryable Backup Store</text>
 
-  <!-- Cyntex Store label — inside light green Store rect, below Queryable Backup Store bar -->
-  <text x="407" y="708" text-anchor="middle" font-size="13" font-weight="600" fill="#1a6b4a">Cyntex Store</text>
+  <!-- TapState Store label — inside light green Store rect, below Queryable Backup Store bar -->
+  <text x="407" y="708" text-anchor="middle" font-size="13" font-weight="600" fill="#1a6b4a">TapState Store</text>
 
   <!-- Arrows from engine to Serve section -->
   <!-- Transform → Push Context Server -->
@@ -148,7 +148,7 @@
   <line x1="678" y1="394" x2="770" y2="458" stroke="#555" stroke-width="1.7" marker-end="url(#a)"/>
 
   <!-- ═══════════════════════════════════════
-       CYNTEX SERVE  (right box)
+       TAPSTATE SERVE  (right box)
   ═══════════════════════════════════════ -->
   <rect x="750" y="180" width="340" height="578" rx="6"
         fill="#daeef8" stroke="#7bbde0" stroke-width="1.8" stroke-dasharray="7,4"/>
@@ -193,7 +193,7 @@
   <line x1="918" y1="453" x2="955" y2="437" stroke="#555" stroke-width="1.2" marker-end="url(#aSm)"/>
   <line x1="918" y1="476" x2="955" y2="491" stroke="#555" stroke-width="1.2" marker-end="url(#aSm)"/>
 
-  <!-- Cyntex Serve label -->
-  <text x="770" y="590" font-size="13" font-weight="600" fill="#1a4f80">Cyntex Serve</text>
+  <!-- TapState Serve label -->
+  <text x="770" y="590" font-size="13" font-weight="600" fill="#1a4f80">TapState Serve</text>
 
 </svg>

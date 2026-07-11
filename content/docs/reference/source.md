@@ -8,12 +8,12 @@ sidebar:
 `source` defines a data source connection, containing the connector type, config, and read mode.
 
 ```yaml
-apiVersion: cyntex/v1
+version: cyntex/v1
 kind: source
 id: <string>           # globally unique; must not contain `.`
 
 connector: <string>    # connector id (from catalog)
-mode: batch | cdc | api | file
+mode: snapshot | cdc | stream | api | file
 
 config:                # connector-specific configuration (fields defined by connector spec)
   <key>: <value>
@@ -45,8 +45,9 @@ Connector id from the bundled catalog. `cyntex validate` verifies that it exists
 
 | Value | Semantics |
 |---|---|
-| `batch` | Full snapshot (bounded); task stops when complete |
+| `snapshot` | One-shot snapshot (bounded); task stops when complete |
 | `cdc` | Continuous change capture (unbounded); runs continuously |
+| `stream` | Unbounded push stream from a message system |
 | `api` | API / SaaS pull (polling or webhook) |
 | `file` | File scanning |
 

@@ -1,6 +1,6 @@
 ---
 title: MCP Integration
-description: Let AI agents operate Cyntex in real time via the MCP protocol
+description: Planned MCP integration for operating a future TapState runtime from AI agents
 sidebar:
   order: 2
 ---
@@ -13,36 +13,32 @@ import { Aside } from '@/components/mdx';
 
 ## Overview
 
-Cyntex embeds an MCP server in-process (HTTP transport). An AI agent connects via the standard MCP protocol and gains real-time operational access to the running Cyntex instance.
+The planned TapState runtime embeds an in-process MCP server over HTTP. An AI agent will connect through the standard MCP protocol to gain operational access to a running TapState instance.
 
 ```
 AI Agent (Claude / GPT-4o …)
     │  MCP protocol (HTTP)
     ▼
-Cyntex MCP server (in-process)
+TapState MCP server (in-process)
     │  direct call
     ▼
 Control Core (CRUD + lifecycle + read-only runtime)
 ```
 
-**Key design: the MCP server contains no LLM** — the model is on the user's agent side; Cyntex only provides the operational interface.
+**Key design: the MCP server contains no LLM** — the model is on the user's agent side; TapState only provides the operational interface.
 
-## Connecting
+## Planned connection model
+
+The endpoint, authentication flow, and startup command are not part of the current release contract. The example below illustrates the intended client configuration only; do not use it as deployment instructions.
 
 ```
 Server URL: http://localhost:7778/mcp
 Auth: Bearer <token>
 ```
 
-A localhost bootstrap token is automatically generated at startup (valid only on the local machine):
+The Alpha release will document the final endpoint, token lifecycle, and startup workflow when they are available in the product.
 
-```bash
-cyntex server --role=all
-# Output: MCP server ready at http://localhost:7778/mcp
-#         Bootstrap token: cyxt_xxxxxxxxxxxx
-```
-
-## Alpha Toolset (Read-Only + Scaffold)
+## Planned Alpha Toolset (Read-Only + Scaffold)
 
 | Tool | Description |
 |---|---|
@@ -54,7 +50,7 @@ cyntex server --role=all
 | `explain_field` | Look up documentation for any DSL field |
 | `validate_yaml` | Validate a YAML content snippet (three-layer validation) |
 
-## Beta Toolset (Full CRUD + Lifecycle)
+## Planned Beta Toolset (Full CRUD + Lifecycle)
 
 In the Beta phase, all control core operations will be exposed as MCP tools:
 
@@ -65,12 +61,12 @@ In the Beta phase, all control core operations will be exposed as MCP tools:
 
 ## Using with Claude
 
-Add Cyntex MCP to Claude's MCP configuration:
+Add TapState MCP to Claude's MCP configuration:
 
 ```json
 {
   "mcpServers": {
-    "cyntex": {
+    "tapstate": {
       "url": "http://localhost:7778/mcp",
       "headers": {
         "Authorization": "Bearer cyxt_xxxxxxxxxxxx"
@@ -80,4 +76,4 @@ Add Cyntex MCP to Claude's MCP configuration:
 }
 ```
 
-Once configured, Claude can directly operate your Cyntex instance — create sources, deploy pipelines, and check runtime status.
+Once the Alpha MCP surface is available, a compatible client will be able to use the published toolset against a running TapState instance. The current release supports offline CLI authoring and validation only.

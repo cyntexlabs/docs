@@ -1,11 +1,11 @@
 ---
 title: DSL & Pipelines
-description: Core concepts of the Cyntex DSL — resource model, dual-layer storage, and pipeline lifecycle
+description: Core concepts of the TapState DSL — resource model, dual-layer storage, and pipeline lifecycle
 sidebar:
   order: 1
 ---
 
-Cyntex's task description language (DSL) uses YAML format with the file extension `.cyn.yml`.
+TapState's task description language (DSL) uses YAML format with the file extension `.cyn.yml`.
 
 For detailed syntax reference, see [DSL Grammar Reference](/reference/dsl-grammar/).
 
@@ -19,7 +19,7 @@ For detailed syntax reference, see [DSL Grammar Reference](/reference/dsl-gramma
 ## Example File Structure
 
 ```yaml
-apiVersion: cyntex/v1
+version: cyntex/v1
 kind: pipeline
 id: my-pipeline
 source: mysql-prod

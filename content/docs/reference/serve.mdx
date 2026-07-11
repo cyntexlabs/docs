@@ -17,7 +17,7 @@ import { Aside } from '@/components/mdx';
 Publish data as an event stream using the `push` field in a pipeline:
 
 ```yaml
-apiVersion: cyntex/v1
+version: cyntex/v1
 kind: pipeline
 id: order-events-publisher
 source: mysql-prod
@@ -41,7 +41,7 @@ In the GA phase, after the apiserver (`role=api`) lands, the DSL will support `k
 
 ```yaml
 # GA phase preview (syntax not yet finalized)
-apiVersion: cyntex/v1
+version: cyntex/v1
 kind: serve
 id: user-api
 source: user_profiles    # references an already-synced collection

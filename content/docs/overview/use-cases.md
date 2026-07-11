@@ -1,219 +1,59 @@
 ---
 title: Use Cases
-description: Industry use cases for Cyntex — Finance, Healthcare, and Hospitality
+description: Operational-data patterns TapState is designed to support, with current release boundaries
 sidebar:
   order: 4
 ---
 
-Cyntex's real-time data capture, enrichment, and serving capabilities address a specific class of problem: **operational data that must be fresh to be useful**. Below are concrete scenarios from the industries where this matters most.
+TapState is designed for operational data that loses value when it becomes stale. The patterns below explain the intended customer outcomes without implying that the current offline CLI already executes them.
 
----
+## Core-system offloading
 
-## Finance: Core Banking Modernization & Fraud Prevention
+**Problem:** Applications, dashboards, and AI systems query a production database directly, increasing coupling and operational risk.
 
-### Mainframe / Oracle Offloading
+**TapState direction:** Capture source changes and maintain a read-oriented copy or materialized view for downstream consumers.
 
-Core banking systems (Mainframe, Oracle RAC) store the most valuable data in a bank, but querying them directly is expensive (MIPS cost) and risky (performance impact). The standard pattern with Cyntex:
+**Available today:** Define source, pipeline, transform, and target intent as validated `.cyn.yml` resources. Live CDC, materialization, and measured source impact require the later runtime.
 
-1. Capture changes from the legacy core via CDC (Oracle Redo Logs, Mainframe EBCDIC → structured events)
-2. Materialize a "sidecar" MongoDB or PostgreSQL database, kept in millisecond-accurate sync
-3. Point all mobile apps, chatbots, and reporting dashboards at the sidecar — never the core
+## Database migration and coexistence
 
-This offloads 80%+ of read-heavy operational queries from the expensive primary system without any migration risk.
+**Problem:** A new system must be prepared while the old system remains active.
 
-```yaml
-apiVersion: cyntex/v1
-kind: source
-id: core-banking-oracle
-connector: oracle
-mode: cdc
-config:
-  host: oracle-prod.bank.internal
-  port: 1521
-  service_name: COREDB
-  username: ${ORACLE_CDC_USER}
-  password: ${ORACLE_CDC_PASS}
----
-apiVersion: cyntex/v1
-kind: pipeline
-id: account-sidecar
-source: core-banking-oracle
-tables:
-  - name: ACCOUNTS
-  - name: TRANSACTIONS
-  - name: CUSTOMERS
-sync:
-  - source: ACCOUNTS
-    target:
-      collection: accounts
-    options:
-      write_mode: upsert
-      ddl: fail
-```
+**TapState direction:** Start with a snapshot, continue with CDC, validate consistency, and cut over after the target is current.
 
-### Real-Time AML and Fraud Intervention
+**Available today:** Connector preparation guides, Snapshot/CDC modes, target connection resources, reference closure, and offline config validation. Cutover orchestration and data-level verification are not current CLI features.
 
-Traditional Anti-Money Laundering checks run hours after a transaction. With Cyntex:
+## Current customer or account views
 
-- Every transaction is streamed to an AI fraud scoring model in milliseconds
-- Suspicious patterns trigger a webhook to the authorization system — **pre-authorization blocking** instead of post-loss recovery
-- The pipeline enriches each transaction with the customer's risk profile via a Lookup Cache join
+**Problem:** Account, order, inventory, and entitlement data is fragmented across systems, while applications need one current view.
 
-```yaml
-apiVersion: cyntex/v1
-kind: pipeline
-id: fraud-stream
-source: core-banking-oracle
-tables:
-  - name: TRANSACTIONS
-transforms:
-  - name: enrich-risk
-    js: |
-      // attach customer risk tier from lookup cache (populated from CUSTOMERS table)
-      record.riskTier = lookup('CUSTOMERS', record.CUSTOMER_ID, 'RISK_TIER');
-      return record;
-push:
-  - source: TRANSACTIONS
-    topic: fraud-scoring-input
-    format: "{'txn_id': record.TXN_ID, 'amount': record.AMOUNT, 'risk_tier': record.riskTier, 'ts': record.TXN_TIME}"
-```
+**TapState direction:** Capture changes, join or reshape records in flight, and materialize current operational state.
 
----
+**Available today:** Declarative transform and view resource models plus schema validation. Stateful runtime behavior and serving-store compatibility remain product direction.
 
-## Healthcare: Unified Patient View and Legacy Migration
+## Operational context for AI
 
-### The Unified Patient View (FHIR)
+**Problem:** Retrieval from documents or a warehouse may omit the latest system-of-record state.
 
-Patient data is notoriously siloed — labs in one system, medications in another, admissions in a third. Clinicians need a 360° view on a single screen, updated the second a nurse enters a new note.
+**TapState direction:** Provide governed, queryable operational state to agents and applications while keeping model choice separate from the data platform.
 
-Cyntex ingests fragments from multiple legacy systems (Oracle, AS/400, HL7 feeds), joins them in real-time, and serves them via a FHIR-compliant API:
+**Available today:** AI-readable docs, JSON Schema, non-interactive scaffolding, coded diagnostics, and structured CLI output. Live MCP queries and runtime lifecycle control are not part of the current open-source release.
 
-```yaml
-apiVersion: cyntex/v1
-kind: pipeline
-id: patient-360
-source: emr-oracle
-tables:
-  - name: PATIENTS
-  - name: LAB_RESULTS
-  - name: MEDICATIONS
-  - name: ADMISSIONS
-transforms:
-  - name: mask-pii
-    js: |
-      // redact SSN at ingestion point — never reaches downstream
-      record.SSN = '***-**-' + String(record.SSN).slice(-4);
-      return record;
-sync:
-  - source: PATIENTS
-    target:
-      collection: patient_profiles
-    options:
-      write_mode: upsert
-  - source: LAB_RESULTS
-    target:
-      collection: lab_results
-    options:
-      write_mode: append
-```
+## Event and analytics feeds
 
-The resulting `patient_profiles` and `lab_results` collections in MongoDB are exposed via the Query Context Server as REST endpoints — the FHIR layer reads from Cyntex, not the production EMR system.
+**Problem:** Downstream teams need a clean stream without independently reading the same production database.
 
-### Zero-Downtime Database Migration
+**TapState direction:** Capture once, apply common transformations, and route approved records to Kafka or other targets.
 
-Moving from Oracle to PostgreSQL while keeping life-critical applications online requires both systems to stay in sync during the transition:
+**Available today:** Catalog-backed Kafka authoring and pipeline intent. Broker connectivity, delivery semantics, throughput, and recovery behavior need runtime verification.
 
-```yaml
-apiVersion: cyntex/v1
-kind: pipeline
-id: oracle-to-pg-migration
-source: legacy-oracle-emr
-tables:
-  - name: /.*/    # sync all tables
-sync:
-  - source: /.*/
-    target:
-      collection: ${table_name}
-    options:
-      write_mode: upsert
-      ddl: apply
-```
+## Evaluate a use case
 
-Run this pipeline continuously. When you're ready to cut over, run `cyntex verify oracle-to-pg-migration` to confirm sync accuracy, then redirect application connections to PostgreSQL.
+Before treating a pattern as production-ready, verify four layers separately:
 
----
+1. **Connector contract:** ID, mode, fields, permissions, and source-system preparation.
+2. **Authoring contract:** valid resources and closed references.
+3. **Runtime behavior:** connectivity, snapshots, CDC, transformations, checkpoints, and recovery.
+4. **Operational evidence:** data correctness, latency, source impact, security, and failure handling in the intended environment.
 
-## Hospitality: Hyper-Personalization and Real-Time Inventory
-
-### Unified Booking Inventory
-
-In an industry with dozens of OTAs (Expedia, Booking.com, direct), double-booking is a constant risk. When a room is booked on one platform, availability must be updated everywhere in sub-second time:
-
-```yaml
-apiVersion: cyntex/v1
-kind: pipeline
-id: inventory-broadcast
-source: pms-mysql
-tables:
-  - name: room_availability
-  - name: reservations
-transforms:
-  - name: only-availability-changes
-    type_filter: insert,update    # skip deletes from broadcast
-push:
-  - source: room_availability
-    topic: inventory-updates
-    format: "{'room_id': record.room_id, 'date': record.stay_date, 'available': record.is_available, 'ts': record.updated_at}"
-```
-
-Downstream OTA connectors subscribe to `inventory-updates` and propagate the change to their respective platforms.
-
-### The Contextual Guest Experience
-
-When a guest updates preferences on a mobile app (dietary restriction, pillow type, room temperature), that context should be available to every touchpoint before they arrive:
-
-```yaml
-apiVersion: cyntex/v1
-kind: pipeline
-id: guest-context-sync
-source: guest-app-postgres
-tables:
-  - name: guest_preferences
-  - name: loyalty_profiles
-transforms:
-  - name: merge-context
-    js: |
-      record.full_context = {
-        preferences: lookup('guest_preferences', record.guest_id),
-        loyalty_tier: lookup('loyalty_profiles', record.guest_id, 'tier')
-      };
-      return record;
-sync:
-  - source: guest_preferences
-    target:
-      collection: guest_context
-    options:
-      write_mode: upsert
-```
-
-The front desk PMS and AI concierge both read from `guest_context` — a materialized, always-current view that is updated milliseconds after the guest taps "Save" on their phone.
-
----
-
-## AI Agent Grounding
-
-All of the above use cases share a common requirement: **AI agents need fresh operational data to make accurate decisions**. A fraud model running on yesterday's transaction history will miss today's patterns. A clinical copilot working from last night's lab results may contradict the morning's findings.
-
-Cyntex provides the "real-time context window" for AI by keeping materialized views current and exposing them via MCP:
-
-```
-AI Agent (Claude / GPT-4o)
-    │ MCP protocol
-    ▼
-Cyntex Query Context Server
-    │ reads
-    ▼
-Materialized View Store (milliseconds behind source)
-```
-
-The AI agent can query `get_source_schema`, `list_pipelines`, or custom views directly — always seeing operational data that reflects the current state of the business.
+The current release directly covers the first two layers.

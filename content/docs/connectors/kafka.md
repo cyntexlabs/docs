@@ -1,26 +1,35 @@
 ---
 title: Kafka
-description: Connect Apache Kafka as a Cyntex source or target
+description: Connect Apache Kafka with the current Confluent-compatible TapState connector
 sidebar:
   order: 8
+ai:
+  kind: connector
+  id: kafka_enhanced
+  maturity: ga
+  useAs: [source, target]
+  modes: [stream]
+  aliases: [apache kafka, confluent kafka, kafka stream, kafka source, kafka target, kafka enhanced]
 ---
 
-Connect an Apache Kafka cluster as a Cyntex source or target for streaming data pipelines. Kafka is consumed topic-by-topic; each topic maps to a Cyntex table.
+Use the catalog ID `kafka_enhanced` for current Kafka connections. The legacy `kafka` catalog entry is deprecated.
 
-**Supported versions:** Kafka 2.3.x and above  
-**Supported modes:** `cdc`
+Supported versions: Kafka 2.3.x and above.
 
-## Prerequisites
+Supported mode: `stream`.
 
-**Kafka connectivity:**
+## Before you begin
 
-- Ensure the Cyntex agent can reach the Kafka broker(s) on the configured port (default `9092`).
-- If Kerberos authentication is enabled, prepare the keytab file and `krb5.conf` configuration file before connecting.
-- If SASL/plain password authentication is used, have the username, password, and encryption method ready.
+### Source
 
-**Topic preparation (optional but recommended when using Kafka as a target):**
+- Ensure the future TapState runtime network can reach every broker address in `clusterURI`.
+- Choose serializers that match the topic key and value formats.
+- If Schema Registry is enabled, prepare its URL and authentication settings.
+- If SASL or Kerberos is enabled, prepare the matching credentials and Kerberos files.
 
-Topics auto-created by Cyntex use 1 partition and 1 replica. For production use, pre-create topics with the desired partition count and replication factor:
+### Target
+
+Pre-create production topics with the required partition count, replication factor, retention, and ACLs. For example:
 
 ```bash
 bin/kafka-topics.sh --create \
@@ -30,64 +39,79 @@ bin/kafka-topics.sh --create \
   --topic my_topic
 ```
 
-**Message format requirement:**
-
-Cyntex only processes messages in JSON Object string format. Each message must be a flat or nested JSON object:
+The selected `keySerialization`, `valueSerialization`, schema mode, and optional Schema Registry type must match the records written to the topic. For a JSON object value:
 
 ```json
 {"id": 1, "name": "Alice", "amount": 99.50}
 ```
 
-Array-root messages, plain strings, and binary-encoded formats (Avro, Protobuf) are not supported without a prior transformation step.
+The catalog also exposes binary, string, numeric, UUID, Avro, and Protobuf paths. Offline validation cannot inspect the actual topic encoding.
 
-## DSL Configuration
+## Create a connection
 
 ```yaml
-apiVersion: cyntex/v1
+version: cyntex/v1
 kind: source
 id: my-kafka
-connector: kafka
-mode: cdc   # cdc only
+connector: kafka_enhanced
+mode: stream
 
 config:
-  brokers: "broker1.internal:9092,broker2.internal:9092"
-  topicExpression: "my_topic"   # exact name or regex pattern (max 256 chars)
-  # username: ${KAFKA_USER}     # optional; required if SASL auth is enabled
-  # password: ${KAFKA_PASS}     # optional; required if SASL auth is enabled
-  # encryption: PLAIN           # optional; PLAIN | SCRAM-SHA-256 | SCRAM-SHA-512
-  # kerberosEnabled: false      # optional; set true to enable Kerberos auth
-  # ignoreNonJsonMessages: true # optional; skip non-JSON messages instead of failing
-
-options:
-  start_from: latest   # latest | earliest
+  clusterURI: "broker1.internal:9092,broker2.internal:9092"
+  schemaRegister: false
+  schemaMode: STANDARD_JSON
+  keySerialization: String
+  valueSerialization: JsonObject
+  useSasl: false
+  krb5: false
 
 tables:
-  - name: my_topic
+  - my_topic
 ```
 
-## Config Reference
+## Validate the configuration
+
+```bash
+cyntex validate --workdir tapstate-work
+```
+
+Offline validation checks the `stream` mode and catalog-backed field values. It does not connect to brokers, authenticate, inspect topics, or send messages.
+
+## Limitations
+
+- Kafka is an unbounded stream; do not model it as Snapshot or CDC.
+- Topic existence, partitioning, replication factor, ACLs, and message compatibility require runtime checks that are not available in the current open-source release.
+- `kafka_enhanced` supports JSON, Avro, and Protobuf registry types through catalog settings; the selected serializers must match the actual topic data.
+- Kerberos files and Schema Registry credentials are catalog fields, but the docs cannot verify them offline.
+
+## Reference
+
+### Core settings
 
 | Field | Required | Default | Description |
 |---|---|---|---|
-| `brokers` | Yes | — | Comma-separated list of Kafka broker addresses in `host:port` format |
-| `topicExpression` | Yes | — | Topic name or regular expression to subscribe to. Maximum 256 characters. |
-| `username` | No | — | SASL username. Required when password authentication is enabled on the broker. |
-| `password` | No | — | SASL password. Required when password authentication is enabled on the broker. |
-| `encryption` | No | — | SASL encryption mechanism: `PLAIN`, `SCRAM-SHA-256`, or `SCRAM-SHA-512` |
-| `kerberosEnabled` | No | `false` | Enable Kerberos (GSSAPI) authentication. Requires keytab and `krb5.conf` files uploaded to the connection. |
-| `ignoreNonJsonMessages` | No | `false` | When `true`, messages that are not valid JSON objects are skipped. When `false`, a non-JSON message halts consumption. |
-| `ackMechanism` | No | `isr-majority` | Producer acknowledgment: `none`, `leader`, `isr-majority`, or `isr-all` |
-| `compressionType` | No | — | Message compression for producer (target): `gzip`, `snappy`, `lz4`, or `zstd` |
+| `clusterURI` | Yes | — | Comma-separated broker addresses. |
+| `schemaRegister` | No | `false` | Enable Schema Registry integration. |
+| `schemaRegisterUrl` | With Schema Registry | — | Schema Registry URL. |
+| `registrySchemaType` | No | `JSON` | `JSON`, `AVRO`, or `PROTOBUF`. |
+| `schemaMode` | No | `STANDARD` | Message envelope mode when Schema Registry is disabled. |
+| `keySerialization` | Yes | `Binary` | Key deserializer type. |
+| `valueSerialization` | Yes | `Binary` | Value deserializer type. |
+| `batchMaxDelay` | Yes | `2000` | Producer batching delay in milliseconds. |
+| `clientId` | No | — | Kafka client ID. |
+| `acksType` | No | `-1` | Producer acknowledgment value: `0`, `1`, `-1`, or `all`. |
+| `compressionType` | No | `lz4` | `disable`, `gzip`, `snappy`, `lz4`, or `zstd`. |
 
-## Notes
+### Authentication settings
 
-- **Kafka mode is always `cdc`:** Kafka is a streaming system; there is no distinct "batch" mode. Use `start_from: earliest` to read all retained messages from the beginning of each partition.
-- **At-least-once delivery:** Cyntex's Kafka consumer implements at-least-once semantics. Downstream targets and transformations must be idempotent to handle potential duplicate messages correctly.
-- **Consumption behavior by sync type:**
-  - *Full sync only:* Reads from the earliest offset of each partition. Resumes from last committed offset if a previous run exists.
-  - *Incremental (CDC) only:* Reads from the latest offset. Resumes from last committed offset if a previous run exists.
-  - *Full + incremental:* Skips the full sync phase and reads directly from the incremental (latest) offset.
-- **Topic regex patterns:** The `topicExpression` field supports standard Java regular expressions. For example, `orders-.*` matches `orders-2024`, `orders-us`, etc.
-- **ACK mechanism for targets:** When writing to Kafka, `isr-majority` (write acknowledged by most in-sync replicas) balances durability and performance for most workloads. Use `isr-all` only when maximum durability is required.
-- **Compression:** Compression is applied at the producer (Kafka target) side. It reduces network and storage overhead for high-throughput pipelines at the cost of additional CPU on the Cyntex agent.
-- **Kerberos:** When Kerberos is enabled, upload the `.keytab` file and the `krb5.conf` configuration file through the Cyntex connection settings UI before testing the connection.
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `useSasl` | No | `false` | Enable username/password SASL. |
+| `saslMechanism` | No | `PLAIN` | `PLAIN`, `SCRAM-SHA-256`, or `SCRAM-SHA-512`. |
+| `saslUsername` | No | — | SASL username. |
+| `saslPassword` | No | — | SASL password. |
+| `krb5` | No | `false` | Enable Kerberos. |
+| `krb5Keytab` | With Kerberos | — | Keytab content or path handled by the product surface. |
+| `krb5Conf` | With Kerberos | — | Kerberos configuration. |
+| `krb5Principal` | With Kerberos | — | Kerberos principal. |
+| `krb5ServiceName` | With Kerberos | — | Kafka Kerberos service name. |

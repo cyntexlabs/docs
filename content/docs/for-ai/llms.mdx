@@ -1,32 +1,32 @@
 ---
 title: LLM Context Files
-description: Structured Cyntex context files for AI models (llms.txt standard)
+description: Structured TapState context files for AI models (llms.txt standard)
 sidebar:
   order: 1
 ---
 
 import { Aside } from '@/components/mdx';
 
-Cyntex provides standard [llms.txt](https://llmstxt.org/) files so any LLM can quickly understand Cyntex.
+TapState provides standard [llms.txt](https://llmstxt.org/) files so any LLM can quickly understand TapState.
 
 ## Quick Start
 
-Provide the following URLs to your AI model so it can understand Cyntex and help you write `.cyn.yml`:
+Provide the following URLs to your AI model so it can understand TapState and help you write `.cyn.yml`:
 
 | File | URL | Purpose |
 |---|---|---|
-| `llms.txt` | `https://docs.cyntex.io/llms.txt` | Condensed version (concepts + quick reference); suitable for most scenarios |
-| `llms-full.txt` | `https://docs.cyntex.io/llms-full.txt` | Full version (all DSL syntax details); suitable for complex tasks |
+| `llms.txt` | `https://tapstate.com/llms.txt` | Condensed version (concepts + quick reference); suitable for most scenarios |
+| `llms-full.txt` | `https://tapstate.com/llms-full.txt` | Full version (all DSL syntax details); suitable for complex tasks |
 
 ### Using with Claude
 
 ```
-Please read https://docs.cyntex.io/llms.txt and then help me create a CDC sync task from MySQL to MongoDB
+Please read https://tapstate.com/llms.txt and then help me create a CDC sync task from MySQL to MongoDB
 ```
 
 ### Using with ChatGPT / GPT-4o
 
-Use the "Browse" feature to fetch `https://docs.cyntex.io/llms.txt`, then ask your question.
+Use the "Browse" feature to fetch `https://tapstate.com/llms.txt`, then ask your question.
 
 ### Using with Any AI That Supports URLs
 
@@ -36,11 +36,11 @@ Paste the URL directly into the conversation. Most modern LLMs can fetch and und
 
 ## JSON Schema
 
-Cyntex's DSL schema is particularly AI-friendly — every field includes `description` and `examples`, generated from the same source as the code:
+TapState's DSL schema is particularly AI-friendly — every field includes `description` and `examples`, generated from the same source as the code:
 
 ```
-https://docs.cyntex.io/schema/v1/pipeline.json
-https://docs.cyntex.io/schema/v1/source.json
+https://tapstate.com/schema/v1/pipeline.json
+https://tapstate.com/schema/v1/source.json
 ```
 
 ### IDE Integration
@@ -50,7 +50,7 @@ Add the following to your VS Code `settings.json`:
 ```json
 {
   "yaml.schemas": {
-    "https://docs.cyntex.io/schema/v1/pipeline.json": "*.cyn.yml"
+    "https://tapstate.com/schema/v1/pipeline.json": "*.cyn.yml"
   }
 }
 ```
@@ -59,7 +59,7 @@ Add the following to your VS Code `settings.json`:
 
 ## Example Corpus
 
-`https://docs.cyntex.io/examples/`
+`https://tapstate.com/examples/`
 
 Contains valid `.cyn.yml` samples covering all scenarios defined in ADR-0016 §14, ready to be provided directly to an AI as few-shot examples.
 
@@ -71,7 +71,7 @@ Contains valid `.cyn.yml` samples covering all scenarios defined in ADR-0016 §1
   The MCP server is enabled in the **Alpha phase**. The POC phase has only the offline CLI.
 </Aside>
 
-When the Cyntex service is running, an AI agent can operate directly via the MCP protocol:
+When the TapState service is running, an AI agent can operate directly via the MCP protocol:
 
 ```
 mcp://localhost:7778

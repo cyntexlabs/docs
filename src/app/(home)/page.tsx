@@ -13,16 +13,16 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Cyntex Documentation',
+  title: 'TapState Documentation',
   description:
     'The Operational Data Hub for the Agentic AI era — real-time CDC, YAML pipelines, and AI-native control.',
 };
 
 const entryPoints = [
   {
-    title: 'Understand Cyntex',
-    description: 'Operational Data Hub concepts, runtime architecture, and where Cyntex fits.',
-    href: '/docs/overview/what-is-cyntex',
+    title: 'Understand TapState',
+    description: 'Operational Data Hub concepts, runtime architecture, and where TapState fits.',
+    href: '/docs/overview/what-is-tapstate',
     icon: Network,
   },
   {
@@ -39,7 +39,7 @@ const entryPoints = [
   },
   {
     title: 'Operate with AI',
-    description: 'llms.txt, MCP, and BYO-agent workflows for controlling Cyntex safely.',
+    description: 'llms.txt, MCP, and BYO-agent workflows for controlling TapState safely.',
     href: '/docs/for-ai/llms',
     icon: Bot,
   },
@@ -90,7 +90,7 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-6xl px-5 pb-14 pt-16 md:pb-20 md:pt-24">
           <div className="max-w-3xl">
             <h1 className="text-4xl font-semibold tracking-normal text-fd-foreground md:text-6xl">
-              Cyntex Documentation
+              TapState Documentation
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-fd-muted-foreground md:text-lg">
               Build real-time operational data flows with CDC, YAML pipelines, connector catalogs, and
@@ -175,7 +175,7 @@ export default function HomePage() {
             <BookOpenText className="mb-5 size-8 text-fd-primary" aria-hidden="true" />
             <h2 className="text-2xl font-semibold tracking-normal md:text-3xl">Reference That Agents Can Read</h2>
             <p className="mt-4 text-sm leading-7 text-fd-muted-foreground">
-              Cyntex docs expose human-readable guides and LLM-oriented context files from the same content tree,
+              TapState docs expose human-readable guides and LLM-oriented context files from the same content tree,
               so product knowledge can support IDEs, assistants, and runtime control workflows without drifting.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -190,7 +190,7 @@ export default function HomePage() {
           <div className="rounded-lg border border-fd-border bg-fd-background p-4">
             <img
               src="/assets/architecture-diagram.svg"
-              alt="Cyntex runtime architecture diagram"
+              alt="TapState runtime architecture diagram"
               className="w-full rounded-md"
             />
           </div>

@@ -8,7 +8,7 @@ sidebar:
 `pipeline` defines a data pipeline: references a source, applies optional transforms, and outputs to sync or push.
 
 ```yaml
-apiVersion: cyntex/v1
+version: cyntex/v1
 kind: pipeline
 id: <string>
 

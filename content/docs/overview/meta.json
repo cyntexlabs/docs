@@ -1,7 +1,8 @@
 {
   "title": "Overview",
   "pages": [
-    "what-is-cyntex",
+    "what-is-tapstate",
+    "quickstart",
     "architecture",
     "use-cases",
     "vs-streaming-stack",

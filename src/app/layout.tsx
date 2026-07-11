@@ -9,10 +9,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://docs.cyntex.io'),
+  metadataBase: new URL('https://tapstate.com'),
   title: {
-    default: 'Cyntex Docs',
-    template: '%s | Cyntex Docs',
+    default: 'TapState Docs',
+    template: '%s | TapState Docs',
   },
 };
 

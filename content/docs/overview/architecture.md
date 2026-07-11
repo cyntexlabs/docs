@@ -1,19 +1,21 @@
 ---
 title: Architecture Overview
-description: Cyntex's four-layer runtime architecture — Engine, Store, Serve, and Manager
+description: TapState's four-layer runtime architecture — Engine, Store, Serve, and Manager
 sidebar:
   order: 2
 ---
 
-![Cyntex Runtime Architecture](/assets/architecture-diagram.svg)
+![TapState Runtime Architecture](/assets/architecture-diagram.svg)
 
-Cyntex is organized into four cooperating layers: **Engine** (data movement), **Store** (persistence), **Serve** (data access), and **Manager** (control plane). Each layer has a clear responsibility boundary and communicates through well-defined interfaces.
+This page describes the target runtime architecture. The current open-source repository implements the shared resource model, connector catalog, schema, and offline CLI; Manager, Engine, Store, and Serve runtime behavior remains phased work unless a section explicitly identifies current implementation evidence.
+
+TapState is organized into four cooperating layers: **Engine** (data movement), **Store** (persistence), **Serve** (data access), and **Manager** (control plane). Each layer has a clear responsibility boundary and communicates through well-defined interfaces.
 
 ---
 
-## Cyntex Manager
+## TapState Manager
 
-The top-most layer provides the control plane and observability surface. It is accessible via the **Web Console** and **CLI**, and exposes all operational capabilities through the **MCP server** so AI agents can operate Cyntex programmatically.
+The top-most layer provides the control plane and observability surface. It is accessible via the **Web Console** and **CLI**, and exposes all operational capabilities through the **MCP server** so AI agents can operate TapState programmatically.
 
 | Capability | Description |
 |---|---|
@@ -27,20 +29,21 @@ The Manager issues control signals to the Engine via a downward interface — it
 
 ---
 
-## Cyntex Engine
+## TapState Engine
 
 The Engine is the data-movement core. All data captured from source systems flows through this layer before reaching storage or consumers.
 
 ### CDC Capture
 
-The entry point for all source data. Cyntex reads the **database transaction log** (binlog for MySQL, WAL for PostgreSQL, oplog for MongoDB) directly — no polling, no triggers. This gives sub-second latency and zero impact on the source database's query workload.
+The target runtime captures database transaction logs such as MySQL binlog, PostgreSQL WAL, and MongoDB Oplog when the selected connector exposes CDC. Latency and source impact depend on the connector, workload, and deployment and require runtime measurement.
 
 Supported capture modes:
 
 | Mode | Mechanism | When to use |
 |---|---|---|
 | `cdc` | Continuous log tailing | Real-time sync; any transactional database |
-| `batch` | Full snapshot scan | One-time initial load; databases without log access |
+| `snapshot` | Bounded snapshot scan | One-time copy of current rows or documents |
+| `stream` | Message-stream consumption | Kafka and other unbounded message systems |
 | `api` | Polling / webhook | SaaS sources (Salesforce, HubSpot, etc.) |
 | `file` | File scanning | S3, SFTP, local directory |
 
@@ -83,7 +86,7 @@ The stateful aggregation stage. Where Transform works row-by-row, Materialize ma
 
 ---
 
-## Cyntex Store
+## TapState Store
 
 The persistence layer sits below the Engine and provides three purpose-built stores plus a unified backup surface.
 
@@ -108,7 +111,7 @@ A unified, queryable backup spanning all three stores. Backed by **MongoDB** (si
 
 ---
 
-## Cyntex Serve
+## TapState Serve
 
 The data-access layer exposes processed data to consumers. There are two server roles:
 
@@ -122,7 +125,7 @@ Actively pushes change events to event-driven consumers:
 | **LakeHouse** | Writes to external data lakes (e.g., Apache Iceberg, Delta Lake) |
 | **Webhook** | HTTP push to any endpoint; payload format as CEL projection |
 
-Push is configured via the `push:` block in a pipeline definition. Output format defaults to the Cyntex TapEvent envelope; custom formats use a CEL expression.
+Push is configured via the `push:` block in a pipeline definition. Output format defaults to the TapState TapEvent envelope; custom formats use a CEL expression.
 
 ### Query Context Server
 
@@ -140,7 +143,7 @@ The Query Context Server is backed directly by the **Materialized View Store** �
 
 ## Code-Level Module Layout
 
-At the source code level, Cyntex uses a **ports-and-adapters** architecture with strictly unidirectional dependencies across six rings:
+At the source code level, TapState uses a **ports-and-adapters** architecture with strictly unidirectional dependencies across six rings:
 
 ```
 core          ← Domain model, DSL pipeline, lifecycle contracts (zero frameworks)

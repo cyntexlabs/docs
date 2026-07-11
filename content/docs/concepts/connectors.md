@@ -1,11 +1,11 @@
 ---
 title: Connectors
-description: Cyntex connector ecosystem — PDK, 60+ official connectors, non-intrusive CDC, and schema evolution
+description: TapState connector ecosystem — PDK, 60+ official connectors, non-intrusive CDC, and schema evolution
 sidebar:
   order: 2
 ---
 
-Cyntex inherits tapdata-connectors and provides 60+ official connectors, extensible via PDK (Plugin Development Kit).
+TapState inherits tapdata-connectors and provides 60+ official connectors, extensible via PDK (Plugin Development Kit).
 
 ## Official Connectors
 
@@ -25,11 +25,11 @@ For per-connector DSL configuration, see the [Connector Reference](/connectors/)
 
 ## Non-Intrusive Ingestion: Log-Based CDC
 
-The most critical aspect of a connector is **how** it extracts data. Cyntex uses log-based Change Data Capture (CDC) — reading the database's internal transaction log rather than querying tables.
+The most critical aspect of a connector is **how** it extracts data. TapState uses log-based Change Data Capture (CDC) — reading the database's internal transaction log rather than querying tables.
 
 | Method | How it works | Production impact |
 |---|---|---|
-| **Log-based CDC** (Cyntex) | Reads binlog / WAL / oplog at the file-system level | Near-zero — database engine is not queried |
+| **Log-based CDC** (TapState) | Reads binlog / WAL / oplog at the file-system level | Near-zero — database engine is not queried |
 | Query-based polling | Issues `SELECT WHERE updated_at > last_run` periodically | Adds CPU/IO load to production DB |
 | Database triggers | Writes to side tables on every change | Slows down every write transaction |
 
@@ -49,9 +49,9 @@ Log-based CDC captures **every** change — including hard deletes — and provi
 
 ## Legacy System Support
 
-A major use case for Cyntex is **modernizing access to legacy systems** — Oracle, DB2, Mainframe, IBM AS/400 — without migrating away from them.
+A major use case for TapState is **modernizing access to legacy systems** — Oracle, DB2, Mainframe, IBM AS/400 — without migrating away from them.
 
-These systems store the most valuable data in the enterprise but are locked behind strict access controls. Directly querying a production Mainframe or Oracle RAC cluster is expensive (MIPS cost) and carries performance risk. Cyntex's log-based approach solves this by:
+These systems store the most valuable data in the enterprise but are locked behind strict access controls. Directly querying a production Mainframe or Oracle RAC cluster is expensive (MIPS cost) and carries performance risk. TapState's log-based approach solves this by:
 
 - Reading at the storage layer, not the query layer — zero "SELECT" overhead
 - Syncing data to a modern "sidecar" store (MongoDB, PostgreSQL) that applications and AI agents query instead
@@ -63,7 +63,7 @@ This pattern — **legacy offloading** — allows banks, hospitals, and hospital
 
 ## Schema Evolution and Data Contracts
 
-When source database schemas change (columns added, types modified, tables renamed), naive CDC pipelines break. Cyntex handles schema drift via the `ddl:` policy on each pipeline:
+When source database schemas change (columns added, types modified, tables renamed), naive CDC pipelines break. TapState handles schema drift via the `ddl:` policy on each pipeline:
 
 | Policy | Behavior |
 |---|---|
@@ -94,7 +94,7 @@ Implement the PDK `ConnectorBase` interface and register it via the SPI. The con
 ## Referencing Connectors in DSL
 
 ```yaml
-apiVersion: cyntex/v1
+version: cyntex/v1
 kind: source
 id: mysql-prod
 connector: mysql        # connector id (from bundled catalog)

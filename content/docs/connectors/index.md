@@ -1,32 +1,34 @@
 ---
 title: Connector Reference
-description: DSL configuration reference for all official Cyntex connectors
+description: Configure connectors that are exposed by the current TapState catalog
 sidebar:
   order: 1
 ---
 
-DSL configuration reference for all connectors that ship with Cyntex. Each connector page lists required and optional config fields, supported modes, version requirements, and database-level prerequisites.
+Use this section to prepare an external system, create its `.cyn.yml` connection resource, and look up catalog-backed fields. Connector maturity describes the connector contract; the current open-source release still provides offline authoring and validation rather than live data execution.
 
 ## Connector Catalog
 
 | Connector | ID | Supported Modes | Status |
 |---|---|---|---|
-| MySQL | `mysql` | `batch`, `cdc` | GA |
-| PostgreSQL | `postgresql` | `batch`, `cdc` | GA |
-| Oracle | `oracle` | `batch`, `cdc` | GA |
-| SQL Server | `sqlserver` | `batch`, `cdc` | GA |
-| MongoDB | `mongodb` | `batch`, `cdc` | GA |
-| MongoDB Atlas | `mongodb-atlas` | `batch`, `cdc` | GA |
-| Kafka | `kafka` | `cdc` | GA |
+| MySQL | `mysql` | `snapshot`, `cdc` | GA |
+| MongoDB | `mongodb` | `snapshot`, `cdc` | GA |
+| MongoDB Atlas | `mongodb-atlas` | `snapshot`, `cdc` | GA |
+| Kafka (Confluent compatible) | `kafka_enhanced` | `stream` | GA |
+| Kafka (legacy) | `kafka` | `stream` | Deprecated |
+| PostgreSQL | `postgres` | — | Catalog contract pending |
+| Oracle | — | — | Not exposed by the current catalog |
+| SQL Server | — | — | Not exposed by the current catalog |
 
 ## Quick Start
 
-Pick a connector from the table above or the left-hand sidebar. Every page follows the same structure:
+Start with a GA row whose ID and mode are present in the current catalog. Migrated pages follow this structure:
 
-1. **Prerequisites** — database user setup, permissions, and any server-side configuration (binlog, WAL, CDC) required before connecting.
-2. **DSL Configuration** — a ready-to-copy `.cyn.yml` snippet with all required fields filled in and optional fields shown as comments.
-3. **Config Reference** — a field-by-field table covering type, requirement, defaults, and description.
-4. **Notes** — caveats, version-specific behavior, and CDC-specific considerations.
+1. **Before you begin** — source and target preparation, separated by the outcome you need.
+2. **Create a connection** — current CLI and `.cyn.yml` examples.
+3. **Validate the configuration** — offline validation and its exact boundary.
+4. **Limitations** — source, target, and operational constraints.
+5. **Reference** — catalog-backed fields and compatibility data.
 
 ## Connector ID vs. Connector Name
 

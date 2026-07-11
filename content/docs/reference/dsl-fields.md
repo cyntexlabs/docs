@@ -1,11 +1,11 @@
 ---
 title: DSL Fields Reference
-description: Machine-verifiable field reference generated from the Cyntex JSON Schema
+description: Machine-verifiable field reference generated from the TapState JSON Schema
 sidebar:
   order: 2
 ---
 
-This page is generated from the Cyntex DSL JSON Schema and is used by Docs AI Agent to verify field completeness and field facts. Edit the upstream schema first when a DSL field changes, then regenerate this page.
+This page is generated from the TapState DSL JSON Schema and is used by Docs AI Agent to verify field completeness and field facts. Edit the upstream schema first when a DSL field changes, then regenerate this page.
 
 | Field | Type | Required | Default | Enum |
 |---|---|---|---|---|
