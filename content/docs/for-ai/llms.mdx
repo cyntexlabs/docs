@@ -23,7 +23,7 @@ Use the smallest surface that answers the task:
 
 ## Give an assistant context
 
-For product discovery, start with `llms.txt`. For a connector or DSL decision, provide the page-level Markdown so the assistant receives the exact maturity, TapState availability, modes, limitations, and every tab body.
+For product discovery, start with `llms.txt`. For a connector or DSL decision, provide the page-level Markdown so the assistant receives the exact maturity, modes, limitations, local-validation boundaries, and every tab body.
 
 ```text
 Read https://tapstate.com/llms.mdx/docs/connectors/mysql/content.md,
@@ -37,8 +37,8 @@ The public site does not currently expose standalone JSON Schema or example-corp
 - Reader HTML is canonical and includes canonical URLs, breadcrumb data, and article structured data.
 - Connector frontmatter is a compact discovery index; the page body remains the authoritative explanation.
 - Interactive tabs expand into labeled sections in Page Markdown and `llms-full.txt`.
-- Maturity and TapState availability are separate signals. Do not infer current product availability from upstream connector maturity.
-- Unsupported UI, runtime, TLS, and connection-test behavior is not inferred from upstream documentation.
+- Maturity describes the connector release level. Do not infer unverified UI, runtime, TLS, or connection-test behavior from upstream documentation.
+- An offline catalog can validate only the connector fields and modes it contains. Its absence or incompleteness does not establish what a server-side runtime supports.
 
 ## MCP integration
 

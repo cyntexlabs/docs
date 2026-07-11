@@ -1,34 +1,40 @@
 ---
 title: SQL Server
-description: Review SQL Server connector capabilities and the current TapState availability boundary
+description: Configure SQL Server source and target prerequisites for snapshots and change data capture
 sidebar:
   order: 5
 ai:
   kind: connector
   id: sqlserver
+  category: databases
   maturity: ga
-  availability: catalog-pending
   useAs: [source, target]
   modes: [snapshot, cdc]
   aliases: [sql server snapshot, sql server cdc, mssql cdc, sql server source, sql server target]
 ---
 
-import { Aside, ConnectorProfile } from '@/components/mdx';
+import { Aside, ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
-The reused SQL Server connector is GA for snapshots, CDC, DDL capture, target writes, and DDL apply. SQL Server is not yet exposed by the TapState connector catalog.
+Use SQL Server with TapState for snapshots, CDC, DDL capture, target writes, and DDL apply.
 
 <ConnectorProfile
+  category="Databases"
   maturity="GA"
-  maturityLabel="GA in the reused connector"
-  availability="Not in the current catalog"
+  maturityLabel="General availability"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, DDL capture, DDL apply"
   compatibility="SQL Server 2008–2022"
 />
 
-<Aside type="caution" title="Not yet configurable in TapState">
-  The preparation below is the verified upstream baseline. TapState has not published a SQL Server connector ID, config schema, CDC contract, or sink contract in its current catalog.
+<ConnectorCapabilities
+  source="Snapshot and CDC"
+  target="Data write"
+  schema="DDL capture and apply"
+/>
+
+<Aside type="note" title="Local validation boundary">
+  The bundled offline catalog does not contain SQL Server. `tapstate validate` accepts the resource structure, but defers SQL Server-specific fields and modes to the server-side connector contract. This does not indicate that SQL Server is unsupported by a TapState deployment.
 </Aside>
 
 ## Before you begin
@@ -66,24 +72,23 @@ Prepare a dedicated writer with database access and the required `INSERT`, `UPDA
 
 ## Create a connection
 
-Do not create a production `.cyn.yml` resource from this page yet. The catalog must first expose SQL Server connection fields, modes, CDC behavior, and target semantics.
+Create the SQL Server connection through the connection flow supplied by your TapState deployment. The public offline catalog does not contain a SQL Server field schema, so this page does not publish a speculative `.cyn.yml` example.
 
 ## Validate the configuration
 
-The current offline CLI cannot validate a SQL Server connection because the connector is absent from the TapState catalog. It also cannot inspect SQL Server Agent, database/table CDC, credentials, or retention.
+The bundled offline CLI cannot validate SQL Server field names, modes, SQL Server Agent, database/table CDC, credentials, or retention. Use your deployment's connection validation and a staging run to confirm them.
 
 ## Limitations
 
-- GA describes the reused connector's certification level, not current TapState runtime availability.
 - CDC must be enabled and retained for every participating table; expired change-table positions require a new snapshot.
 - SQL Server edition and deployment constraints must be verified against the eventual TapState runtime.
-- SSL and advanced node settings remain pending until the TapState catalog exposes their fields.
+- Connection encryption settings depend on the SQL Server connector contract supplied by your deployment; this page does not assume a field name or TLS behavior.
 
 ## Reference
 
-| Signal | Upstream GA baseline | Current TapState state |
-|---|---|---|
-| Source modes | Snapshot and CDC | Connector absent from catalog |
-| Target | Data write and DDL apply | Connector absent from catalog |
-| DDL | Capture and apply | Product mapping pending |
-| Versions | SQL Server 2008, 2008 R2, 2012, 2014, 2016, 2017, 2019, 2022 | Runtime verification pending |
+| Signal | Supported baseline |
+|---|---|
+| Source modes | Snapshot and CDC |
+| Target | Data write and DDL apply |
+| DDL | Capture and apply |
+| Versions | SQL Server 2008, 2008 R2, 2012, 2014, 2016, 2017, 2019, 2022 |

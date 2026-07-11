@@ -1,34 +1,40 @@
 ---
 title: Oracle
-description: Review Oracle connector capabilities and the current TapState availability boundary
+description: Configure Oracle source and target prerequisites for snapshots and change data capture
 sidebar:
   order: 4
 ai:
   kind: connector
   id: oracle
+  category: databases
   maturity: ga
-  availability: catalog-pending
   useAs: [source, target]
   modes: [snapshot, cdc]
   aliases: [oracle snapshot, oracle cdc, oracle logminer, oracle source, oracle target]
 ---
 
-import { Aside, ConnectorProfile } from '@/components/mdx';
+import { Aside, ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
-The reused Oracle connector is GA for snapshots, CDC, DDL capture, target writes, and DDL apply. Oracle is not yet exposed by the TapState connector catalog.
+Use Oracle with TapState for snapshots, CDC, DDL capture, target writes, and DDL apply.
 
 <ConnectorProfile
+  category="Databases"
   maturity="GA"
-  maturityLabel="GA in the reused connector"
-  availability="Not in the current catalog"
+  maturityLabel="General availability"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, DDL capture, DDL apply"
   compatibility="Oracle 9i, 10g, 11g, 12c, 18c, 19c+ · Single instance and RAC"
 />
 
-<Aside type="caution" title="Not yet configurable in TapState">
-  The preparation below is the verified upstream baseline. TapState has not published an Oracle connector ID, config schema, CDC method, or sink contract in its current catalog.
+<ConnectorCapabilities
+  source="Snapshot and CDC"
+  target="Data write"
+  schema="DDL capture and apply"
+/>
+
+<Aside type="note" title="Local validation boundary">
+  The bundled offline catalog does not contain Oracle. `tapstate validate` accepts the resource structure, but defers Oracle-specific fields and modes to the server-side connector contract. This does not indicate that Oracle is unsupported by a TapState deployment.
 </Aside>
 
 ## Before you begin
@@ -51,13 +57,13 @@ Snapshot does not require ARCHIVELOG, supplemental logging, or LogMiner.
 
 Use **Snapshot + CDC** to copy existing rows and then capture redo-log changes.
 
-1. Grant the Snapshot permissions plus the confirmed LogMiner and transaction-log access required by the reused connector.
+1. Grant the Snapshot permissions plus the LogMiner and transaction-log access required by your selected CDC method.
 2. Enable `ARCHIVELOG` and database-level supplemental logging.
 3. Enable supplemental logging for participating tables and verify that archived logs cover the recovery window.
 4. Grant `LOGMINING` on Oracle 12c and later when using LogMiner.
 5. Prepare DDL-capture permissions only when DDL collection is required.
 
-The upstream connector also supports a raw-log path, but TapState has not exposed a CDC-method selector, so this page does not recommend one.
+Oracle CDC methods have different architecture and operational requirements. Confirm the method configured by your TapState deployment before applying method-specific settings.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -68,24 +74,23 @@ Prepare a dedicated writer with session, object creation, and DML privileges for
 
 ## Create a connection
 
-Do not create a production `.cyn.yml` resource from this page yet. The catalog must first expose Oracle connection fields, multitenant settings, the supported CDC method, modes, and target semantics.
+Create the Oracle connection through the connection flow supplied by your TapState deployment. The public offline catalog does not contain an Oracle field schema, so this page does not publish a speculative `.cyn.yml` example.
 
 ## Validate the configuration
 
-The current offline CLI cannot validate an Oracle connection because the connector is absent from the TapState catalog. It also cannot test Oracle credentials, logging, supplemental logging, or LogMiner access.
+The bundled offline CLI cannot validate Oracle field names, modes, credentials, logging, supplemental logging, or LogMiner access. Use your deployment's connection validation and a staging run to confirm them.
 
 ## Limitations
 
-- GA describes the reused connector's certification level, not current TapState runtime availability.
 - LogMiner and raw-log capture have different type, architecture, and operational constraints.
 - Oracle empty strings become `NULL`; heterogeneous targets and constraints require staging tests.
-- SSL and advanced node settings remain pending until the TapState catalog exposes their fields.
+- Connection encryption settings depend on the Oracle connector contract supplied by your deployment; this page does not assume a field name or TLS behavior.
 
 ## Reference
 
-| Signal | Upstream GA baseline | Current TapState state |
-|---|---|---|
-| Source modes | Snapshot and CDC | Connector absent from catalog |
-| Target | Data write and DDL apply | Connector absent from catalog |
-| DDL | Capture and apply | Product mapping pending |
-| Versions | Oracle 9i, 10g, 11g, 12c, 18c, 19c+ | Runtime verification pending |
+| Signal | Supported baseline |
+|---|---|
+| Source modes | Snapshot and CDC |
+| Target | Data write and DDL apply |
+| DDL | Capture and apply |
+| Versions | Oracle 9i, 10g, 11g, 12c, 18c, 19c+ |

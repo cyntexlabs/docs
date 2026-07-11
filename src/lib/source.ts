@@ -44,8 +44,8 @@ function renderConnectorProfileForLLM(attrs: string) {
 
 | Signal | What it means |
 |---|---|
+| Category | ${field('category')} |
 | Maturity | ${field('maturity')} — ${field('maturityLabel')} |
-| TapState availability | ${field('availability')} |
 | Works as | ${field('worksAs')} |
 | Capabilities | ${field('capabilities')} |
 | Compatibility | ${field('compatibility')} |`;
@@ -93,6 +93,10 @@ function cleanMdxForLLM(markdown: string) {
     .replace(/<ConnectorProfile\s+([\s\S]*?)\/>/g, (_match, attrs: string) => {
       return renderConnectorProfileForLLM(attrs);
     })
+    .replace(/<ConnectorCapabilities\s+([\s\S]*?)\/>/g, (_match, attrs: string) => {
+      const field = (name: string, fallback: string) => readAttribute(attrs, name) ?? fallback;
+      return `## Capabilities\n\n| Role | What you can do |\n|---|---|\n| Source | ${field('source', 'Not specified')} |\n| Target | ${field('target', 'Not specified')} |\n| Schema changes | ${field('schema', 'Not claimed')} |`;
+    })
     .replace(/^\s{2,}(#{1,6}\s.*)$/gm, '$1')
     .replace(/^\s{2,}(\|.*\|)$/gm, '$1')
     .replace(/([^\n])\n(#{2,6}\s)/g, '$1\n\n$2')
@@ -103,8 +107,8 @@ function cleanMdxForLLM(markdown: string) {
 type AIPageMetadata = {
   kind: 'connector' | 'concept' | 'reference' | 'guide';
   id: string;
+  category?: string;
   maturity: 'experimental' | 'preview' | 'ga' | 'deprecated';
-  availability?: 'available' | 'catalog-pending';
   useAs?: Array<'source' | 'target'>;
   modes?: string[];
   aliases?: string[];
@@ -131,8 +135,8 @@ function renderAgentMetadata(page: (typeof source)['$inferPage']) {
   const fields = [
     ['Content type', ai.kind],
     ['Identifier', ai.id],
+    ['Category', ai.category],
     ['Maturity', ai.maturity],
-    ['Availability', ai.availability],
     ['Use as', ai.useAs?.join(', ')],
     ['Modes', ai.modes?.join(', ')],
     ['Aliases', ai.aliases?.join(', ')],

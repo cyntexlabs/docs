@@ -6,25 +6,30 @@ sidebar:
 ai:
   kind: connector
   id: mongodb
+  category: databases
   maturity: ga
-  availability: available
   useAs: [source, target]
   modes: [snapshot, cdc]
   aliases: [mongodb snapshot, mongodb full load, mongodb cdc, mongodb oplog, mongodb source, mongodb target]
 ---
 
-import { ConnectorProfile } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Connect MongoDB replica set or sharded cluster deployments as a TapState source or target for snapshots and CDC through the Oplog.
 
 <ConnectorProfile
+  category="Databases"
   maturity="GA"
   maturityLabel="Production ready"
-  availability="Available for authoring"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Schema discovery"
   compatibility="MongoDB 4.0+ · Replica sets and sharded clusters"
+/>
+
+<ConnectorCapabilities
+  source="Snapshot and CDC through the Oplog"
+  target="Data write"
 />
 
 ## Before you begin
@@ -157,7 +162,7 @@ tables:
 ## Validate the configuration
 
 ```bash
-cyntex validate --workdir tapstate-work
+tapstate validate --workdir tapstate-work
 ```
 
 Offline validation checks resource structure, references, field types, and supported modes. It does not connect to MongoDB or inspect the Oplog.

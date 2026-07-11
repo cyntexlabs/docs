@@ -1,0 +1,88 @@
+---
+title: Alibaba 1688
+description: Configure Alibaba 1688 as a TapState API source
+sidebar:
+  order: 50
+ai:
+  kind: connector
+  id: ali1688
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [api]
+  aliases: [alibaba 1688, 1688 api, alibaba marketplace, 1688 source]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Alibaba 1688 as an API source for marketplace data exposed to your authorized developer application.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="API read, Resource discovery"
+  compatibility="Alibaba 1688 Open Platform"
+/>
+
+<ConnectorCapabilities
+  source="API read"
+  target="Not declared in the current catalog"
+/>
+
+<Aside type="note" title="Authorization contract">
+  The current catalog exposes one required `code` field labelled **Authorize**. It does not publish App Key, App Secret, target-write, or CDC fields, so this page does not invent them from the upstream console guide.
+</Aside>
+
+## Before you begin
+
+1. Create or select an Alibaba 1688 Open Platform developer application authorized for the marketplace data you need.
+2. Complete the platform authorization flow and obtain the authorization value required by your deployment.
+3. Confirm the API permissions, rate limits, and accessible business resources with the application owner.
+
+## Create a connection
+
+```bash
+tapstate new --non-interactive \
+  --kind source \
+  --connector ali1688 \
+  --id alibaba_orders \
+  --mode api \
+  --set code='${ALI1688_AUTHORIZATION_CODE}' \
+  --workdir tapstate-work
+```
+
+```yaml title="tapstate-work/source/alibaba_orders.cyn.yml"
+version: cyntex/v1
+kind: source
+id: alibaba_orders
+connector: ali1688
+config:
+  code: ${ALI1688_AUTHORIZATION_CODE}
+mode: api
+```
+
+Use the value accepted by your TapState deployment's Alibaba 1688 authorization flow. Do not substitute a guessed App Key or App Secret field; they are not part of the bundled catalog contract.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope, `api` mode, and required `code` field shape. It does not complete OAuth, authenticate to Alibaba 1688, verify permissions, or fetch marketplace data.
+
+## Limitations
+
+- The current catalog declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- Authorization scope, code expiry, API quotas, and marketplace resource access are runtime concerns enforced by Alibaba 1688.
+- Keep the authorization value outside committed workspace files by supplying it through an environment variable.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `code` | Yes | Authorization value accepted by the deployment's Alibaba 1688 connector flow. |

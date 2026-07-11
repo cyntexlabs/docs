@@ -6,25 +6,30 @@ sidebar:
 ai:
   kind: connector
   id: mongodb-atlas
+  category: databases
   maturity: ga
-  availability: available
   useAs: [source, target]
   modes: [snapshot, cdc]
   aliases: [mongodb atlas snapshot, mongodb atlas cdc, atlas oplog, atlas source, atlas target]
 ---
 
-import { ConnectorProfile } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Connect a MongoDB Atlas cluster as a TapState source or target for snapshots and CDC through the Atlas-managed Oplog.
 
 <ConnectorProfile
+  category="Databases"
   maturity="GA"
   maturityLabel="Production ready"
-  availability="Available for authoring"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Schema discovery"
   compatibility="MongoDB Atlas 5.0.15+ · SRV and standard URI"
+/>
+
+<ConnectorCapabilities
+  source="Snapshot and CDC through the Atlas-managed Oplog"
+  target="Data write"
 />
 
 ## Before you begin
@@ -121,7 +126,7 @@ tables:
 ## Validate the configuration
 
 ```bash
-cyntex validate --workdir tapstate-work
+tapstate validate --workdir tapstate-work
 ```
 
 Offline validation checks resource structure and catalog-backed fields. It does not test the Atlas network allowlist, credentials, DNS seed discovery, or Oplog access.

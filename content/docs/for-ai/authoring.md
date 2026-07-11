@@ -13,7 +13,7 @@ The current TapState AI workflow is offline and human-reviewable. An assistant c
 1. Give the assistant llms.txt or the relevant page Markdown
 2. Describe one source, target, and desired data outcome
 3. Generate or scaffold .cyn.yml resources
-4. Run cyntex validate
+4. Run tapstate validate
 5. Feed coded diagnostics back to the assistant
 6. Review the final diff before keeping it
 ```
@@ -33,7 +33,7 @@ Then load the page-level Markdown for the connector or DSL area being edited. Co
 For repeatable automation, use the non-interactive CLI:
 
 ```bash
-cyntex new --non-interactive \
+tapstate new --non-interactive \
   --kind source \
   --connector mysql \
   --id orders_source \
@@ -50,7 +50,7 @@ Use `--dry-run` when the assistant should preview canonical YAML without writing
 ## Validate and repair
 
 ```bash
-cyntex validate --workdir tapstate-work --output json
+tapstate validate --workdir cyn-work --output json
 ```
 
 On failure, give the assistant the diagnostic `code`, location, message, and solution. Ask it to change only the reported resource, then validate again. Exit code `0` proves the offline resource contract, not database connectivity or runtime execution.
@@ -60,8 +60,8 @@ On failure, give the assistant the diagnostic `code`, location, message, and sol
 Associate `*.cyn.yml` with the bundled JSON Schema for editor completion. For a focused question, use:
 
 ```bash
-cyntex explain source.mode
-cyntex explain pipeline.sync
+tapstate explain source.mode
+tapstate explain pipeline.sync
 ```
 
 `explain` describes grammar fields; connector pages describe database preparation and catalog-backed config.

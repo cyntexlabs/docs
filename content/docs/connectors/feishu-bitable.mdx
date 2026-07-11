@@ -1,0 +1,102 @@
+---
+title: Lark Bitable
+description: Configure Lark Bitable (Feishu Bitable) as a TapState API source
+sidebar:
+  order: 40
+ai:
+  kind: connector
+  id: feishu-bitable
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [api]
+  aliases: [lark bitable, feishu bitable, feishu multi-dimensional table, lark base, bitable api]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Lark Bitable, also known as Feishu Bitable, to read records from one Bitable table through the platform API.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="API read, Resource discovery"
+  compatibility="Lark / Feishu Bitable API"
+/>
+
+<ConnectorCapabilities
+  source="API read"
+  target="Not declared in the current catalog"
+/>
+
+<Aside type="note" title="Catalog takes precedence over the upstream UI guide">
+  The bundled catalog declares an API source and no target-write capability. This page intentionally does not carry over the upstream claim that Bitable can be a target.
+</Aside>
+
+## Before you begin
+
+1. Create or select a Lark/Feishu self-built application.
+2. Record its App ID and App Secret.
+3. Grant the application access to the Bitable application and table that TapState will read.
+4. Copy the Bitable App Token and Table ID from the Bitable URL or API tooling.
+
+The Bitable API enforces rate limits. Design downstream polling and retries for the limits published by Lark/Feishu, rather than assuming that a successful local YAML check has tested the API.
+
+## Create a connection
+
+```bash
+tapstate new --non-interactive \
+  --kind source \
+  --connector feishu-bitable \
+  --id customer_requests \
+  --mode api \
+  --set app_id='${LARK_APP_ID}' \
+  --set app_secret='${LARK_APP_SECRET}' \
+  --set app_token='${LARK_BITABLE_APP_TOKEN}' \
+  --set table_id='${LARK_BITABLE_TABLE_ID}' \
+  --workdir tapstate-work
+```
+
+The resource uses the catalog's exact field spellings:
+
+```yaml title="tapstate-work/source/customer_requests.cyn.yml"
+version: cyntex/v1
+kind: source
+id: customer_requests
+connector: feishu-bitable
+config:
+  app_id: ${LARK_APP_ID}
+  app_secret: ${LARK_APP_SECRET}
+  app_token: ${LARK_BITABLE_APP_TOKEN}
+  table_id: ${LARK_BITABLE_TABLE_ID}
+mode: api
+```
+
+All four fields are required by the catalog. Keep secrets in environment variables even though the current catalog does not mark `app_secret` as a secret field.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope, API mode, and catalog-known field types. It does not authenticate to Lark/Feishu, check application scopes, enumerate Bitable tables, or read records.
+
+## Limitations
+
+- The current catalog declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- App permissions, tenant policy, and API rate limits are enforced by Lark/Feishu at runtime.
+- Do not put App Secret values in a committed `.cyn.yml` file.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `app_id` | Yes | Self-built application App ID. |
+| `app_secret` | Yes | Self-built application secret. Supply through an environment variable. |
+| `app_token` | Yes | Bitable application token. |
+| `table_id` | Yes | Bitable table identifier. |

@@ -2,12 +2,20 @@
   "title": "Connectors",
   "pages": [
     "index",
+    "---Databases---",
     "mysql",
     "postgresql",
     "oracle",
     "sqlserver",
     "mongodb",
     "mongodb-atlas",
-    "kafka"
+    "opengauss",
+    "---Warehouses & analytics---",
+    "selectdb",
+    "---Streaming & messaging---",
+    "kafka",
+    "---SaaS, business & commerce APIs---",
+    "feishu-bitable",
+    "alibaba-1688"
   ]
 }

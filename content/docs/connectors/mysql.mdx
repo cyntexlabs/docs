@@ -6,25 +6,31 @@ sidebar:
 ai:
   kind: connector
   id: mysql
+  category: databases
   maturity: ga
-  availability: available
   useAs: [source, target]
   modes: [snapshot, cdc]
   aliases: [mysql snapshot, mysql full load, mysql cdc, mysql binlog, mysql source, mysql target]
 ---
 
-import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Connect MySQL to TapState for point-in-time snapshots, real-time change capture, and downstream delivery.
 
 <ConnectorProfile
+  category="Databases"
   maturity="GA"
   maturityLabel="Production ready"
-  availability="Available for authoring"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Schema discovery, DDL capture, DDL apply"
   compatibility="MySQL 5.0–9.x · Single node and primary-replica"
+/>
+
+<ConnectorCapabilities
+  source="Snapshot and CDC"
+  target="Data write"
+  schema="DDL capture and apply"
 />
 
 ## Before you begin
@@ -136,7 +142,7 @@ TapState stores each MySQL connection as a `.cyn.yml` file in the workspace. Cre
 The example below creates a Snapshot + CDC source using the current CLI contract.
 
 ```bash
-cyntex new --non-interactive \
+tapstate new --non-interactive \
   --kind source \
   --connector mysql \
   --id orders_source \
@@ -207,7 +213,7 @@ For CDC from a replica, make sure it writes replicated events to its own binlog 
 A MySQL target is represented by the same `kind: source` connection resource, but it has no reader `mode` or `tables`. This lets a pipeline refer to it as an output connection.
 
 ```bash
-cyntex new --non-interactive \
+tapstate new --non-interactive \
   --kind source \
   --connector mysql \
   --id analytics_mysql \
@@ -241,7 +247,7 @@ Before using `upsert`, confirm that the target tables have the keys and column t
 Run the offline validation gate after creating or editing the connection files:
 
 ```bash
-cyntex validate --workdir tapstate-work
+tapstate validate --workdir tapstate-work
 ```
 
 <ValidationStatusGuide />
