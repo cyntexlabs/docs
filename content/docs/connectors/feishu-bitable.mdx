@@ -47,7 +47,7 @@ The Bitable API enforces rate limits. Design downstream polling and retries for 
 ## Create a connection
 
 ```bash
-cyntex new --non-interactive \
+tapstate new --non-interactive \
   --kind source \
   --connector feishu-bitable \
   --id customer_requests \
@@ -79,7 +79,7 @@ All four fields are required by the catalog. Keep secrets in environment variabl
 ## Validate the configuration
 
 ```bash
-cyntex validate --workdir tapstate-work
+tapstate validate --workdir tapstate-work
 ```
 
 <ValidationStatusGuide />

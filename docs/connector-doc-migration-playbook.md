@@ -61,7 +61,7 @@ Do not put an internal evidence discussion ahead of the setup path. Keep essenti
 
 | Upstream TapData concept | TapState result | Evidence / rationale |
 |---|---|---|
-| `Connections` → `Create` → `MySQL` UI | `cyntex new --kind source --connector mysql ...` plus a workspace YAML artifact | Current TapState implementation exposes a CLI authoring workflow, not the TapData console. |
+| `Connections` → `Create` → `MySQL` UI | `tapstate new --kind source --connector mysql ...` plus a workspace YAML artifact | Current TapState implementation exposes a CLI authoring workflow, not the TapData console. |
 | `apiVersion` and `batch` from the old target page | `version: cyntex/v1` and `snapshot` | Current TapState schema and catalog use those exact values. |
 | `connectionParams` | `addtionalString` | The bundled MySQL catalog preserves this connector-spec spelling. |
 | UI table selection | `tables: [orders, /orders_.*/]` | The TapState source model accepts literal and regex table references. |
@@ -76,7 +76,7 @@ Use **TapState** for all reader-facing product names, page titles, descriptions,
 
 Do not mechanically rename implementation identifiers. Until the product code provides a compatibility layer or a formal migration, preserve these exactly:
 
-- CLI binary: `cyntex`
+- CLI binary: `tapstate`
 - DSL file extension: `.cyn.yml`
 - DSL version: `version: cyntex/v1`
 - environment variable: `CYNTEX_WORKDIR`

@@ -54,7 +54,7 @@ Choose a connector by the system you need to read from or write to. Each page le
 Connection resources are `.cyn.yml` files. Use the exact connector ID and field names from the page's Reference section. A target is represented by the same `kind: source` connection resource without a reader `mode` or `tables` section.
 
 ```bash
-cyntex validate --workdir tapstate-work
+tapstate validate --workdir tapstate-work
 ```
 
 This offline check validates workspace structure plus catalog-known modes and field shapes. It does not test a network route, credentials, database privileges, API access, or a live write.

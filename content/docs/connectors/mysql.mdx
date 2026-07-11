@@ -142,7 +142,7 @@ TapState stores each MySQL connection as a `.cyn.yml` file in the workspace. Cre
 The example below creates a Snapshot + CDC source using the current CLI contract.
 
 ```bash
-cyntex new --non-interactive \
+tapstate new --non-interactive \
   --kind source \
   --connector mysql \
   --id orders_source \
@@ -213,7 +213,7 @@ For CDC from a replica, make sure it writes replicated events to its own binlog 
 A MySQL target is represented by the same `kind: source` connection resource, but it has no reader `mode` or `tables`. This lets a pipeline refer to it as an output connection.
 
 ```bash
-cyntex new --non-interactive \
+tapstate new --non-interactive \
   --kind source \
   --connector mysql \
   --id analytics_mysql \
@@ -247,7 +247,7 @@ Before using `upsert`, confirm that the target tables have the keys and column t
 Run the offline validation gate after creating or editing the connection files:
 
 ```bash
-cyntex validate --workdir tapstate-work
+tapstate validate --workdir tapstate-work
 ```
 
 <ValidationStatusGuide />

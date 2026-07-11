@@ -99,7 +99,7 @@ Use **TapState** in titles, descriptions, diagrams, and reader-facing product co
 
 The current implementation still exposes several compatibility identifiers. Keep them exact in executable examples until the product repository changes the contract:
 
-- CLI binary: `cyntex`
+- CLI binary: `tapstate`
 - resource extension: `.cyn.yml`
 - resource version: `version: cyntex/v1`
 - workspace environment variable: `CYNTEX_WORKDIR`
