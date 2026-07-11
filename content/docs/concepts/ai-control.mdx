@@ -1,0 +1,67 @@
+---
+title: AI Control Layer
+description: Current AI-assisted authoring and the planned TapState runtime control surface
+sidebar:
+  order: 3
+---
+
+import { Aside } from '@/components/mdx';
+
+TapState separates AI assistance from deterministic product control. No model is bundled: teams bring their own assistant, while the TapState schema, catalog, and validation code remain authoritative.
+
+## Available today: offline authoring
+
+The current open-source release supports a human-reviewable loop:
+
+```text
+Docs / skill / JSON Schema
+          ↓
+AI or human drafts .cyn.yml
+          ↓
+cyntex new / explain / validate
+          ↓
+Coded diagnostics and reviewed files
+```
+
+Useful interfaces include:
+
+- `llms.txt` and page-level Markdown for documentation discovery;
+- JSON Schema for completion and editor diagnostics;
+- `cyntex new --non-interactive` for deterministic scaffolding;
+- `cyntex explain` for field-level grammar help;
+- `cyntex validate --output json` for machine-readable results.
+
+An assistant can draft and repair resources, but offline validation does not connect to sources or execute data movement.
+
+## Planned runtime control
+
+The target architecture adds a server-side operation registry and thin CLI, API, and MCP frontends. Operations are intended to carry explicit read, write, or administrative scopes and to share validation and audit behavior.
+
+<Aside type="caution" title="Not in the current open-source release">
+  Live source discovery, apply, run, start, stop, status, logs, lag metrics, and MCP lifecycle tools require a TapState server. Current server-dependent CLI verbs exit with code `3`.
+</Aside>
+
+## Human-in-the-loop boundary
+
+Even after live control is available, generated changes should remain reviewable:
+
+- read operations may be automated within granted scope;
+- writes must name the resource and intended change;
+- destructive or lifecycle operations require explicit authorization;
+- credentials stay outside generated YAML where possible;
+- AI suggestions never override catalog, schema, runtime, or access-control decisions.
+
+## Why this design matters
+
+AI improves discoverability and authoring speed. Deterministic interfaces provide safety:
+
+| Need | Deterministic surface |
+|---|---|
+| Correct resource shape | JSON Schema and parser |
+| Correct connector fields | Embedded catalog |
+| Closed references | Workspace validation |
+| Repairable failures | Stable error code, location, message, and solution |
+| Automation | JSON/YAML CLI output |
+| Future live access | Scoped server operations exposed through thin frontends |
+
+See [Authoring with AI](/docs/for-ai/authoring) for the current workflow.

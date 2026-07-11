@@ -1,0 +1,199 @@
+<svg viewBox="0 0 1250 800" xmlns="http://www.w3.org/2000/svg"
+     font-family="'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <marker id="a"  markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L0,9 L9,4.5z" fill="#555"/></marker>
+    <marker id="aO" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L0,9 L9,4.5z" fill="#c97a10"/></marker>
+    <marker id="aG" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L0,9 L9,4.5z" fill="#1a7a40"/></marker>
+    <marker id="aSm" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5z" fill="#555"/></marker>
+  </defs>
+
+  <rect width="1250" height="800" fill="white"/>
+
+  <!-- ── TOP LABELS ── -->
+  <text x="418" y="27" text-anchor="middle" fill="#444" font-size="13.5">Web Console</text>
+  <text x="556" y="27" text-anchor="middle" fill="#444" font-size="13.5">CLI</text>
+
+  <!-- ═══════════════════════════════════════
+       TAPSTATE MANAGER
+  ═══════════════════════════════════════ -->
+  <rect x="82" y="36" width="836" height="108" rx="6"
+        fill="#daeef8" stroke="#7bbde0" stroke-width="1.8" stroke-dasharray="7,4"/>
+  <text x="97" y="56" font-size="13" font-weight="600" fill="#1a4f80">TapState Manager</text>
+  <rect x="102" y="63" width="796" height="64" rx="5"
+        fill="#b2d5ef" stroke="#5fa8d8" stroke-width="1.1"/>
+  <text x="500" y="100" text-anchor="middle" font-size="13" font-weight="600" fill="#0d3560">
+    MCP  |  Observability  |  Lineage &amp; Data Trace  |  Validation  |  Security
+  </text>
+
+  <!-- Manager → Engine dashed control arrows -->
+  <line x1="340" y1="144" x2="340" y2="180" stroke="#666" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#a)"/>
+  <line x1="645" y1="144" x2="645" y2="180" stroke="#666" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#a)"/>
+
+  <!-- ═══════════════════════════════════════
+       TAPSTATE ENGINE  (outer box)
+  ═══════════════════════════════════════ -->
+  <rect x="82" y="180" width="648" height="578" rx="6"
+        fill="#daeef8" stroke="#7bbde0" stroke-width="1.8" stroke-dasharray="7,4"/>
+  <text x="97" y="200" font-size="13" font-weight="600" fill="#1a4f80">TapState Engine</text>
+
+  <!-- ── Database Cylinder ── -->
+  <!-- body -->
+  <rect x="90" y="311" width="62" height="50" fill="#c8c8c8" stroke="#888" stroke-width="1.2"/>
+  <!-- top ellipse -->
+  <ellipse cx="121" cy="311" rx="31" ry="10" fill="#e0e0e0" stroke="#888" stroke-width="1.2"/>
+  <!-- bottom ellipse -->
+  <ellipse cx="121" cy="361" rx="31" ry="10" fill="#b8b8b8" stroke="#888" stroke-width="1.2"/>
+  <!-- label -->
+  <text x="121" y="383" text-anchor="middle" font-size="11" fill="#555">Database</text>
+  <text x="121" y="397" text-anchor="middle" font-size="11" fill="#555">Transaction</text>
+  <text x="121" y="411" text-anchor="middle" font-size="11" fill="#555">Log</text>
+
+  <!-- DB → CDC Capture -->
+  <line x1="152" y1="336" x2="188" y2="336" stroke="#555" stroke-width="1.7" marker-end="url(#a)"/>
+
+  <!-- ── CDC Capture ── -->
+  <rect x="190" y="308" width="132" height="56" rx="9" fill="#4a9fd4" stroke="#2a72a8" stroke-width="1.4"/>
+  <text x="256" y="341" text-anchor="middle" font-size="13" fill="white" font-weight="600">CDC Capture</text>
+
+  <!-- CDC → Change Log Buffer (diagonal down-right) -->
+  <line x1="322" y1="340" x2="360" y2="364" stroke="#555" stroke-width="1.7" marker-end="url(#a)"/>
+
+  <!-- ── Lookup Cache (orange, upper) ── -->
+  <rect x="362" y="228" width="132" height="56" rx="9" fill="#f5972a" stroke="#c97a10" stroke-width="1.4"/>
+  <text x="428" y="261" text-anchor="middle" font-size="13" fill="white" font-weight="600">Lookup Cache</text>
+
+  <!-- Sync Cache: dashed vertical + label to right -->
+  <line x1="428" y1="284" x2="428" y2="332" stroke="#c97a10" stroke-width="1.3" stroke-dasharray="4,2.5"/>
+  <text x="442" y="314" font-size="10.5" fill="#7a5010">Sync Cache</text>
+
+  <!-- ── Change Log Buffer (orange, lower) ── -->
+  <rect x="362" y="334" width="132" height="65" rx="9" fill="#f5972a" stroke="#c97a10" stroke-width="1.4"/>
+  <text x="428" y="362" text-anchor="middle" font-size="12" fill="white" font-weight="600">Change Log</text>
+  <text x="428" y="380" text-anchor="middle" font-size="12" fill="white" font-weight="600">Buffer</text>
+
+  <!-- Feeds: dashed orange Lookup Cache → Transform -->
+  <line x1="494" y1="252" x2="544" y2="285" stroke="#c97a10" stroke-width="1.5" stroke-dasharray="5,2.5" marker-end="url(#aO)"/>
+  <text x="527" y="261" text-anchor="middle" font-size="11" fill="#7a5010">Feeds</text>
+
+  <!-- ── Transform ── -->
+  <rect x="546" y="262" width="132" height="56" rx="9" fill="#4a9fd4" stroke="#2a72a8" stroke-width="1.4"/>
+  <text x="612" y="296" text-anchor="middle" font-size="13" fill="white" font-weight="600">Transform</text>
+
+  <!-- Change Log Buffer → Transform (solid arc going upper-right) -->
+  <path d="M 494 352 Q 522 322 546 302" stroke="#555" stroke-width="1.7" fill="none" marker-end="url(#a)"/>
+
+  <!-- Change Log Buffer → Materialize (dashed orange, going right) -->
+  <line x1="494" y1="376" x2="546" y2="384" stroke="#c97a10" stroke-width="1.5" stroke-dasharray="5,2.5" marker-end="url(#aO)"/>
+
+  <!-- ── Materialize ── -->
+  <rect x="546" y="360" width="132" height="56" rx="9" fill="#4a9fd4" stroke="#2a72a8" stroke-width="1.4"/>
+  <text x="612" y="394" text-anchor="middle" font-size="13" fill="white" font-weight="600">Materialize</text>
+
+  <!-- Join lookup: green dashed, Source Replica area → Materialize -->
+  <path d="M 428 490 L 428 436 L 546 400"
+        stroke="#1a7a40" stroke-width="1.4" fill="none" stroke-dasharray="5,3" marker-end="url(#aG)"/>
+  <text x="494" y="452" text-anchor="middle" font-size="11" fill="#1a6032">Join lookup</text>
+
+  <!-- ── TapState Store inner border ── -->
+  <rect x="100" y="478" width="614" height="258" rx="5"
+        fill="#c5e8e1" stroke="#45b09a" stroke-width="1.3" stroke-dasharray="5,3"/>
+
+  <!-- "Persist Change Log" curved arrow: Change Log Buffer → Change Log Store -->
+  <path d="M 390 399 C 370 444 308 468 255 490"
+        stroke="#555" stroke-width="1.3" fill="none" marker-end="url(#a)"/>
+  <text x="293" y="449" font-size="10" fill="#555" transform="rotate(-36,293,449)">Persist Change Log</text>
+
+  <!-- "Sync Replica" arrow: Change Log Buffer bottom → Source Replica Store -->
+  <line x1="430" y1="399" x2="430" y2="490" stroke="#555" stroke-width="1.3" marker-end="url(#a)"/>
+  <text x="438" y="448" font-size="10" fill="#555">Sync Replica</text>
+
+  <!-- Materialize → Materialized View Store -->
+  <line x1="612" y1="416" x2="612" y2="490" stroke="#555" stroke-width="1.3" marker-end="url(#a)"/>
+
+  <!-- Change Log Store -->
+  <rect x="116" y="492" width="140" height="56" rx="7" fill="#2ab5a0" stroke="#1a8070" stroke-width="1.3"/>
+  <text x="186" y="516" text-anchor="middle" font-size="12" fill="white" font-weight="600">Change Log</text>
+  <text x="186" y="534" text-anchor="middle" font-size="12" fill="white" font-weight="600">Store</text>
+
+  <!-- Source Replica Store -->
+  <rect x="303" y="492" width="150" height="56" rx="7" fill="#2ab5a0" stroke="#1a8070" stroke-width="1.3"/>
+  <text x="378" y="516" text-anchor="middle" font-size="12" fill="white" font-weight="600">Source Replica</text>
+  <text x="378" y="534" text-anchor="middle" font-size="12" fill="white" font-weight="600">Store</text>
+
+  <!-- Materialized View Store -->
+  <rect x="502" y="492" width="160" height="56" rx="7" fill="#2ab5a0" stroke="#1a8070" stroke-width="1.3"/>
+  <text x="582" y="516" text-anchor="middle" font-size="12" fill="white" font-weight="600">Materialized</text>
+  <text x="582" y="534" text-anchor="middle" font-size="12" fill="white" font-weight="600">View Store</text>
+
+  <!-- Collector lines: 3 stores → Queryable Backup Store -->
+  <line x1="186" y1="548" x2="186" y2="576" stroke="#555" stroke-width="1.2"/>
+  <line x1="378" y1="548" x2="378" y2="576" stroke="#555" stroke-width="1.2"/>
+  <line x1="582" y1="548" x2="582" y2="576" stroke="#555" stroke-width="1.2"/>
+  <line x1="186" y1="576" x2="582" y2="576" stroke="#555" stroke-width="1.2"/>
+  <line x1="384" y1="576" x2="384" y2="590" stroke="#555" stroke-width="1.2" marker-end="url(#a)"/>
+
+  <!-- Queryable Backup Store -->
+  <rect x="116" y="592" width="566" height="60" rx="7" fill="#27ae60" stroke="#1a8042" stroke-width="1.6"/>
+  <text x="480" y="628" text-anchor="middle" font-size="14" fill="white" font-weight="700">Queryable Backup Store</text>
+
+  <!-- TapState Store label — inside light green Store rect, below Queryable Backup Store bar -->
+  <text x="407" y="708" text-anchor="middle" font-size="13" font-weight="600" fill="#1a6b4a">TapState Store</text>
+
+  <!-- Arrows from engine to Serve section -->
+  <!-- Transform → Push Context Server -->
+  <line x1="678" y1="287" x2="770" y2="312" stroke="#555" stroke-width="1.7" marker-end="url(#a)"/>
+  <!-- Materialize → Push Context Server -->
+  <line x1="678" y1="382" x2="770" y2="342" stroke="#555" stroke-width="1.7" marker-end="url(#a)"/>
+  <!-- Materialize → Query Context Server -->
+  <line x1="678" y1="394" x2="770" y2="458" stroke="#555" stroke-width="1.7" marker-end="url(#a)"/>
+
+  <!-- ═══════════════════════════════════════
+       TAPSTATE SERVE  (right box)
+  ═══════════════════════════════════════ -->
+  <rect x="750" y="180" width="340" height="578" rx="6"
+        fill="#daeef8" stroke="#7bbde0" stroke-width="1.8" stroke-dasharray="7,4"/>
+
+  <!-- ── Push Context Server ── -->
+  <rect x="770" y="258" width="148" height="108" rx="14" fill="#a8cde0" stroke="#5a9abf" stroke-width="1.4"/>
+  <text x="844" y="304" text-anchor="middle" font-size="13" fill="#0e3660" font-weight="600">Push Context</text>
+  <text x="844" y="324" text-anchor="middle" font-size="13" fill="#0e3660" font-weight="600">Server</text>
+
+  <!-- Kafka -->
+  <rect x="955" y="246" width="112" height="34" rx="5" fill="white" stroke="#aaa" stroke-width="1.2"/>
+  <text x="1011" y="268" text-anchor="middle" font-size="12" fill="#333">Kafka</text>
+  <!-- LakeHouse -->
+  <rect x="955" y="290" width="112" height="34" rx="5" fill="white" stroke="#aaa" stroke-width="1.2"/>
+  <text x="1011" y="312" text-anchor="middle" font-size="12" fill="#333">LakeHouse</text>
+  <!-- Webhook -->
+  <rect x="955" y="334" width="112" height="34" rx="5" fill="white" stroke="#aaa" stroke-width="1.2"/>
+  <text x="1011" y="356" text-anchor="middle" font-size="12" fill="#333">Webhook</text>
+
+  <!-- Push Context → outputs -->
+  <line x1="918" y1="280" x2="955" y2="263" stroke="#555" stroke-width="1.2" marker-end="url(#aSm)"/>
+  <line x1="918" y1="305" x2="955" y2="307" stroke="#555" stroke-width="1.2" marker-end="url(#aSm)"/>
+  <line x1="918" y1="326" x2="955" y2="351" stroke="#555" stroke-width="1.2" marker-end="url(#aSm)"/>
+
+  <!-- ── Query Context Server ── -->
+  <rect x="770" y="420" width="148" height="108" rx="14" fill="#a8cde0" stroke="#5a9abf" stroke-width="1.4"/>
+  <text x="844" y="466" text-anchor="middle" font-size="13" fill="#0e3660" font-weight="600">Query Context</text>
+  <text x="844" y="486" text-anchor="middle" font-size="13" fill="#0e3660" font-weight="600">Server</text>
+
+  <!-- MCP label + AI Agents -->
+  <text x="942" y="436" text-anchor="middle" font-size="11" fill="#555">MCP</text>
+  <rect x="955" y="420" width="112" height="34" rx="5" fill="white" stroke="#aaa" stroke-width="1.2"/>
+  <text x="1011" y="442" text-anchor="middle" font-size="12" fill="#333">AI Agents</text>
+
+  <!-- REST / GraphQL label + Applications -->
+  <text x="935" y="490" text-anchor="middle" font-size="11" fill="#555">REST</text>
+  <text x="935" y="504" text-anchor="middle" font-size="11" fill="#555">GraphQL</text>
+  <rect x="955" y="474" width="112" height="34" rx="5" fill="white" stroke="#aaa" stroke-width="1.2"/>
+  <text x="1011" y="496" text-anchor="middle" font-size="12" fill="#333">Applications</text>
+
+  <!-- Query Context → outputs -->
+  <line x1="918" y1="453" x2="955" y2="437" stroke="#555" stroke-width="1.2" marker-end="url(#aSm)"/>
+  <line x1="918" y1="476" x2="955" y2="491" stroke="#555" stroke-width="1.2" marker-end="url(#aSm)"/>
+
+  <!-- TapState Serve label -->
+  <text x="770" y="590" font-size="13" font-weight="600" fill="#1a4f80">TapState Serve</text>
+
+</svg>

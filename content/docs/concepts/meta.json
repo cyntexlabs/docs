@@ -1,0 +1,10 @@
+{
+  "title": "Concepts",
+  "root": true,
+  "pages": [
+    "dsl",
+    "connectors",
+    "ai-control",
+    "storage"
+  ]
+}

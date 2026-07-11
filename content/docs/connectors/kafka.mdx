@@ -1,0 +1,123 @@
+---
+title: Kafka
+description: Connect Apache Kafka with the current Confluent-compatible TapState connector
+sidebar:
+  order: 8
+ai:
+  kind: connector
+  id: kafka_enhanced
+  maturity: ga
+  useAs: [source, target]
+  modes: [stream]
+  aliases: [apache kafka, confluent kafka, kafka stream, kafka source, kafka target, kafka enhanced]
+---
+
+import { ConnectorProfile } from '@/components/mdx';
+
+Use the catalog ID `kafka_enhanced` for current Kafka connections. The legacy `kafka` catalog entry is deprecated.
+
+<ConnectorProfile
+  maturity="GA"
+  maturityLabel="Production ready"
+  worksAs="Source, Target"
+  capabilities="Stream read, Stream write, Schema Registry"
+  compatibility="Kafka 2.3+ · Confluent-compatible clients"
+/>
+
+## Before you begin
+
+### Source
+
+- Ensure the future TapState runtime network can reach every broker address in `clusterURI`.
+- Choose serializers that match the topic key and value formats.
+- If Schema Registry is enabled, prepare its URL and authentication settings.
+- If SASL or Kerberos is enabled, prepare the matching credentials and Kerberos files.
+
+### Target
+
+Pre-create production topics with the required partition count, replication factor, retention, and ACLs. For example:
+
+```bash
+bin/kafka-topics.sh --create \
+  --bootstrap-server localhost:9092 \
+  --replication-factor 3 \
+  --partitions 3 \
+  --topic my_topic
+```
+
+The selected `keySerialization`, `valueSerialization`, schema mode, and optional Schema Registry type must match the records written to the topic. For a JSON object value:
+
+```json
+{"id": 1, "name": "Alice", "amount": 99.50}
+```
+
+The catalog also exposes binary, string, numeric, UUID, Avro, and Protobuf paths. Offline validation cannot inspect the actual topic encoding.
+
+## Create a connection
+
+```yaml
+version: cyntex/v1
+kind: source
+id: my-kafka
+connector: kafka_enhanced
+mode: stream
+
+config:
+  clusterURI: "broker1.internal:9092,broker2.internal:9092"
+  schemaRegister: false
+  schemaMode: STANDARD_JSON
+  keySerialization: String
+  valueSerialization: JsonObject
+  useSasl: false
+  krb5: false
+
+tables:
+  - my_topic
+```
+
+## Validate the configuration
+
+```bash
+cyntex validate --workdir tapstate-work
+```
+
+Offline validation checks the `stream` mode and catalog-backed field values. It does not connect to brokers, authenticate, inspect topics, or send messages.
+
+## Limitations
+
+- Kafka is an unbounded stream; do not model it as Snapshot or CDC.
+- Topic existence, partitioning, replication factor, ACLs, and message compatibility require runtime checks that are not available in the current open-source release.
+- `kafka_enhanced` supports JSON, Avro, and Protobuf registry types through catalog settings; the selected serializers must match the actual topic data.
+- Kerberos files and Schema Registry credentials are catalog fields, but the docs cannot verify them offline.
+
+## Reference
+
+### Core settings
+
+| Field | Required | Default | Description |
+|---|---|---|---|
+| `clusterURI` | Yes | — | Comma-separated broker addresses. |
+| `schemaRegister` | No | `false` | Enable Schema Registry integration. |
+| `schemaRegisterUrl` | With Schema Registry | — | Schema Registry URL. |
+| `registrySchemaType` | No | `JSON` | `JSON`, `AVRO`, or `PROTOBUF`. |
+| `schemaMode` | No | `STANDARD` | Message envelope mode when Schema Registry is disabled. |
+| `keySerialization` | Yes | `Binary` | Key deserializer type. |
+| `valueSerialization` | Yes | `Binary` | Value deserializer type. |
+| `batchMaxDelay` | Yes | `2000` | Producer batching delay in milliseconds. |
+| `clientId` | No | — | Kafka client ID. |
+| `acksType` | No | `-1` | Producer acknowledgment value: `0`, `1`, `-1`, or `all`. |
+| `compressionType` | No | `lz4` | `disable`, `gzip`, `snappy`, `lz4`, or `zstd`. |
+
+### Authentication settings
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `useSasl` | No | `false` | Enable username/password SASL. |
+| `saslMechanism` | No | `PLAIN` | `PLAIN`, `SCRAM-SHA-256`, or `SCRAM-SHA-512`. |
+| `saslUsername` | No | — | SASL username. |
+| `saslPassword` | No | — | SASL password. |
+| `krb5` | No | `false` | Enable Kerberos. |
+| `krb5Keytab` | With Kerberos | — | Keytab content or path handled by the product surface. |
+| `krb5Conf` | With Kerberos | — | Kerberos configuration. |
+| `krb5Principal` | With Kerberos | — | Kerberos principal. |
+| `krb5ServiceName` | With Kerberos | — | Kafka Kerberos service name. |

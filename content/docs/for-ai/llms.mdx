@@ -1,0 +1,80 @@
+---
+title: LLM Context Files
+description: Structured TapState context files for AI models (llms.txt standard)
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@/components/mdx';
+
+TapState provides standard [llms.txt](https://llmstxt.org/) files so any LLM can quickly understand TapState.
+
+## Quick Start
+
+Provide the following URLs to your AI model so it can understand TapState and help you write `.cyn.yml`:
+
+| File | URL | Purpose |
+|---|---|---|
+| `llms.txt` | `https://tapstate.com/llms.txt` | Condensed version (concepts + quick reference); suitable for most scenarios |
+| `llms-full.txt` | `https://tapstate.com/llms-full.txt` | Full version (all DSL syntax details); suitable for complex tasks |
+
+### Using with Claude
+
+```
+Please read https://tapstate.com/llms.txt and then help me create a CDC sync task from MySQL to MongoDB
+```
+
+### Using with ChatGPT / GPT-4o
+
+Use the "Browse" feature to fetch `https://tapstate.com/llms.txt`, then ask your question.
+
+### Using with Any AI That Supports URLs
+
+Paste the URL directly into the conversation. Most modern LLMs can fetch and understand file content.
+
+---
+
+## JSON Schema
+
+TapState's DSL schema is particularly AI-friendly — every field includes `description` and `examples`, generated from the same source as the code:
+
+```
+https://tapstate.com/schema/v1/pipeline.json
+https://tapstate.com/schema/v1/source.json
+```
+
+### IDE Integration
+
+Add the following to your VS Code `settings.json`:
+
+```json
+{
+  "yaml.schemas": {
+    "https://tapstate.com/schema/v1/pipeline.json": "*.cyn.yml"
+  }
+}
+```
+
+---
+
+## Example Corpus
+
+`https://tapstate.com/examples/`
+
+Contains valid `.cyn.yml` samples covering all scenarios defined in ADR-0016 §14, ready to be provided directly to an AI as few-shot examples.
+
+---
+
+## MCP Integration
+
+<Aside type="note">
+  The MCP server is enabled in the **Alpha phase**. The POC phase has only the offline CLI.
+</Aside>
+
+When the TapState service is running, an AI agent can operate directly via the MCP protocol:
+
+```
+mcp://localhost:7778
+```
+
+This lets the AI not only **write** `.cyn.yml` but also **deploy, start, and monitor** tasks. See [MCP Integration](/for-ai/mcp/).

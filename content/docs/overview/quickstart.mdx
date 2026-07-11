@@ -1,0 +1,106 @@
+---
+title: Quickstart
+description: Create and validate a TapState workspace with the current offline CLI
+sidebar:
+  order: 2
+ai:
+  kind: guide
+  id: quickstart
+  maturity: preview
+  aliases: [tapstate quickstart, create cyn yml, validate workspace]
+---
+
+This quickstart exercises the current open-source release: create declarative resources, inspect them, and validate the workspace offline. It does not connect to MySQL or move data.
+
+## 1. Get the CLI
+
+If a `cyntex` binary is already installed, verify it:
+
+```bash
+cyntex --version
+```
+
+To build the native binary from an existing source checkout, use Maven and GraalVM for JDK 21:
+
+```bash
+cd /path/to/tapstate-source
+mvn -Pnative -pl cli -am -DskipTests package
+export PATH="$PWD/cli/target:$PATH"
+```
+
+The website currently shows an `install.tapstate.dev` command, but that hostname was not reachable during this documentation review. Use the source build until a published installer is verified.
+
+## 2. Create a MySQL source
+
+The non-interactive command is suitable for terminals, scripts, and AI agents:
+
+```bash
+cyntex new --non-interactive \
+  --kind source \
+  --connector mysql \
+  --id orders_source \
+  --mode snapshot \
+  --set host=db.internal \
+  --set port=3306 \
+  --set database=orders \
+  --set username='${MYSQL_USER}' \
+  --set password='${MYSQL_PASSWORD}' \
+  --workdir tapstate-work
+```
+
+The CLI creates `tapstate-work/source/orders_source.cyn.yml` with canonical `cyntex/v1` YAML. See the [MySQL connector guide](/docs/connectors/mysql) before choosing CDC.
+
+## 3. Create a target connection
+
+A mode-less source resource acts as a target connection supplier:
+
+```bash
+cyntex new --non-interactive \
+  --kind source \
+  --connector mongodb \
+  --id customer_view \
+  --set isUri=true \
+  --set uri='${MONGODB_URI}' \
+  --workdir tapstate-work
+```
+
+## 4. Connect them with a pipeline
+
+```bash
+cyntex new --non-interactive \
+  --kind pipeline \
+  --id orders_to_customer_view \
+  --source orders_source \
+  --sync-to customer_view \
+  --workdir tapstate-work
+```
+
+## 5. Validate the workspace
+
+```bash
+cyntex validate --workdir tapstate-work
+```
+
+A valid three-resource workspace returns:
+
+```text
+valid: 3 resources in tapstate-work
+```
+
+Exit code `0` means the offline contract passed. It does not mean credentials, network access, connector runtime, or data movement succeeded.
+
+## 6. Inspect and explain
+
+```bash
+cyntex ls --workdir tapstate-work
+cyntex desc orders_to_customer_view --workdir tapstate-work
+cyntex explain source.mode
+```
+
+Use `ls` and `desc` for concrete workspace resources. Use `explain` for grammar fields. Add `--output json` when an agent or CI job needs structured results.
+
+## Next steps
+
+- Prepare the database with the [MySQL connector guide](/docs/connectors/mysql).
+- Learn the resource model in the [DSL Grammar](/docs/reference/dsl-grammar).
+- Read [What is TapState?](/docs/overview/what-is-tapstate) for the current/product-direction boundary.

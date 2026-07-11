@@ -1,0 +1,79 @@
+---
+title: MCP Integration
+description: Planned MCP integration for operating a future TapState runtime from AI agents
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@/components/mdx';
+
+<Aside type="note" title="Available in Alpha Phase">
+  The MCP server is enabled in the **Alpha phase**. The current POC phase has only the offline CLI.
+</Aside>
+
+## Overview
+
+The planned TapState runtime embeds an in-process MCP server over HTTP. An AI agent will connect through the standard MCP protocol to gain operational access to a running TapState instance.
+
+```
+AI Agent (Claude / GPT-4o …)
+    │  MCP protocol (HTTP)
+    ▼
+TapState MCP server (in-process)
+    │  direct call
+    ▼
+Control Core (CRUD + lifecycle + read-only runtime)
+```
+
+**Key design: the MCP server contains no LLM** — the model is on the user's agent side; TapState only provides the operational interface.
+
+## Planned connection model
+
+The endpoint, authentication flow, and startup command are not part of the current release contract. The example below illustrates the intended client configuration only; do not use it as deployment instructions.
+
+```
+Server URL: http://localhost:7778/mcp
+Auth: Bearer <token>
+```
+
+The Alpha release will document the final endpoint, token lifecycle, and startup workflow when they are available in the product.
+
+## Planned Alpha Toolset (Read-Only + Scaffold)
+
+| Tool | Description |
+|---|---|
+| `list_sources` | List all registered sources |
+| `list_pipelines` | List all pipelines and their runtime status |
+| `get_pipeline_status` | Query the status, lag, and error rate of a specific pipeline |
+| `get_source_schema` | Get the table schema of a source (DiscoverSchema) |
+| `scaffold_pipeline` | Generate a pipeline YAML draft from a source id and table name |
+| `explain_field` | Look up documentation for any DSL field |
+| `validate_yaml` | Validate a YAML content snippet (three-layer validation) |
+
+## Planned Beta Toolset (Full CRUD + Lifecycle)
+
+In the Beta phase, all control core operations will be exposed as MCP tools:
+
+- `create_source` / `update_source` / `delete_source`
+- `apply_pipeline` / `delete_pipeline`
+- `start_pipeline` / `stop_pipeline` / `restart_pipeline`
+- `export_pipeline` (canonical YAML round-trip)
+
+## Using with Claude
+
+Add TapState MCP to Claude's MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "tapstate": {
+      "url": "http://localhost:7778/mcp",
+      "headers": {
+        "Authorization": "Bearer cyxt_xxxxxxxxxxxx"
+      }
+    }
+  }
+}
+```
+
+Once the Alpha MCP surface is available, a compatible client will be able to use the published toolset against a running TapState instance. The current release supports offline CLI authoring and validation only.

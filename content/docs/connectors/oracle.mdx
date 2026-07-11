@@ -1,0 +1,30 @@
+---
+title: Oracle
+description: Oracle connector catalog alignment status
+sidebar:
+  order: 4
+---
+
+import { ConnectorProfile } from '@/components/mdx';
+
+Oracle is not exposed by the current TapState connector catalog. The previous page inherited Oracle preparation and performance claims from TapData, but the current product cannot validate an `oracle` connection resource.
+
+<ConnectorProfile
+  maturity="Unavailable"
+  maturityLabel="Not in the current catalog"
+  worksAs="Not available"
+  capabilities="Contract pending"
+  compatibility="Upstream Oracle baseline · Not enabled in TapState"
+/>
+
+## Current status
+
+Do not create production resources from this page yet. The TapState catalog must first define the connector ID, supported modes, sink capability, config fields, and the supported CDC implementation.
+
+## Upstream baseline
+
+The reused connector documentation discusses Oracle versions, RAC, ARCHIVELOG, supplemental logging, LogMiner, and raw-log parsing. Those details remain useful migration inputs, but they must not be presented as current TapState features without a catalog entry and implementation evidence.
+
+## Next documentation step
+
+Once the connector contract exists, migrate the upstream page and verify every permission, field, mode, limitation, and throughput statement. Do not restore performance numbers until they are reproduced in TapState.

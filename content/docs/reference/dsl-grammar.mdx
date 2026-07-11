@@ -1,0 +1,204 @@
+---
+title: DSL Grammar Overview
+description: Complete syntax reference for the TapState DSL (.cyn.yml) — multi-resource declaration model
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@/components/mdx';
+
+The TapState DSL is YAML format with file extension `.cyn.yml`, declared with `version: cyntex/v1`.
+
+<Aside type="tip">
+  The JSON Schema for the DSL is available at `tapstate.com/schema/v1/`, supporting IDE completion and real-time validation.
+  VS Code users: associate `"*.cyn.yml"` → `cyntex/v1` schema in your workspace `settings.json`.
+</Aside>
+
+## Resource Types
+
+TapState uses a **multi-resource declaration model**. Each `.cyn.yml` file can contain one resource, distinguished by `kind`:
+
+| Kind | Responsibility |
+|---|---|
+| `source` | Defines a data source connection (connector type + config + mining mode) |
+| `pipeline` | Defines a data pipeline (references source + transforms + output) |
+
+Future extensions: `workspace` (batch multi-resource), `serve` (API publishing, GA phase)
+
+---
+
+## source
+
+Describes a data source: connection configuration + read mode.
+
+```yaml title="mysql-prod.cyn.yml"
+version: cyntex/v1
+kind: source
+id: mysql-prod
+
+connector: mysql
+mode: cdc        # snapshot | cdc | stream | api | file
+
+config:
+  host: db.internal
+  port: 3306
+  database: production
+  username: ${MYSQL_USER}
+  password: ${MYSQL_PASS}
+
+options:
+  start_from: latest    # earliest | latest | <ISO timestamp>
+
+tables:
+  - name: users         # literal = fixed table name
+  - name: /orders_.*/   # regex = dynamic matching (requires discovery capability)
+```
+
+### mode — Four Values
+
+| mode | Semantics | Typical connectors |
+|---|---|---|
+| `snapshot` | One-shot snapshot (bounded) | MySQL, MongoDB, and other catalog-backed databases |
+| `cdc` | Continuous change capture (unbounded) | MySQL binlog, PG WAL, MongoDB oplog |
+| `stream` | Unbounded message stream | Kafka and other message systems |
+| `api` | API / SaaS pull (polling or webhook) | Salesforce, HubSpot |
+| `file` | File scanning | S3, SFTP, local directory |
+
+Valid combinations of connector and mode are verified by the **capability matrix** (bundled catalog) at validate time — invalid combinations produce an error, not silent failures.
+
+### tables Omission Semantics
+
+- `tables` omitted = all tables (equivalent to `/.*/`)
+- Literal string = fixed table name; does not track new tables
+- `/regex/` = dynamic: new tables matching the regex automatically join the pipeline (requires discovery capability)
+
+---
+
+## pipeline
+
+Describes a data pipeline: reference source → optional transforms → output (sync / push).
+
+```yaml title="user-sync.cyn.yml"
+version: cyntex/v1
+kind: pipeline
+id: user-profile-sync
+
+source: mysql-prod    # references the id of a kind:source
+
+tables:
+  - name: users
+  - name: /orders_.*/
+
+transforms:
+  - name: filter-active
+    filter: "record.status == 'active'"   # CEL expression
+
+  - name: enrich-type
+    js: |
+      record.tier = record.spend > 1000 ? 'premium' : 'standard';
+      return record;
+
+sync:
+  - source: users
+    target:
+      collection: user_profiles
+    options:
+      write_mode: upsert    # upsert | append
+      ddl: apply            # apply | ignore | fail (default: fail)
+
+settings:
+  error_policy: fail        # fail | skip | dlq
+  batch_size: 1000
+  parallelism: 1
+```
+
+### transforms (Transform Nodes)
+
+Each transform is a processing step in the pipeline, executed in declaration order.
+
+| Node type | Field | Semantics |
+|---|---|---|
+| Filter | `filter: <CEL>` | Discard rows that do not satisfy the condition |
+| JS transform | `js: <script>` | GraalVM JS row-by-row processing |
+| rename | `rename: {old: new}` | Field renaming |
+| typeFilter | `type_filter: <type>` | Filter by data type |
+| unwind | `unwind: <array field>` | Array flattening |
+| nest | `nest:` | Master-detail merge (Beta; MERGE family) |
+
+<Aside type="note">
+  `nest` (master-detail merge) is not available in Alpha; it lands in Beta. See [Roadmap](/overview/roadmap/).
+</Aside>
+
+### sync Output
+
+Full snapshot / CDC write to target storage:
+
+```yaml
+sync:
+  - source: <table name or regex>        # references the logical stream from tables
+    target:
+      collection: <target collection name>
+    options:
+      write_mode: upsert | append
+      ddl: apply | ignore | fail
+      auto_create_table: true   # default: true
+```
+
+### push Output (Event Stream)
+
+Publish data as an event stream (Kafka, etc.):
+
+```yaml
+push:
+  - source: orders
+    topic: order-events          # omitted = uses table name
+    format: cyntex               # default: cyntex envelope; custom = CEL projection
+    options:
+      start_from: latest
+```
+
+---
+
+## Expressions: CEL
+
+Fields such as `filter` and `format` use CEL (Common Expression Language):
+
+```yaml
+filter: "record.amount > 100 && record.currency == 'USD'"
+format: "{'id': record.user_id, 'ts': record.created_at}"
+```
+
+- Compiled + type-checked at validate time (not evaluated)
+- Evaluated by the engine at runtime
+- JS nodes (`js:` field) are the escape hatch beyond CEL, supporting complex logic
+
+---
+
+## id Rules
+
+- Top-level `id`: globally unique within the workspace; must not contain `.`
+- Inline private resources: `<pipeline_id>.<local_id>` (auto-naming for inline transforms/views)
+- Reference: a string value = reference to the resource with the corresponding `id`
+
+---
+
+## Version Evolution
+
+```yaml
+version: cyntex/v1
+```
+
+- **Strict rejection of unknown fields** (`additionalProperties: false`): any typo causes an immediate error
+- **Experimental zone**: experimental fields go under the `experimental:` block with no compatibility guarantee
+
+---
+
+## validate — Three Layers
+
+`cyntex validate <file.cyn.yml>` runs three layers of validation:
+
+1. **Structural layer**: JSON Schema validation (unknown fields, types, required fields)
+2. **Reference layer**: id reference closure within this batch of resources (offline; no server connection needed)
+3. **Capability matrix layer**: connector × mode validity + required config fields (bundled catalog)
+
+Error format: file path / line number / field path + plain-language explanation.
