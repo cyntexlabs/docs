@@ -1,0 +1,75 @@
+---
+title: Apache ActiveMQ
+description: Configure Apache ActiveMQ as a TapState stream source or target
+sidebar:
+  order: 31
+ai:
+  kind: connector
+  id: activemq
+  category: streaming-messaging
+  maturity: preview
+  useAs: [source, target]
+  modes: [stream]
+  aliases: [apache activemq, activemq, activemq stream, activemq queue, activemq source, activemq target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Apache ActiveMQ to read or write queue messages through the catalog-declared stream connector.
+
+<ConnectorProfile
+  category="Streaming & messaging"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Stream read, Stream write"
+  compatibility="ActiveMQ Classic 5.14.x · Artemis 2.39.x upstream baseline"
+/>
+
+<ConnectorCapabilities source="Stream read" target="Stream write" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog validates Stream mode and the listed connection fields. It does not open a broker connection, verify credentials, list queues, consume a message, or publish one.
+</Aside>
+
+## Before you begin
+
+Create a broker account restricted to the intended queues and decide which queue names the pipeline may access. The upstream baseline accepts JSON-object messages and queue mode; test message shape and acknowledgement behavior with the deployed runtime.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/events_activemq.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: events_activemq
+connector: activemq
+config:
+  mqQueueString: orders.events
+  brokerURL: tcp://activemq.internal:61616
+  mqUsername: ${ACTIVEMQ_USER}
+  mqPassword: ${ACTIVEMQ_PASSWORD}
+mode: stream
+```
+
+For a target-only connection, omit `mode`.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog does not define delivery guarantee, acknowledgement, transactions, topic support, CDC, or DDL behavior.
+- The upstream compatibility baseline is not a deployed TapState runtime test; stage Classic and Artemis broker URLs separately.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `mqQueueString` | No | Optional queue selection. |
+| `brokerURL` | Yes | Broker connection string, for example `tcp://host:61616`. |
+| `mqUsername`, `mqPassword` | No | Broker credentials. Keep the password in an environment variable. |
