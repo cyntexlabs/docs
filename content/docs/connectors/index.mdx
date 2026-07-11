@@ -51,7 +51,7 @@ Choose a connector by the system you need to read from or write to. Each page le
 
 ## Create and validate a connection
 
-Connection resources are `.cyn.yml` files. Use the exact connector ID and field names from the page's Reference section. A target is represented by the same `kind: source` connection resource without a reader `mode` or `tables` section.
+Connection resources are `.tapstate.yml` files. Use the exact connector ID and field names from the page's Reference section. A target is represented by the same `kind: source` connection resource without a reader `mode` or `tables` section.
 
 ```bash
 tapstate validate --workdir tapstate-work

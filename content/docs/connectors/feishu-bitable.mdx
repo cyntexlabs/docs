@@ -61,8 +61,8 @@ tapstate new --non-interactive \
 
 The resource uses the catalog's exact field spellings:
 
-```yaml title="tapstate-work/source/customer_requests.cyn.yml"
-version: cyntex/v1
+```yaml title="tapstate-work/source/customer_requests.tapstate.yml"
+version: tapstate/v1
 kind: source
 id: customer_requests
 connector: feishu-bitable
@@ -90,7 +90,7 @@ Local validation checks the resource envelope, API mode, and catalog-known field
 
 - The current catalog declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
 - App permissions, tenant policy, and API rate limits are enforced by Lark/Feishu at runtime.
-- Do not put App Secret values in a committed `.cyn.yml` file.
+- Do not put App Secret values in a committed `.tapstate.yml` file.
 
 ## Reference
 

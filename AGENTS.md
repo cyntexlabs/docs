@@ -1,6 +1,6 @@
 # Documentation authoring guide
 
-This repository publishes TapState documentation. Use **TapState** in reader-facing copy. Preserve implementation identifiers such as `cyntex`, `.cyn.yml`, and `version: cyntex/v1` until the product contract changes them.
+This repository publishes TapState documentation. Use **TapState** in reader-facing copy. Preserve implementation identifiers such as `tapstate`, `.tapstate.yml`, and `version: tapstate/v1` until the product contract changes them.
 
 ## AI-readable documentation contract
 

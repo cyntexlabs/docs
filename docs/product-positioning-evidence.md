@@ -8,7 +8,7 @@ Source: the local TapState implementation repository README, CLI implementation,
 
 - The shipped product surface is an offline authoring CLI.
 - Current offline verbs are `new`, `validate`, `ls`, `desc`, and `explain`.
-- Resources are declarative `.cyn.yml` files using `version: cyntex/v1`.
+- Resources are declarative `.tapstate.yml` files using `version: tapstate/v1`.
 - The workspace models sources, pipelines, transforms, views, and serving intent.
 - Validation covers structure, reference closure, and catalog-backed capability/config rules.
 - JSON Schema, structured output, coded diagnostics, and non-interactive scaffolding support editors, CI, and AI assistants.

@@ -8,7 +8,7 @@ sidebar:
 `pipeline` defines a data pipeline: references a source, applies optional transforms, and outputs to sync or push.
 
 ```yaml
-version: cyntex/v1
+version: tapstate/v1
 kind: pipeline
 id: <string>
 
@@ -37,7 +37,7 @@ sync:                     # write to target storage (full snapshot / CDC)
 push:                     # publish as event stream (Kafka, etc.)
   - source: <table name>
     topic: <string>       # omitted = uses table name
-    format: cyntex        # default: cyntex envelope; custom = CEL projection
+    format: tapstate        # default: tapstate envelope; custom = CEL projection
 
 settings:
   error_policy: fail | skip | dlq   # default: fail

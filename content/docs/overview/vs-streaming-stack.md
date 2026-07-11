@@ -17,7 +17,7 @@ This is currently a comparison of architectural direction. The open-source TapSt
 | Flexibility | Choose and replace every layer independently | Use an integrated model and connector contract |
 | Operations | Tune, upgrade, observe, and recover each layer | Reduce handoffs and duplicated configuration |
 | Processing depth | Mature windowing, event-time, and arbitrary stateful computation | Focus on common integration, reshaping, joins, and materialized state |
-| Authoring | Connector configs, topics, jobs, and sink definitions | Declarative `.cyn.yml` resources |
+| Authoring | Connector configs, topics, jobs, and sink definitions | Declarative `.tapstate.yml` resources |
 | Current implementation | Mature ecosystem with production runtimes | Offline scaffolding, schema, catalog, inspection, and validation |
 
 ## Code-backed TapState foundations

@@ -89,7 +89,7 @@ function cleanMdxForLLM(markdown: string) {
     .replace(/<ValidationStatusGuide\s*\/>/g, `### Interpret the result
 
 - **Valid:** \`valid: 3 resources in tapstate-work\`. Exit code 0; workspace structure, references, and known mode/config rules passed.
-- **Needs attention:** \`invalid: orders_source.cyn.yml:12:1 dsl.unknown-field\`. Exit code 1; the CLI prints the message and a suggested fix before you validate again.`)
+- **Needs attention:** \`invalid: orders_source.tapstate.yml:12:1 dsl.unknown-field\`. Exit code 1; the CLI prints the message and a suggested fix before you validate again.`)
     .replace(/<ConnectorProfile\s+([\s\S]*?)\/>/g, (_match, attrs: string) => {
       return renderConnectorProfileForLLM(attrs);
     })

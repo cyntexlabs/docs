@@ -80,8 +80,8 @@ tapstate new --non-interactive \
 
 The resulting source connection uses catalog-backed field names:
 
-```yaml title="tapstate-work/source/orders_opengauss.cyn.yml"
-version: cyntex/v1
+```yaml title="tapstate-work/source/orders_opengauss.tapstate.yml"
+version: tapstate/v1
 kind: source
 id: orders_opengauss
 connector: open-gauss
@@ -102,8 +102,8 @@ tables:
 
 Targets use the same connection-resource envelope, without a read mode or table selection.
 
-```yaml title="tapstate-work/source/analytics_opengauss.cyn.yml"
-version: cyntex/v1
+```yaml title="tapstate-work/source/analytics_opengauss.tapstate.yml"
+version: tapstate/v1
 kind: source
 id: analytics_opengauss
 connector: open-gauss

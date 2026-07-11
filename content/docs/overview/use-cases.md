@@ -13,7 +13,7 @@ TapState is designed for operational data that loses value when it becomes stale
 
 **TapState direction:** Capture source changes and maintain a read-oriented copy or materialized view for downstream consumers.
 
-**Available today:** Define source, pipeline, transform, and target intent as validated `.cyn.yml` resources. Live CDC, materialization, and measured source impact require the later runtime.
+**Available today:** Define source, pipeline, transform, and target intent as validated `.tapstate.yml` resources. Live CDC, materialization, and measured source impact require the later runtime.
 
 ## Database migration and coexistence
 

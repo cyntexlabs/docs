@@ -35,7 +35,7 @@ These benefits are directly visible in the current codebase.
 
 ### A reviewable data contract
 
-TapState resources are ordinary `.cyn.yml` files organized by kind:
+TapState resources are ordinary `.tapstate.yml` files organized by kind:
 
 ```text
 cyn-work/

@@ -27,7 +27,7 @@ const entryPoints = [
   },
   {
     title: 'Write DSL',
-    description: 'The .cyn.yml resource model, field rules, validation flow, and examples.',
+    description: 'The .tapstate.yml resource model, field rules, validation flow, and examples.',
     href: '/docs/reference/dsl-grammar',
     icon: Braces,
   },

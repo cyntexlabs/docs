@@ -1,13 +1,13 @@
 ---
 title: DSL Grammar Overview
-description: Complete syntax reference for the TapState DSL (.cyn.yml) — multi-resource declaration model
+description: Complete syntax reference for the TapState DSL (.tapstate.yml) — multi-resource declaration model
 sidebar:
   order: 1
 ---
 
 import { Aside } from '@/components/mdx';
 
-The TapState DSL is YAML format with file extension `.cyn.yml`, declared with `version: cyntex/v1`.
+The TapState DSL is YAML format with file extension `.tapstate.yml`, declared with `version: tapstate/v1`.
 
 <Aside type="tip">
   The current implementation includes a JSON Schema for editor tooling and validation, but the documentation site does not yet publish it at a stable public URL. Do not configure a remote schema URL until that route is released.
@@ -15,7 +15,7 @@ The TapState DSL is YAML format with file extension `.cyn.yml`, declared with `v
 
 ## Resource Types
 
-TapState uses a **multi-resource declaration model**. Each `.cyn.yml` file can contain one resource, distinguished by `kind`:
+TapState uses a **multi-resource declaration model**. Each `.tapstate.yml` file can contain one resource, distinguished by `kind`:
 
 | Kind | Responsibility |
 |---|---|
@@ -30,8 +30,8 @@ Future extensions: `workspace` (batch multi-resource), `serve` (API publishing, 
 
 Describes a data source: connection configuration + read mode.
 
-```yaml title="mysql-prod.cyn.yml"
-version: cyntex/v1
+```yaml title="mysql-prod.tapstate.yml"
+version: tapstate/v1
 kind: source
 id: mysql-prod
 
@@ -77,8 +77,8 @@ Valid combinations of connector and mode are verified by the **capability matrix
 
 Describes a data pipeline: reference source → optional transforms → output (sync / push).
 
-```yaml title="user-sync.cyn.yml"
-version: cyntex/v1
+```yaml title="user-sync.tapstate.yml"
+version: tapstate/v1
 kind: pipeline
 id: user-profile-sync
 
@@ -151,7 +151,7 @@ Publish data as an event stream (Kafka, etc.):
 push:
   - source: orders
     topic: order-events          # omitted = uses table name
-    format: cyntex               # default: cyntex envelope; custom = CEL projection
+    format: tapstate               # default: tapstate envelope; custom = CEL projection
     options:
       start_from: latest
 ```
@@ -184,7 +184,7 @@ format: "{'id': record.user_id, 'ts': record.created_at}"
 ## Version Evolution
 
 ```yaml
-version: cyntex/v1
+version: tapstate/v1
 ```
 
 - **Strict rejection of unknown fields** (`additionalProperties: false`): any typo causes an immediate error
@@ -194,7 +194,7 @@ version: cyntex/v1
 
 ## validate — Three Layers
 
-`tapstate validate <file.cyn.yml>` runs three layers of validation:
+`tapstate validate <file.tapstate.yml>` runs three layers of validation:
 
 1. **Structural layer**: JSON Schema validation (unknown fields, types, required fields)
 2. **Reference layer**: id reference closure within this batch of resources (offline; no server connection needed)

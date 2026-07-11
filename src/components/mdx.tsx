@@ -265,7 +265,7 @@ export function ValidationStatusGuide() {
           Needs attention
         </div>
         <code className="block whitespace-pre-wrap rounded-md border border-amber-200/80 bg-white/70 px-2.5 py-2 text-xs leading-5 text-amber-950 dark:border-amber-900 dark:bg-black/15 dark:text-amber-100">
-          {`invalid: orders_source.cyn.yml:12:1  dsl.unknown-field
+          {`invalid: orders_source.tapstate.yml:12:1  dsl.unknown-field
 Unknown field 'unexpected' at unexpected.`}
         </code>
         <p className="mb-0 mt-2 text-sm text-amber-950/80 dark:text-amber-100/80">

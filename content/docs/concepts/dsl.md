@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-TapState's task description language (DSL) uses YAML format with the file extension `.cyn.yml`.
+TapState's task description language (DSL) uses YAML format with the file extension `.tapstate.yml`.
 
 For detailed syntax reference, see [DSL Grammar Reference](/reference/dsl-grammar/).
 
@@ -19,7 +19,7 @@ For detailed syntax reference, see [DSL Grammar Reference](/reference/dsl-gramma
 ## Example File Structure
 
 ```yaml
-version: cyntex/v1
+version: tapstate/v1
 kind: pipeline
 id: my-pipeline
 source: mysql-prod

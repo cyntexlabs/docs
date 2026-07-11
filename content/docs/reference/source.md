@@ -8,7 +8,7 @@ sidebar:
 `source` defines a data source connection, containing the connector type, config, and read mode.
 
 ```yaml
-version: cyntex/v1
+version: tapstate/v1
 kind: source
 id: <string>           # globally unique; must not contain `.`
 

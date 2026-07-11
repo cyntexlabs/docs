@@ -5,10 +5,13 @@ const roots = ['content', 'docs', 'public', 'scripts', 'src'];
 const rootFiles = ['AGENTS.md', 'README.md', 'package.json', 'package-lock.json', 'source.config.ts'];
 const textExtensions = new Set(['.css', '.js', '.json', '.md', '.mdx', '.mjs', '.svg', '.ts', '.tsx']);
 const forbidden = [
-  { label: 'legacy product brand', pattern: /Cyntex/g },
-  { label: 'legacy documentation domain', pattern: /docs\.cyntex\.io/g },
-  { label: 'legacy overview slug', pattern: /what-is-cyntex/g },
-  { label: 'legacy package name', pattern: /cyntex-docs/g },
+  { label: 'legacy product name', pattern: /cyntex/gi },
+  { label: 'legacy documentation domain', pattern: /docs\.cyntex\.io/gi },
+  { label: 'legacy overview slug', pattern: /what-is-cyntex/gi },
+  { label: 'legacy package name', pattern: /cyntex-docs/gi },
+  { label: 'legacy resource extension', pattern: /\.cyn\.yml/gi },
+  { label: 'legacy resource version', pattern: /cyntex\/v1/gi },
+  { label: 'legacy workspace variable', pattern: /CYNTEX_WORKDIR/g },
 ];
 
 async function collect(directory) {
