@@ -1,0 +1,101 @@
+---
+title: ClickHouse
+description: Configure ClickHouse as a TapState snapshot source or data-writing target
+sidebar:
+  order: 21
+ai:
+  kind: connector
+  id: clickhouse
+  category: warehouses-analytics
+  maturity: ga
+  useAs: [source, target]
+  modes: [snapshot]
+  aliases: [clickhouse, clickhouse snapshot, clickhouse source, clickhouse target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use ClickHouse for point-in-time reads or as an analytical destination.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="GA"
+  maturityLabel="General availability"
+  worksAs="Source, Target"
+  capabilities="Snapshot, Schema discovery, Data write"
+  compatibility="ClickHouse 20.x–24.x"
+/>
+
+<ConnectorCapabilities source="Snapshot read" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The bundled catalog validates the Snapshot mode and documented field shapes. It does not connect to ClickHouse, validate credentials, or verify a target write.
+</Aside>
+
+## Before you begin
+
+### Source
+
+Create a least-privilege reader for the selected database:
+
+```sql
+CREATE USER tapstate_reader IDENTIFIED WITH sha256_password BY 'replace_with_a_secret';
+GRANT SELECT ON analytics.* TO tapstate_reader;
+```
+
+### Target
+
+Create a writer. Add table-creation and alteration permissions only when pipelines are allowed to manage destination tables.
+
+```sql
+CREATE USER tapstate_writer IDENTIFIED WITH sha256_password BY 'replace_with_a_secret';
+GRANT INSERT ON analytics.* TO tapstate_writer;
+```
+
+## Create a connection
+
+```yaml title="tapstate-work/source/analytics_clickhouse.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: analytics_clickhouse
+connector: clickhouse
+config:
+  host: clickhouse.internal
+  port: "8123"
+  database: analytics
+  user: ${CLICKHOUSE_USER}
+  password: ${CLICKHOUSE_PASSWORD}
+mode: snapshot
+tables:
+  - events
+```
+
+For a target-only connection, omit `mode` and `tables`.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+This checks the local resource, Snapshot mode, and catalog-known field types—not network access, ClickHouse privileges, or query results.
+
+## Limitations
+
+- The catalog declares Snapshot only; it does not declare a CDC or DDL contract.
+- ClickHouse HTTP is commonly served on port `8123`; confirm the endpoint and any encryption settings with your deployment rather than assuming a TLS field.
+- Test target table engines, sort keys, and data-type mappings with representative data before production writes.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host` | Yes | — | ClickHouse host. |
+| `port` | Yes | `8123` | HTTP endpoint port. |
+| `database` | Yes | — | Database name. |
+| `user` | Yes | — | Database user. |
+| `password` | No | — | Password; inject through an environment variable. |
+| `extParams` | No | — | Connector-specific connection parameters. |
+| `timezone` | No | empty | UTC offset used by the connector. |

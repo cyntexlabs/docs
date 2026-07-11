@@ -1,0 +1,84 @@
+---
+title: StarRocks
+description: Configure StarRocks as a TapState snapshot source or data-writing target
+sidebar:
+  order: 28
+ai:
+  kind: connector
+  id: starrocks
+  category: warehouses-analytics
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot]
+  aliases: [starrocks, starrocks snapshot, starrocks target, starrocks stream load]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use StarRocks for catalog-declared Snapshot reads or as a destination for analytical data.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, Data write"
+  compatibility="StarRocks 3.x upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot read" target="Data write" />
+
+<Aside type="note" title="Catalog and upstream baseline differ">
+  The catalog declares Snapshot source and target roles. The upstream guide focuses on target use. Treat a live source read as a staging-test requirement.
+</Aside>
+
+## Before you begin
+
+Prepare a user with read or write access to the selected database and verify the Frontend SQL and HTTP endpoints. For targets, decide key model, table type, distribution, and partitioning before production writes.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/analytics_starrocks.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: analytics_starrocks
+connector: starrocks
+config:
+  host: fe.starrocks.internal
+  port: "9030"
+  starrocksHttp: http://fe.starrocks.internal:8030
+  database: analytics
+  user: ${STARROCKS_USER}
+  password: ${STARROCKS_PASSWORD}
+  useHTTPS: false
+mode: snapshot
+tables:
+  - events
+```
+
+For a target connection, omit `mode` and `tables`.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog declares Snapshot only; it does not declare CDC or DDL behavior.
+- The upstream target baseline references Stream Load, but the current catalog does not publish its tuning or delivery semantics.
+- Confirm HTTPS behavior, certificate handling, target table design, and type mapping in staging.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host`, `port` | Yes | `9030` for port | Frontend SQL endpoint. |
+| `starrocksHttp` | Yes | — | Frontend HTTP endpoint. |
+| `database` | Yes | — | Database name. |
+| `useHTTPS` | No | `false` | Catalog HTTPS boolean. |
+| `user`, `password` | No | — | Account and secret. |
+| `backendNum`, `catalog`, `extParams`, `timezone` | No | — | Optional connector fields. |

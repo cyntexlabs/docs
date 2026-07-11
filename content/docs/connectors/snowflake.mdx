@@ -1,0 +1,102 @@
+---
+title: Snowflake
+description: Configure Snowflake as a TapState snapshot source or data-writing target
+sidebar:
+  order: 22
+ai:
+  kind: connector
+  id: snowflake
+  category: warehouses-analytics
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot]
+  aliases: [snowflake, snowflake snapshot, snowflake source, snowflake target, snowflake pat, snowflake key pair]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Snowflake to read existing tables or to deliver pipeline data into a selected database and schema.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, Schema discovery, Data write"
+  compatibility="Snowflake accounts supported by JDBC"
+/>
+
+<ConnectorCapabilities source="Snapshot read" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The bundled catalog validates Snapshot mode and the selected authentication-field shapes. It does not authenticate to Snowflake, test a warehouse, or prove target-write behavior.
+</Aside>
+
+## Before you begin
+
+### Source
+
+Use a dedicated role with `USAGE` on the warehouse, database, and schema plus `SELECT` on the selected tables. Snowflake reads consume warehouse compute, so use a warehouse sized and isolated for the expected workload where possible.
+
+### Target
+
+Grant the writer role `USAGE` on the warehouse, database, and schema plus the DML permissions required by the destination tables. Add `CREATE TABLE` or `ALTER` only when automatic destination-table management is approved.
+
+## Create a connection
+
+Choose one `authMethod`: `password`, `pat`, or `keyPair`. Provide only the corresponding secret fields.
+
+```yaml title="tapstate-work/source/warehouse_snowflake.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: warehouse_snowflake
+connector: snowflake
+config:
+  account: org-account
+  user: ${SNOWFLAKE_USER}
+  authMethod: password
+  password: ${SNOWFLAKE_PASSWORD}
+  warehouse: TAPSTATE_WH
+  database: ANALYTICS
+  schema: PUBLIC
+  role: TAPSTATE_READER
+  timezone: "+00:00"
+mode: snapshot
+tables:
+  - ORDERS
+```
+
+For a target-only connection, omit `mode` and `tables`, then use the target role and credentials.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks mode, field types, and authentication-method enum values. It does not verify account identifiers, network policy, credentials, roles, or warehouse availability.
+
+## Limitations
+
+- The catalog declares Snapshot, not a Snowflake Streams, Change Tracking, or log-based CDC mode.
+- Only physical tables should be assumed for source selection until a deployment proves additional object support.
+- Do not put passwords, PATs, or private keys in committed resource files.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `account` | Yes | — | Snowflake account identifier. |
+| `user` | Yes | — | Snowflake user. |
+| `authMethod` | No | `password` | `password`, `pat`, or `keyPair`. |
+| `password` | With password auth | — | Password secret. |
+| `patToken` | With PAT auth | — | Programmatic access token. |
+| `privateKey` | With key-pair auth | — | Private-key material. |
+| `privateKeyPassword` | With encrypted key | — | Private-key password. |
+| `warehouse` | Yes | — | Compute warehouse. |
+| `database` | Yes | — | Database name. |
+| `schema` | Yes | `PUBLIC` | Schema name. |
+| `role` | No | — | Role used by the connection. |
+| `timezone` | No | `+00:00` | UTC offset used by the connector. |

@@ -1,0 +1,90 @@
+---
+title: Apache Doris
+description: Configure Apache Doris as a TapState snapshot source or data-writing target
+sidebar:
+  order: 21
+ai:
+  kind: connector
+  id: doris
+  category: warehouses-analytics
+  maturity: ga
+  useAs: [source, target]
+  modes: [snapshot]
+  aliases: [apache doris, doris, doris snapshot, doris target, doris stream load]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Apache Doris for point-in-time reads or as an analytical destination.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="GA"
+  maturityLabel="GA upstream baseline; catalog-backed configuration"
+  worksAs="Source, Target"
+  capabilities="Snapshot, Data write"
+  compatibility="Apache Doris 1.2–3.0 upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot read" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog validates Snapshot mode, SQL/HTTP endpoint fields, and known types. It does not connect to a Frontend node, authenticate, or prove a write.
+</Aside>
+
+## Before you begin
+
+### Source
+
+Create a reader with `SELECT` on the selected database and tables. Confirm the Frontend SQL and HTTP endpoints the runtime can reach.
+
+### Target
+
+Create a writer with the narrowest database/table privileges that permit destination writes. Add schema-management privileges only when approved; design distribution and partitioning before a production write.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/analytics_doris.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: analytics_doris
+connector: doris
+config:
+  host: fe.doris.internal
+  port: "9030"
+  dorisHttp: http://fe.doris.internal:8030
+  database: analytics
+  user: ${DORIS_USER}
+  password: ${DORIS_PASSWORD}
+  useHTTPS: false
+mode: snapshot
+tables:
+  - events
+```
+
+For target-only use, omit `mode` and `tables`.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog declares Snapshot only; it does not declare CDC or DDL behavior.
+- `useHTTPS` is a boolean in the catalog, but certificate fields and verification behavior are not documented. Confirm the security model with the deployed runtime.
+- Test target table keys, distribution, partitions, and type mappings in staging.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host`, `port` | Yes | `9030` for port | Frontend SQL endpoint. |
+| `dorisHttp` | Yes | — | Frontend HTTP endpoint. |
+| `database` | Yes | — | Database name. |
+| `useHTTPS` | No | `false` | Catalog HTTPS boolean. |
+| `user`, `password` | No | — | Database account and secret. |
+| `backendNum`, `catalog`, `extParams`, `timezone` | No | — | Optional connector tuning and context fields. |

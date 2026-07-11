@@ -1,0 +1,84 @@
+---
+title: Elasticsearch
+description: Configure Elasticsearch as a TapState data-writing target
+sidebar:
+  order: 11
+ai:
+  kind: connector
+  id: elasticsearch
+  category: databases
+  maturity: preview
+  useAs: [target]
+  modes: []
+  aliases: [elasticsearch, elasticsearch target, elastic target, elasticsearch ssl]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Elasticsearch as a destination for searchable pipeline data.
+
+<ConnectorProfile
+  category="Databases"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Target"
+  capabilities="Data write"
+  compatibility="Elasticsearch 7.6 upstream baseline"
+/>
+
+<ConnectorCapabilities source="Not declared in the current catalog" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The bundled catalog declares an Elasticsearch target and validates the documented connection fields. It does not connect to a cluster, verify certificates, or index a document.
+</Aside>
+
+## Before you begin
+
+Create or select destination indices and an account with only the index privileges required by the pipeline. Decide mapping, analyzers, and lifecycle policy before the first production write; those settings are enforced by Elasticsearch rather than the local resource validator.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/search_elasticsearch.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: search_elasticsearch
+connector: elasticsearch
+config:
+  host: elasticsearch.internal
+  port: "9200"
+  user: ${ELASTICSEARCH_USER}
+  password: ${ELASTICSEARCH_PASSWORD}
+  sslValidate: true
+  validateCA: true
+  sslCA: ${ELASTICSEARCH_CA_PEM}
+```
+
+The catalog requires `sslCA`; supply the CA material through a secret-aware variable and confirm the runtime's expected PEM/path representation before deployment.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+This checks local field shape only. It does not test DNS, TLS negotiation, certificate trust, authentication, index permissions, mappings, or writes.
+
+## Limitations
+
+- The catalog declares a target only; it does not declare source reads, Snapshot, CDC, or DDL behavior.
+- The upstream baseline covers Elasticsearch 7.6. Version compatibility and mappings need staging verification.
+- The catalog exposes certificate-related fields but not a complete security model. Do not assume defaults for HTTPS, certificate paths, or hostname verification.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `host` | Yes | Elasticsearch host. |
+| `port` | Yes | Elasticsearch service port; catalog type is string. |
+| `user` | No | Account name. |
+| `password` | No | Account password; use an environment variable. |
+| `sslValidate` | No | Catalog boolean for SSL validation. |
+| `validateCA` | No | Catalog boolean for CA validation. |
+| `sslCA` | Yes | CA material required by the current catalog. |

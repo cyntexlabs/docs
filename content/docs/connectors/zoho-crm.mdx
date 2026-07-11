@@ -1,0 +1,72 @@
+---
+title: Zoho CRM
+description: Configure Zoho CRM as a TapState API source
+sidebar:
+  order: 45
+ai:
+  kind: connector
+  id: zoho-crm
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [api]
+  aliases: [zoho crm, zoho-crm, zoho api, zoho crm source]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Zoho CRM as a catalog-declared API source.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="API read"
+  compatibility="Zoho CRM API"
+/>
+
+<ConnectorCapabilities source="API read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Authorization boundary">
+  The catalog requires one field, `code`. The upstream interactive authorization guide is not evidence of an equivalent TapState UI or CLI flow.
+</Aside>
+
+## Before you begin
+
+Have a Zoho CRM administrator approve the connected account and least-privilege CRM module access. Keep the authorization value in a secret manager or environment variable.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/sales_zoho.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: sales_zoho
+connector: zoho-crm
+config:
+  code: ${ZOHO_CRM_AUTHORIZATION_CODE}
+mode: api
+```
+
+The current catalog does not disclose token refresh, selected modules, or incremental behavior; confirm those with a deployed runtime.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation does not authorize Zoho, test permissions, enumerate modules, or read records.
+
+## Limitations
+
+- API source only; no target, Snapshot, CDC, DDL, or rate-limit contract is declared.
+- The resource schema does not establish access to every upstream-listed CRM module.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `code` | Yes | Catalog-defined authorization value. Keep it out of committed files. |

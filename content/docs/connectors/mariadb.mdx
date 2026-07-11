@@ -1,0 +1,138 @@
+---
+title: MariaDB
+description: Configure MariaDB as a TapState snapshot or CDC source and data-writing target
+sidebar:
+  order: 9
+ai:
+  kind: connector
+  id: mariadb
+  category: databases
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot, cdc]
+  aliases: [mariadb, mariadb snapshot, mariadb cdc, mariadb binlog, mariadb source, mariadb target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
+
+Use MariaDB to copy existing tables once or to keep a downstream system current from binary-log changes.
+
+<ConnectorProfile
+  category="Databases"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, Data write"
+  compatibility="MariaDB 10.x upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The bundled catalog validates the two source modes and documented field shapes. It does not log in to MariaDB, inspect binary-log settings, or test a target write.
+</Aside>
+
+## Before you begin
+
+### Source
+
+<SourceModeTabs>
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** when you need the rows that exist now and do not need later changes.
+
+```sql
+CREATE USER 'tapstate_reader'@'%' IDENTIFIED BY 'replace_with_a_secret';
+GRANT SELECT ON `orders`.* TO 'tapstate_reader'@'%';
+FLUSH PRIVILEGES;
+```
+
+Snapshot does not require replication privileges or binary logging.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** when the target must begin with existing rows and then receive inserts, updates, and deletes.
+
+```sql
+CREATE USER 'tapstate_reader'@'%' IDENTIFIED BY 'replace_with_a_secret';
+GRANT SELECT ON `orders`.* TO 'tapstate_reader'@'%';
+GRANT REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'tapstate_reader'@'%';
+FLUSH PRIVILEGES;
+```
+
+Enable row-based binary logging and retain logs longer than the longest credible pipeline interruption:
+
+```ini
+[mysqld]
+server_id       = 223344
+log_bin         = mariadb-bin
+binlog_format   = ROW
+binlog_row_image = FULL
+```
+
+Restart MariaDB during an approved maintenance window, then verify `binlog_format` is `ROW`.
+
+</SourceModeTab>
+</SourceModeTabs>
+
+### Target
+
+Create a dedicated writer. Grant table-creation or alteration privileges only when the destination schema is allowed to be managed by a pipeline.
+
+```sql
+CREATE USER 'tapstate_writer'@'%' IDENTIFIED BY 'replace_with_a_secret';
+GRANT SELECT, INSERT, UPDATE, DELETE ON `analytics`.* TO 'tapstate_writer'@'%';
+FLUSH PRIVILEGES;
+```
+
+## Create a connection
+
+```yaml title="tapstate-work/source/orders_mariadb.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: orders_mariadb
+connector: mariadb
+config:
+  host: mariadb.internal
+  port: "3306"
+  database: orders
+  username: ${MARIADB_USER}
+  password: ${MARIADB_PASSWORD}
+  addtionalString: "useUnicode=yes&characterEncoding=UTF-8"
+  timezone: "+00:00"
+mode: cdc
+tables:
+  - orders
+```
+
+For a one-time copy, use `mode: snapshot`. For a target connection, omit `mode` and `tables`, and use the writer credentials.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource, mode, and catalog-known field types. It does not test network access, credentials, MariaDB privileges, binlog retention, or data movement.
+
+## Limitations
+
+- The catalog declares `snapshot` and `cdc`, but does not declare DDL handling; this page does not claim DDL capture or application.
+- The upstream preparation baseline is MariaDB 10.x. Test versions, replication topology, and data types with representative data before production use.
+- The catalog does not expose transport-encryption fields. Do not infer a TapState TLS configuration from server-side MariaDB settings.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host` | Yes | — | MariaDB host. |
+| `port` | Yes | — | MariaDB service port; catalog type is string. |
+| `database` | Yes | — | Database name. |
+| `username` | Yes | — | Database account. |
+| `password` | No | — | Account password; supply through a secret-aware environment variable. |
+| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Extra connector parameters. The inherited spelling is exact. |
+| `timezone` | No | empty | UTC offset used for timezone-naive values. |

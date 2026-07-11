@@ -1,0 +1,83 @@
+---
+title: CSV
+description: Configure CSV files as TapState sources or data-writing targets
+sidebar:
+  order: 50
+ai:
+  kind: connector
+  id: csv
+  category: files
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot, cdc]
+  aliases: [csv, csv file, csv snapshot, csv cdc, csv source, csv target, sftp csv, s3 csv]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use CSV files from local storage, FTP, SFTP, SMB, S3-compatible storage, or OSS as a pipeline source or target.
+
+<ConnectorProfile
+  category="Files"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, Data write"
+  compatibility="Local, FTP, SFTP, SMB, S3FS, OSS"
+/>
+
+<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog validates the selected mode and file-transport field shapes. It does not open a file, authenticate to remote storage, watch for changes, parse CSV, or write an output file.
+</Aside>
+
+## Before you begin
+
+Place files where the TapState runtime can reach them. For remote storage, use a dedicated account restricted to the required path or bucket. For CSV sources, make headers and delimiters consistent across files in the same logical dataset.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/orders_csv.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: orders_csv
+connector: csv
+config:
+  protocol: sftp
+  encoding: UTF-8
+  sftpHost: sftp.internal
+  sftpPort: "22"
+  sftpUsername: ${SFTP_USER}
+  sftpPassword: ${SFTP_PASSWORD}
+  filePathString: /exports/orders/*.csv
+mode: snapshot
+```
+
+Use `mode: cdc` only after staging the deployed file-change behavior. For a target connection, omit `mode`; validate naming, overwrite, and write semantics with the runtime before production use.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog exposes Snapshot, CDC, and target roles but does not define a file-change mechanism, deletion behavior, output layout, or write conflict policy.
+- The upstream baseline describes file polling and source types, but that behavior is not published as a TapState runtime guarantee.
+- Treat `oss` as a storage protocol option, not an endorsement of a regional deployment; S3-compatible storage is also available through `s3fs`.
+
+## Reference
+
+| Scope | Fields | Notes |
+|---|---|---|
+| Common | `protocol`, `encoding`, `filePathString` | Protocol defaults to `local`; encoding defaults to `UTF-8`. |
+| FTP | `ftpHost`, `ftpPort`, `ftpUsername`, `ftpPassword`, `ftpPassiveMode`, `ftpConnectTimeout`, `ftpDataTimeout` | Catalog defaults: port `21`, passive mode `true`, connect timeout `60`, data timeout `0`. |
+| SFTP | `sftpHost`, `sftpPort`, `sftpUsername`, `sftpPassword` | Catalog default SFTP port is `22`. |
+| SMB | `smbHost`, `smbUsername`, `smbPassword`, `smbShareDir` | Select this group only for `smb`. |
+| S3FS / OSS | `accessKey`, `secretKey`, `endpoint`, `region`, `bucket` | Use secret-aware variables for key material. |
+
+`protocol` accepts `local`, `ftp`, `sftp`, `smb`, `s3fs`, or `oss`. The catalog marks transport-specific fields as required; provide only the fields relevant to the selected protocol and verify the deployed connector's conditional validation.

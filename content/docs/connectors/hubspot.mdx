@@ -1,0 +1,72 @@
+---
+title: HubSpot
+description: Configure HubSpot as a TapState API source
+sidebar:
+  order: 43
+ai:
+  kind: connector
+  id: hubspot
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [api]
+  aliases: [hubspot, hubspot api, hubspot crm, hubspot source]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use HubSpot as a catalog-declared API source for CRM data.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="API read"
+  compatibility="HubSpot API"
+/>
+
+<ConnectorCapabilities source="API read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Authorization boundary">
+  The catalog requires `code`. The upstream guide uses an interactive authorization flow, but a corresponding TapState UI or CLI exchange is not yet evidenced; this page does not invent one.
+</Aside>
+
+## Before you begin
+
+Choose the HubSpot account and objects to expose, then arrange administrator-approved authorization with the smallest scopes needed. Store the resulting credential outside source control.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/marketing_hubspot.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: marketing_hubspot
+connector: hubspot
+config:
+  code: ${HUBSPOT_AUTHORIZATION_CODE}
+mode: api
+```
+
+The catalog does not expose a token-refresh field, selected-object field, or account selector. Confirm those runtime behaviors before production use.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation does not authorize HubSpot, verify scopes, enumerate CRM objects, or read records.
+
+## Limitations
+
+- API source only; no target, Snapshot, CDC, DDL, or API-rate contract is declared.
+- The code-backed resource schema is intentionally smaller than the upstream UI guide; do not infer missing configuration fields.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `code` | Yes | Catalog-defined authorization value; use a secret-aware environment variable. |

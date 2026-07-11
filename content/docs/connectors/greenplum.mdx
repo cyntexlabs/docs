@@ -1,0 +1,81 @@
+---
+title: Greenplum
+description: Configure Greenplum as a TapState snapshot source or data-writing target
+sidebar:
+  order: 25
+ai:
+  kind: connector
+  id: greenplum
+  category: warehouses-analytics
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot]
+  aliases: [greenplum, greenplum snapshot, greenplum target, mpp database]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Greenplum for point-in-time table reads or as a target for analytical data.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, Data write"
+  compatibility="Greenplum upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot read" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog validates Snapshot mode and field shapes. It does not test PostgreSQL-compatible network access, credentials, privileges, plugins, or target writes.
+</Aside>
+
+## Before you begin
+
+Create separate reader and writer accounts limited to the selected schema. The upstream guide exposes a `logPluginName` setting for incremental work, but the current catalog declares Snapshot only; do not configure an incremental path based on that field alone.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/mart_greenplum.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: mart_greenplum
+connector: greenplum
+config:
+  host: greenplum.internal
+  port: "5432"
+  database: analytics
+  schema: public
+  user: ${GREENPLUM_USER}
+  password: ${GREENPLUM_PASSWORD}
+  logPluginName: pgoutput
+mode: snapshot
+tables:
+  - orders
+```
+
+For a target connection, omit `mode` and `tables`.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- `logPluginName` is required by the catalog but does not establish CDC support; the catalog declares Snapshot only.
+- The catalog does not declare DDL behavior, topology/failover semantics, or TLS fields.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host`, `port`, `database`, `schema` | Yes | — | Greenplum endpoint and selected schema. |
+| `user`, `password` | No | — | Connection account and secret. |
+| `logPluginName` | Yes | `pgoutput` | Plugin enum includes `pgoutput`, `wal2json`, and related variants. |
+| `extParams`, `timezone` | No | empty timezone | Extra parameters and UTC offset. |

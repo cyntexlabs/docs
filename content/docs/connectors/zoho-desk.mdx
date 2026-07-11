@@ -1,0 +1,80 @@
+---
+title: Zoho Desk
+description: Configure Zoho Desk as a TapState snapshot source
+sidebar:
+  order: 46
+ai:
+  kind: connector
+  id: zoho-desk
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [snapshot]
+  aliases: [zoho desk, zoho-desk, zoho desk snapshot, zoho desk source, zoho desk webhook]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Zoho Desk as a catalog-declared Snapshot source for service data.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="Snapshot, API read"
+  compatibility="Zoho Desk API"
+/>
+
+<ConnectorCapabilities source="Snapshot read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Webhook is not a catalog-declared mode">
+  The upstream guide describes WebHook updates, but the current catalog declares `snapshot` only. This page does not represent webhook incremental delivery as an available TapState mode.
+</Aside>
+
+## Before you begin
+
+Obtain the Zoho Desk organization ID, client ID, client secret, and authorization code from an administrator. Keep every credential in a secret manager. Confirm organization policy and any webhook configuration separately; it is not validated by this resource.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/support_zoho_desk.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: support_zoho_desk
+connector: zoho-desk
+config:
+  orgId: ${ZOHO_DESK_ORG_ID}
+  clientID: ${ZOHO_DESK_CLIENT_ID}
+  clientSecret: ${ZOHO_DESK_CLIENT_SECRET}
+  generateCode: ${ZOHO_DESK_AUTHORIZATION_CODE}
+  connectionMode: DocumentMode
+  streamReadType: WebHook
+mode: snapshot
+```
+
+`streamReadType` is a catalog field with a `WebHook` default; it does not override the catalog's Snapshot-only mode declaration.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation does not authenticate to Zoho Desk, exchange credentials, generate callback URLs, receive a webhook, or retrieve tickets.
+
+## Limitations
+
+- The current catalog declares Snapshot only; it does not declare CDC, target writes, DDL, or webhook delivery semantics.
+- The catalog exposes `getTokenMsg`, `getRefreshMsg`, and `hookText` but does not document their runtime representation; leave them unset unless the deployed contract specifies values.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `orgId`, `clientID`, `clientSecret`, `generateCode` | Yes | — | Zoho Desk organization and authorization material. |
+| `connectionMode` | No | `DocumentMode` | Catalog connection-mode enum. |
+| `streamReadType` | No | `WebHook` | Catalog field; not a TapState CDC declaration. |
+| `getTokenMsg`, `getRefreshMsg`, `hookText` | No | — | Runtime-specific optional fields. |

@@ -1,0 +1,83 @@
+---
+title: XML
+description: Configure XML files as a TapState source
+sidebar:
+  order: 53
+ai:
+  kind: connector
+  id: xml
+  category: files
+  maturity: preview
+  useAs: [source]
+  modes: [snapshot, cdc]
+  aliases: [xml, xml file, xml snapshot, xml cdc, xml source, sftp xml, s3 xml]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use XML files from local or supported remote storage as a source for structured pipeline data.
+
+<ConnectorProfile
+  category="Files"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="Snapshot, CDC"
+  compatibility="Local, FTP, SFTP, SMB, S3FS, OSS"
+/>
+
+<ConnectorCapabilities source="Snapshot and CDC" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog validates the selected mode and configuration field shapes. It does not read XML, authenticate to storage, watch files, or validate XML schema.
+</Aside>
+
+## Before you begin
+
+Make files available to the TapState runtime and restrict remote credentials to the required path or bucket. Decide how repeating elements and attributes map to records before creating a production pipeline.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/catalog_xml.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: catalog_xml
+connector: xml
+config:
+  protocol: sftp
+  encoding: UTF-8
+  sftpHost: sftp.internal
+  sftpPort: "22"
+  sftpUsername: ${SFTP_USER}
+  sftpPassword: ${SFTP_PASSWORD}
+  filePathString: /exports/catalog/*.xml
+mode: snapshot
+```
+
+Use `mode: cdc` only after staging the deployed file-change behavior.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog declares a source only; target writes and DDL behavior are not declared.
+- It does not specify XML schema validation, record mapping, file polling, or deletion behavior.
+- Keep transport credentials out of committed workspace files.
+
+## Reference
+
+| Protocol | Fields |
+|---|---|
+| Common | `protocol`, `encoding`, `filePathString` |
+| FTP | `ftpHost`, `ftpPort`, `ftpUsername`, `ftpPassword`, `ftpPassiveMode`, `ftpConnectTimeout`, `ftpDataTimeout` |
+| SFTP | `sftpHost`, `sftpPort`, `sftpUsername`, `sftpPassword` |
+| SMB | `smbHost`, `smbUsername`, `smbPassword`, `smbShareDir` |
+| S3FS / OSS | `accessKey`, `secretKey`, `endpoint`, `region`, `bucket` |
+
+`protocol` accepts `local`, `ftp`, `sftp`, `smb`, `s3fs`, and `oss`; `encoding` defaults to `UTF-8`.
