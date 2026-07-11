@@ -1,0 +1,60 @@
+---
+title: Connectors
+description: Choose and configure a TapState connector by system type and data-delivery outcome
+sidebar:
+  order: 1
+---
+
+import { CardGrid, LinkCard } from '@/components/mdx';
+
+Choose a connector by the system you need to read from or write to. Each page leads with a compact profile and a capability table. Capability tables distinguish the current catalog contract from upstream database preparation, and never treat local CLI validation as a live connectivity test.
+
+## Databases
+
+<CardGrid>
+  <LinkCard title="MySQL" href="/docs/connectors/mysql" description="Snapshot and CDC source; data-writing target." />
+  <LinkCard title="PostgreSQL" href="/docs/connectors/postgresql" description="Snapshot and CDC baseline; data-writing target." />
+  <LinkCard title="Oracle" href="/docs/connectors/oracle" description="Snapshot and CDC baseline; data-writing target." />
+  <LinkCard title="SQL Server" href="/docs/connectors/sqlserver" description="Snapshot and CDC baseline; data-writing target." />
+  <LinkCard title="MongoDB" href="/docs/connectors/mongodb" description="Snapshot and Oplog-based CDC; data-writing target." />
+  <LinkCard title="MongoDB Atlas" href="/docs/connectors/mongodb-atlas" description="Atlas-managed Oplog CDC; data-writing target." />
+  <LinkCard title="openGauss" href="/docs/connectors/opengauss" description="Catalog-backed Snapshot source and data-writing target." />
+</CardGrid>
+
+## Warehouses & analytics
+
+<CardGrid>
+  <LinkCard title="SelectDB" href="/docs/connectors/selectdb" description="Catalog-backed Snapshot source and data-writing target." />
+</CardGrid>
+
+## Streaming & messaging
+
+<CardGrid>
+  <LinkCard title="Kafka" href="/docs/connectors/kafka" description="Read from and write to Confluent-compatible Kafka streams." />
+</CardGrid>
+
+## SaaS, business & commerce APIs
+
+<CardGrid>
+  <LinkCard title="Lark Bitable" href="/docs/connectors/feishu-bitable" description="Read one Lark or Feishu Bitable table through its API." />
+  <LinkCard title="Alibaba 1688" href="/docs/connectors/alibaba-1688" description="Read authorized marketplace data through the 1688 API." />
+</CardGrid>
+
+## How capability claims are made
+
+| Signal | Meaning |
+|---|---|
+| Maturity | The connector lifecycle level, such as GA or Preview. |
+| Source | The supported way to read data: Snapshot, CDC, stream, or API. |
+| Target | Whether the current connector contract declares data writing. |
+| Schema changes | DDL handling only when it is explicitly evidenced; otherwise it is not claimed. |
+
+## Create and validate a connection
+
+Connection resources are `.cyn.yml` files. Use the exact connector ID and field names from the page's Reference section. A target is represented by the same `kind: source` connection resource without a reader `mode` or `tables` section.
+
+```bash
+cyntex validate --workdir tapstate-work
+```
+
+This offline check validates workspace structure plus catalog-known modes and field shapes. It does not test a network route, credentials, database privileges, API access, or a live write.

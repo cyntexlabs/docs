@@ -64,9 +64,9 @@ export function Badge({ text, children }: { text?: ReactNode; children?: ReactNo
 }
 
 type ConnectorProfileProps = {
+  category: string;
   maturity: string;
   maturityLabel: string;
-  availability: string;
   worksAs: string;
   capabilities: string;
   compatibility: string;
@@ -155,9 +155,9 @@ function ConnectorProfileTags({ value }: { value: string }) {
 
 /** A compact connector summary that remains a structured definition list in LLM output. */
 export function ConnectorProfile({
+  category,
   maturity,
   maturityLabel,
-  availability,
   worksAs,
   capabilities,
   compatibility,
@@ -171,6 +171,11 @@ export function ConnectorProfile({
     >
       <h2 className="sr-only">Connector profile</h2>
       <dl className="divide-y divide-fd-border">
+        <ConnectorProfileRow label="Category">
+          <span className="inline-flex rounded-md border border-fd-border bg-fd-muted/55 px-2 py-0.5 text-xs font-medium leading-5 text-fd-foreground">
+            {category}
+          </span>
+        </ConnectorProfileRow>
         <ConnectorProfileRow label="Maturity">
           <span className="flex flex-wrap items-center gap-2.5">
             <span className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-semibold leading-5 ${maturityTone.badge}`}>
@@ -178,22 +183,6 @@ export function ConnectorProfile({
               {maturity}
             </span>
             <span className={maturityTone.label}>{maturityLabel}</span>
-          </span>
-        </ConnectorProfileRow>
-        <ConnectorProfileRow label="TapState availability">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-semibold leading-5 ${
-              availability.toLowerCase().startsWith('available')
-                ? 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950/45 dark:text-blue-200'
-                : 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/45 dark:text-amber-200'
-            }`}
-          >
-            {availability.toLowerCase().startsWith('available') ? (
-              <CircleCheck aria-hidden="true" className="size-3.5" strokeWidth={2.25} />
-            ) : (
-              <CircleAlert aria-hidden="true" className="size-3.5" strokeWidth={2.25} />
-            )}
-            {availability}
           </span>
         </ConnectorProfileRow>
         <ConnectorProfileRow label="Works as">
@@ -209,6 +198,47 @@ export function ConnectorProfile({
           </span>
         </ConnectorProfileRow>
       </dl>
+    </section>
+  );
+}
+
+/** A compact, neutral capability table. Values must be traceable to the connector evidence matrix. */
+export function ConnectorCapabilities({
+  source,
+  target,
+  schema = 'Not claimed',
+}: {
+  source: string;
+  target: string;
+  schema?: string;
+}) {
+  return (
+    <section aria-label="Connector capabilities" className="not-prose my-6">
+      <h2 className="mb-2 text-base font-semibold text-fd-foreground">Capabilities</h2>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[30rem] text-left text-sm">
+          <thead className="border-y border-fd-border text-xs uppercase tracking-wide text-fd-muted-foreground">
+            <tr>
+              <th className="px-0 py-2.5 font-semibold">Role</th>
+              <th className="px-4 py-2.5 font-semibold">What you can do</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-fd-border text-fd-card-foreground">
+            <tr>
+              <th className="px-0 py-3 font-medium">Source</th>
+              <td className="px-4 py-3">{source}</td>
+            </tr>
+            <tr>
+              <th className="px-0 py-3 font-medium">Target</th>
+              <td className="px-4 py-3">{target}</td>
+            </tr>
+            <tr>
+              <th className="px-0 py-3 font-medium">Schema changes</th>
+              <td className="px-4 py-3">{schema}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
@@ -254,6 +284,7 @@ export function getMDXComponents(components?: MDXComponents) {
     LinkCard,
     Badge,
     ConnectorProfile,
+    ConnectorCapabilities,
     ValidationStatusGuide,
     ...components,
   } satisfies MDXComponents;

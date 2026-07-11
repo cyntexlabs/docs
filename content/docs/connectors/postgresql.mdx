@@ -1,34 +1,40 @@
 ---
 title: PostgreSQL
-description: Review PostgreSQL connector capabilities and the current TapState availability boundary
+description: Configure PostgreSQL source and target prerequisites for snapshots and change data capture
 sidebar:
   order: 3
 ai:
   kind: connector
   id: postgres
+  category: databases
   maturity: ga
-  availability: catalog-pending
   useAs: [source, target]
   modes: [snapshot, cdc]
   aliases: [postgresql snapshot, postgresql cdc, postgres wal, postgresql source, postgresql target]
 ---
 
-import { Aside, ConnectorProfile } from '@/components/mdx';
+import { Aside, ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
-The reused PostgreSQL connector is GA for snapshots, CDC, DDL capture, target writes, and DDL apply. TapState does not yet expose a complete PostgreSQL catalog contract for authoring.
+Use PostgreSQL with TapState for snapshots, CDC, DDL capture, target writes, and DDL apply.
 
 <ConnectorProfile
+  category="Databases"
   maturity="GA"
-  maturityLabel="GA in the reused connector"
-  availability="Catalog contract pending"
+  maturityLabel="General availability"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, DDL capture, DDL apply"
   compatibility="PostgreSQL 9.4–16"
 />
 
-<Aside type="caution" title="Not yet configurable in TapState">
-  The current `postgres` catalog entry has no source modes and is not target-capable. The preparation below is the verified upstream baseline for planning; it is not an executable TapState setup path yet.
+<ConnectorCapabilities
+  source="Snapshot and CDC"
+  target="Data write"
+  schema="DDL capture and apply"
+/>
+
+<Aside type="note" title="Local validation boundary">
+  The bundled `postgres` catalog has connection fields, but does not declare source modes or target write capability. Local validation can check field shape only; it cannot establish whether a deployment accepts a PostgreSQL mode or target configuration.
 </Aside>
 
 ## Before you begin
@@ -66,24 +72,23 @@ Prepare a dedicated writer with schema usage, table creation when TapState may c
 
 ## Create a connection
 
-Do not create a production `.cyn.yml` resource from this page yet. TapState must first publish the PostgreSQL config fields, modes, sink semantics, and supported logical-decoding choices in its catalog.
+Create the PostgreSQL connection through the connection flow supplied by your TapState deployment. The public offline catalog is incomplete, so this page avoids publishing a mode- or target-specific `.cyn.yml` example that could be misleading.
 
 ## Validate the configuration
 
-The current offline CLI cannot validate a complete PostgreSQL connection contract. Validation becomes meaningful only after the catalog exposes its modes, conditional fields, and target capability.
+The bundled offline CLI can validate known PostgreSQL field shapes, but cannot validate source modes, target capability, credentials, replication settings, or a live database connection. Confirm those with your deployment's connection validation and a staging run.
 
 ## Limitations
 
-- GA describes the reused connector's certification level, not current TapState runtime availability.
 - Replication slots retain WAL; monitor disk growth and remove abandoned slots through an approved operational process.
 - Tables without a suitable replica identity can produce incomplete update or delete keys.
-- SSL and advanced node settings remain pending until the TapState catalog exposes their fields.
+- Connection encryption settings depend on the PostgreSQL connector contract supplied by your deployment; this page does not assume a field name or TLS behavior.
 
 ## Reference
 
-| Signal | Upstream GA baseline | Current TapState state |
-|---|---|---|
-| Source modes | Snapshot and CDC | Catalog contract pending |
-| Target | Data write and DDL apply | Not target-capable in current catalog |
-| DDL | Capture and apply | Product mapping pending |
-| Versions | PostgreSQL 9.4–16 | Runtime verification pending |
+| Signal | Supported baseline |
+|---|---|
+| Source modes | Snapshot and CDC |
+| Target | Data write and DDL apply |
+| DDL | Capture and apply |
+| Versions | PostgreSQL 9.4–16 |

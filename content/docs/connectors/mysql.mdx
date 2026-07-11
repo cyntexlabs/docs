@@ -6,25 +6,31 @@ sidebar:
 ai:
   kind: connector
   id: mysql
+  category: databases
   maturity: ga
-  availability: available
   useAs: [source, target]
   modes: [snapshot, cdc]
   aliases: [mysql snapshot, mysql full load, mysql cdc, mysql binlog, mysql source, mysql target]
 ---
 
-import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Connect MySQL to TapState for point-in-time snapshots, real-time change capture, and downstream delivery.
 
 <ConnectorProfile
+  category="Databases"
   maturity="GA"
   maturityLabel="Production ready"
-  availability="Available for authoring"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Schema discovery, DDL capture, DDL apply"
   compatibility="MySQL 5.0–9.x · Single node and primary-replica"
+/>
+
+<ConnectorCapabilities
+  source="Snapshot and CDC"
+  target="Data write"
+  schema="DDL capture and apply"
 />
 
 ## Before you begin

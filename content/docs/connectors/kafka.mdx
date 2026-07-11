@@ -6,24 +6,29 @@ sidebar:
 ai:
   kind: connector
   id: kafka_enhanced
+  category: streaming-messaging
   maturity: ga
-  availability: available
   useAs: [source, target]
   modes: [stream]
   aliases: [apache kafka, confluent kafka, kafka stream, kafka source, kafka target, kafka enhanced]
 ---
 
-import { ConnectorProfile } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
 
 Use the catalog ID `kafka_enhanced` for current Kafka connections. The legacy `kafka` catalog entry is deprecated.
 
 <ConnectorProfile
+  category="Streaming & messaging"
   maturity="GA"
   maturityLabel="Production ready"
-  availability="Available for authoring"
   worksAs="Source, Target"
   capabilities="Stream read, Stream write, Schema Registry"
   compatibility="Kafka 2.3+ · Confluent-compatible clients"
+/>
+
+<ConnectorCapabilities
+  source="Stream read"
+  target="Stream write"
 />
 
 ## Before you begin

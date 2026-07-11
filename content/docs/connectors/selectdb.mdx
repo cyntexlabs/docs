@@ -1,0 +1,112 @@
+---
+title: SelectDB
+description: Configure SelectDB as a TapState snapshot source or data-writing target
+sidebar:
+  order: 20
+ai:
+  kind: connector
+  id: selectdb
+  category: warehouses-analytics
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot]
+  aliases: [selectdb, selectdb cloud, apache doris, selectdb snapshot, selectdb target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use SelectDB for point-in-time reads or as a destination for pipeline data. SelectDB Cloud is based on Apache Doris; validate the endpoint types and privileges against your deployment before production use.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, Schema discovery, Data write"
+  compatibility="SelectDB Cloud 2.0.13+"
+/>
+
+<ConnectorCapabilities
+  source="Snapshot read"
+  target="Data write"
+/>
+
+<Aside type="note" title="Local validation boundary">
+  The bundled catalog validates the `snapshot` mode and this connection schema. It does not connect to SelectDB, validate FE or HTTP endpoints, or prove target-write behavior against a live cluster.
+</Aside>
+
+## Before you begin
+
+### Source
+
+Create an account with read access to the database and tables selected by the source. The current catalog declares Snapshot source capability, while the upstream SelectDB Cloud guide focuses on target setup; confirm the exact least-privilege `SELECT` grant syntax with your SelectDB administrator.
+
+### Target
+
+The upstream SelectDB baseline uses a database account that can write the selected destination table. Start with the narrowest privileges allowed by your SelectDB deployment. If your administrator uses the upstream baseline, it includes a table-level grant and `PROCESS` access; review both before applying them to production.
+
+## Create a connection
+
+### Snapshot source
+
+```yaml title="tapstate-work/source/orders_selectdb.cyn.yml"
+version: cyntex/v1
+kind: source
+id: orders_selectdb
+connector: selectdb
+config:
+  host: fe.selectdb.internal
+  port: "9030"
+  selectDbHttp: http://fe.selectdb.internal:8030
+  database: analytics
+  user: ${SELECTDB_READER}
+  password: ${SELECTDB_READER_PASSWORD}
+mode: snapshot
+tables:
+  - orders
+```
+
+### Target connection
+
+```yaml title="tapstate-work/source/warehouse_selectdb.cyn.yml"
+version: cyntex/v1
+kind: source
+id: warehouse_selectdb
+connector: selectdb
+config:
+  host: fe.selectdb.internal
+  port: "9030"
+  selectDbHttp: http://fe.selectdb.internal:8030
+  database: warehouse
+  user: ${SELECTDB_WRITER}
+  password: ${SELECTDB_WRITER_PASSWORD}
+```
+
+Use the FE SQL endpoint for `host` and `port`; supply the HTTP endpoint separately in `selectDbHttp`. Do not reuse a browser console URL unless it is the endpoint accepted by your SelectDB deployment.
+
+## Validate the configuration
+
+```bash
+cyntex validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+This checks the YAML envelope, `snapshot` mode, and catalog-known field shapes only. Test connectivity, account privileges, FE reachability, HTTP reachability, and a staging write separately.
+
+## Limitations
+
+- The current catalog declares Snapshot; it does not declare CDC or DDL behavior for SelectDB.
+- The catalog exposes both source and target roles, even though the upstream UI guide describes target setup only. Treat live source behavior as a staging-test requirement.
+- This page does not claim TLS fields, automatic table creation, or schema evolution because those details are not exposed by the current catalog.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host` | Yes | — | FE SQL host. |
+| `port` | Yes | — | FE SQL port. |
+| `selectDbHttp` | Yes | — | SelectDB HTTP endpoint. |
+| `database` | Yes | — | Database name. |
+| `user` | No | — | Read or write account. Prefer an environment variable. |
+| `password` | No | — | Account password. Prefer an environment variable. |
