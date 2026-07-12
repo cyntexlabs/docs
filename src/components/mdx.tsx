@@ -1,6 +1,6 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import Link from 'next/link';
-import { BadgeCheck, CircleAlert, CircleCheck, Database, FileText, RadioTower, Store, TableProperties } from 'lucide-react';
+import { BadgeCheck, CircleAlert, CircleCheck, Database, FileText, RadioTower, Store, TableProperties, Wrench } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { MDXComponents } from 'mdx/types';
 import {
@@ -306,6 +306,10 @@ const categoryPresentation: Record<
     icon: Store,
     iconClassName: 'bg-rose-50 text-rose-700 dark:bg-rose-950/45 dark:text-rose-300',
   },
+  'custom-development': {
+    icon: Wrench,
+    iconClassName: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+  },
 };
 
 function DirectoryMaturity({ maturity }: { maturity: 'ga' | 'preview' }) {
@@ -374,7 +378,13 @@ export function SupportedConnectorMatrix() {
                         </th>
                         <td className="px-3 py-2.5"><DirectoryMaturity maturity={connector.maturity} /></td>
                         <td className="px-3 py-2.5 text-fd-muted-foreground">{connector.useAs.map((role) => role[0].toUpperCase() + role.slice(1)).join(' + ')}</td>
-                        <td className="px-3 py-2.5 text-fd-muted-foreground">{connector.modes.length > 0 ? connector.modes.join(' · ') : '—'}</td>
+                        <td className="px-3 py-2.5 text-fd-muted-foreground">
+                          {connector.modes.length > 0
+                            ? connector.modes.join(' · ')
+                            : connector.useAs.includes('source')
+                              ? 'Not declared'
+                              : '—'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

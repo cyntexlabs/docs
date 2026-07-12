@@ -208,9 +208,9 @@
 
       <div class="summary-grid" aria-label="Key figures">
         <article class="metric good">
-          <span class="value">43</span>
+          <span class="value">49</span>
           <span class="label">Published connector guides</span>
-          <span class="hint">43 guide slugs, sidebar, and matrix agree</span>
+          <span class="hint">49 guide slugs, sidebar, and matrix agree</span>
         </article>
         <article class="metric">
           <span class="value">77</span>
@@ -218,14 +218,14 @@
           <span class="hint">Bundled entries in the latest code</span>
         </article>
         <article class="metric good">
-          <span class="value">39</span>
+          <span class="value">46</span>
           <span class="label">Exact role/mode matches</span>
           <span class="hint">Guide ID, source modes, and target flag align</span>
         </article>
         <article class="metric warn">
-          <span class="value">4</span>
+          <span class="value">3</span>
           <span class="label">P0 reconciliation items</span>
-          <span class="hint">One mismatch and three missing catalog IDs</span>
+          <span class="hint">One mismatch and two missing catalog IDs</span>
         </article>
       </div>
 
@@ -300,12 +300,12 @@
         </p>
         <div class="checks">
           <article class="check">
-            <span class="tag">39 exact matches</span>
+            <span class="tag">46 exact matches</span>
             <h3>Safe catalog alignment</h3>
             <p>For these guides, the published ID, declared read modes, and target flag agree with the current catalog entry.</p>
           </article>
           <article class="check">
-            <span class="tag">37 catalog-only entries</span>
+            <span class="tag">30 catalog-only entries</span>
             <h3>Not automatically missing docs</h3>
             <p>Some are deployment variants covered by base guides; others are deferred, legacy, internal, or need an explicit product decision.</p>
           </article>
@@ -344,35 +344,27 @@
                 <td>No bundled entry</td>
                 <td>Same action as Oracle: reconcile against a server registration or add an authoritative catalog entry.</td>
               </tr>
-              <tr>
-                <td><span class="pill danger">P0 ID mismatch</span></td>
-                <td><strong>GitHub</strong><br /><code>github</code></td>
-                <td>Source<br /><small>API</small></td>
-                <td><code>GitHub</code> (capital G)<br /><small>Source, API</small></td>
-                <td>Decide one canonical case-sensitive ID. The catalog loader indexes IDs exactly; the current lower-case guide ID is not an offline match.</td>
-              </tr>
             </tbody>
           </table>
         </div>
 
         <details style="margin-top:16px">
-          <summary>Catalog entries without a dedicated published guide (37)</summary>
+          <summary>Catalog entries without a dedicated published guide (30)</summary>
           <div class="details-body">
             <p>
-              This list is not a backlog of 37 mandatory pages. It includes cloud variants, legacy IDs,
+              This list is not a backlog of 30 mandatory pages. It includes cloud variants, legacy IDs,
               internal/test connectors, and connectors awaiting a product-priority decision. The migration record
               at <code>docs/connector-coverage.md</code> explains the upstream-page classification.
             </p>
             <div class="chips" aria-label="Catalog-only connector IDs">
-              <span class="chip">GitHub</span><span class="chip">ai-chat</span><span class="chip">aliyun-adb-mysql</span><span class="chip">aliyun-adb-postgres</span>
+              <span class="chip">ai-chat</span><span class="chip">aliyun-adb-mysql</span><span class="chip">aliyun-adb-postgres</span>
               <span class="chip">aliyun-db-mongodb</span><span class="chip">aliyun-rds-mariadb</span><span class="chip">aliyun-rds-mysql</span><span class="chip">aliyun-rds-postgres</span>
-              <span class="chip">aws-clickhouse</span><span class="chip">aws-rds-mysql</span><span class="chip">bes-channels</span><span class="chip">coding</span>
-              <span class="chip">custom</span><span class="chip">dummy</span><span class="chip">dws</span><span class="chip">file-stream</span>
-              <span class="chip">hazelcast</span><span class="chip">highgo</span><span class="chip">http-receiver</span><span class="chip">huawei-gauss-db</span>
+              <span class="chip">aws-rds-mysql</span><span class="chip">bes-channels</span><span class="chip">coding</span><span class="chip">dws</span><span class="chip">file-stream</span>
+              <span class="chip">highgo</span><span class="chip">http-receiver</span><span class="chip">huawei-gauss-db</span>
               <span class="chip">kafka</span><span class="chip">kafka_avro</span><span class="chip">lark-im</span><span class="chip">lark-task</span>
-              <span class="chip">mongodb3</span><span class="chip">polar-db-mysql</span><span class="chip">polar-db-postgres</span><span class="chip">quickapi</span>
+              <span class="chip">mongodb3</span><span class="chip">polar-db-mysql</span><span class="chip">polar-db-postgres</span>
               <span class="chip">shein</span><span class="chip">tablestore</span><span class="chip">temu</span><span class="chip">tencent-db-mariadb</span>
-              <span class="chip">tencent-db-mongodb</span><span class="chip">tencent-db-postgres</span><span class="chip">vastbase</span><span class="chip">vika</span><span class="chip">yashandb</span>
+              <span class="chip">tencent-db-mongodb</span><span class="chip">tencent-db-postgres</span><span class="chip">vastbase</span><span class="chip">yashandb</span>
             </div>
           </div>
         </details>
@@ -411,8 +403,8 @@
         <div class="roadmap">
           <article class="roadmap-item p0">
             <div>
-              <h3>P0 · Resolve the four documentation/catalog deltas</h3>
-              <p>Reconcile PostgreSQL’s blank source/target/mode contract; establish catalog or server evidence for Oracle and SQL Server; choose the canonical GitHub ID case. Do not automatically downgrade a guide merely because the offline catalog is incomplete.</p>
+              <h3>P0 · Resolve the three remaining documentation/catalog deltas</h3>
+              <p>Reconcile PostgreSQL’s blank source/target/mode contract, then establish catalog or server evidence for Oracle and SQL Server. Do not automatically downgrade a guide merely because the offline catalog is incomplete.</p>
             </div>
           </article>
           <article class="roadmap-item p0">
@@ -435,7 +427,7 @@
           </article>
           <article class="roadmap-item">
             <div>
-              <h3>P2 · Triage the 33 deferred upstream pages</h3>
+              <h3>P2 · Triage the 28 deferred upstream pages</h3>
               <p>Use the existing coverage record to choose candidates by customer value, global applicability, and a usable current contract. Treat cloud variants as base-guide coverage unless their authentication, networking, CDC, or compatibility path truly differs.</p>
             </div>
           </article>

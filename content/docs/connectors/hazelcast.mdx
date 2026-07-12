@@ -1,0 +1,86 @@
+---
+title: Hazelcast
+description: Configure the current Hazelcast connection contract for TapState
+sidebar:
+  order: 62
+ai:
+  kind: connector
+  id: hazelcast
+  category: custom-development
+  maturity: preview
+  useAs: [source]
+  modes: []
+  aliases: [hazelcast, hazelcast cloud, hazelcast connection, hazelcast source]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+The current Hazelcast catalog entry defines connection fields but does not declare a readable mode or target-write capability. Use this page to prepare the connection contract; confirm the server-side read behavior before designing a pipeline.
+
+<ConnectorProfile
+  category="Custom & development"
+  maturity="Preview"
+  maturityLabel="Connection fields are catalog-backed; read contract pending"
+  worksAs="Source"
+  capabilities="Connection configuration"
+  compatibility="Hazelcast / Hazelcast Cloud catalog contract"
+/>
+
+<ConnectorCapabilities source="No catalog-declared read mode" target="Not declared in the current catalog" />
+
+<Aside type="caution" title="Mode and runtime boundary">
+  The catalog has no `modes` value for Hazelcast. Offline validation can check supplied field types, but it defers source-mode legality to the server and cannot test a cluster connection.
+</Aside>
+
+## Before you begin
+
+### Source
+
+Obtain the Hazelcast cluster ID, token, and password from the cluster administrator. If your deployment uses certificate validation, prepare the key and CA material in a secret manager. Confirm map, topic, stream, or other data-selection behavior with the deployed product contract before configuring a pipeline.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/cache_hazelcast.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: cache_hazelcast
+connector: hazelcast
+config:
+  clusterID: ${HAZELCAST_CLUSTER_ID}
+  token: ${HAZELCAST_TOKEN}
+  password: ${HAZELCAST_PASSWORD}
+  ssl: true
+  sslKey: ${HAZELCAST_SSL_KEY}
+  sslValidate: true
+  sslCA: ${HAZELCAST_SSL_CA}
+```
+
+The catalog marks the three core credentials as required. `sslKey` and `sslCA` are conditionally relevant only when the selected deployment needs them; the current catalog does not publish the exact visibility rule.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope and known field types. It does not connect to Hazelcast, authenticate, validate a certificate chain, list maps, or read data.
+
+## Limitations
+
+- The catalog does not declare Snapshot, CDC, stream, API, file, target, or DDL behavior for Hazelcast.
+- The upstream platform guide cannot establish a TapState UI flow, connection test, or reader implementation.
+- Treat certificate material as secrets and do not commit it in workspace files.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `clusterID` | Yes | — | Hazelcast cluster identifier. |
+| `token` | Yes | — | Cluster access token; supply through an environment variable. |
+| `password` | Yes | — | Cluster password; supply through an environment variable. |
+| `ssl` | No | `false` | Enable the catalog-defined SSL option. |
+| `sslKey` | Catalog marks yes | — | Key material for deployments that require it. |
+| `sslValidate` | No | — | Catalog boolean for certificate validation. |
+| `sslCA` | Catalog marks yes | — | CA material for deployments that require it. |

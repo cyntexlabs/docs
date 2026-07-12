@@ -3,7 +3,8 @@ export type ConnectorCategoryId =
   | 'warehouses-analytics'
   | 'streaming-messaging'
   | 'files'
-  | 'saas-business-commerce-apis';
+  | 'saas-business-commerce-apis'
+  | 'custom-development';
 
 export type ConnectorMaturity = 'ga' | 'preview';
 
@@ -27,6 +28,7 @@ export const connectorCategories: Array<{
   { id: 'streaming-messaging', label: 'Streaming & messaging', description: 'Event brokers and message queues.' },
   { id: 'files', label: 'Files', description: 'Structured file formats and file transports.' },
   { id: 'saas-business-commerce-apis', label: 'SaaS, business & commerce APIs', description: 'Productivity, CRM, and marketplace APIs.' },
+  { id: 'custom-development', label: 'Custom & development', description: 'Script-defined integrations and deterministic test data.' },
 ];
 
 /**
@@ -53,6 +55,7 @@ export const connectorDirectory: ConnectorDirectoryItem[] = [
   { slug: 'selectdb', id: 'selectdb', title: 'SelectDB', category: 'warehouses-analytics', maturity: 'preview', useAs: ['source', 'target'], modes: ['snapshot'] },
   { slug: 'doris', id: 'doris', title: 'Apache Doris', category: 'warehouses-analytics', maturity: 'ga', useAs: ['source', 'target'], modes: ['snapshot'] },
   { slug: 'clickhouse', id: 'clickhouse', title: 'ClickHouse', category: 'warehouses-analytics', maturity: 'ga', useAs: ['source', 'target'], modes: ['snapshot'] },
+  { slug: 'aws-clickhouse', id: 'aws-clickhouse', title: 'ClickHouse Cloud on AWS', category: 'warehouses-analytics', maturity: 'preview', useAs: ['source', 'target'], modes: ['snapshot'] },
   { slug: 'snowflake', id: 'snowflake', title: 'Snowflake', category: 'warehouses-analytics', maturity: 'preview', useAs: ['source', 'target'], modes: ['snapshot'] },
   { slug: 'bigquery', id: 'bigquery', title: 'BigQuery', category: 'warehouses-analytics', maturity: 'preview', useAs: ['target'], modes: [] },
   { slug: 'databend', id: 'databend', title: 'Databend', category: 'warehouses-analytics', maturity: 'preview', useAs: ['target'], modes: [] },
@@ -75,12 +78,18 @@ export const connectorDirectory: ConnectorDirectoryItem[] = [
   { slug: 'lark-approval', id: 'lark-approval', title: 'Lark Approval', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'lark-doc', id: 'lark-doc', title: 'Lark Doc', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'alibaba-1688', id: 'ali1688', title: 'Alibaba 1688', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
-  { slug: 'github', id: 'github', title: 'GitHub', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
+  { slug: 'github', id: 'GitHub', title: 'GitHub', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
+  { slug: 'quickapi', id: 'quickapi', title: 'QuickAPI', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['snapshot'] },
   { slug: 'hubspot', id: 'hubspot', title: 'HubSpot', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'metabase', id: 'metabase', title: 'Metabase', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'salesforce', id: 'salesforce', title: 'Salesforce', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'zoho-crm', id: 'zoho-crm', title: 'Zoho CRM', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'zoho-desk', id: 'zoho-desk', title: 'Zoho Desk', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['snapshot'] },
+  { slug: 'vika', id: 'vika', title: 'Vika', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['target'], modes: [] },
+
+  { slug: 'custom', id: 'custom', title: 'Custom Connection', category: 'custom-development', maturity: 'preview', useAs: ['source', 'target'], modes: ['snapshot', 'cdc'] },
+  { slug: 'dummy', id: 'dummy', title: 'Dummy', category: 'custom-development', maturity: 'preview', useAs: ['source', 'target'], modes: ['snapshot', 'cdc'] },
+  { slug: 'hazelcast', id: 'hazelcast', title: 'Hazelcast', category: 'custom-development', maturity: 'preview', useAs: ['source'], modes: [] },
 ];
 
 export function getConnectorsByCategory(category: ConnectorCategoryId) {
@@ -103,7 +112,11 @@ export function renderSupportedConnectorMatrixForLLM() {
       const rows = getConnectorsByCategory(category.id)
         .map((connector) => {
           const roles = connector.useAs.map((role) => role[0].toUpperCase() + role.slice(1)).join(' + ');
-          const modes = connector.modes.length > 0 ? connector.modes.join(', ') : 'Target only';
+          const modes = connector.modes.length > 0
+            ? connector.modes.join(', ')
+            : connector.useAs.includes('source')
+              ? 'Not declared'
+              : 'Target only';
           return `| [${connector.title}](/docs/connectors/${connector.slug}) | ${connector.maturity.toUpperCase()} | ${roles} | ${modes} |`;
         })
         .join('\n');

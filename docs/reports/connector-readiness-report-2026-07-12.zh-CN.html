@@ -74,10 +74,10 @@
       <nav class="nav" aria-label="报告目录"><a href="#answer">直接结论</a><a href="#evidence">代码证据链</a><a href="#reconciliation">文档核对</a><a href="#boundary">代码边界</a><a href="#next">后续工作</a></nav>
 
       <div class="summary-grid" aria-label="关键指标">
-        <article class="metric good"><span class="value">43</span><span class="label">已发布连接器指南</span><span class="hint">指南 slug、侧栏与支持矩阵一致</span></article>
+        <article class="metric good"><span class="value">49</span><span class="label">已发布连接器指南</span><span class="hint">指南 slug、侧栏与支持矩阵一致</span></article>
         <article class="metric"><span class="value">77</span><span class="label">最新 catalog 连接器条目</span><span class="hint">来自内置 <code>index.json</code></span></article>
-        <article class="metric good"><span class="value">39</span><span class="label">角色与模式完全匹配</span><span class="hint">指南 ID、读取模式和 Target 标记一致</span></article>
-        <article class="metric warn"><span class="value">4</span><span class="label">P0 待对齐项</span><span class="hint">1 项角色/模式差异，3 项 catalog ID 缺口</span></article>
+        <article class="metric good"><span class="value">46</span><span class="label">角色与模式完全匹配</span><span class="hint">指南 ID、读取模式和 Target 标记一致</span></article>
+        <article class="metric warn"><span class="value">3</span><span class="label">P0 待对齐项</span><span class="hint">1 项角色/模式差异，2 项 catalog ID 缺口</span></article>
       </div>
 
       <section id="answer">
@@ -104,14 +104,13 @@
       <section id="reconciliation">
         <h2>已发布指南与最新 catalog 的核对</h2>
         <p class="section-intro">此比较仅检查指南连接器 ID、Source 模式与 Target 角色是否和最新 catalog 一致；它不声称每个 Reference 表中的字段都已做真实运行测试。</p>
-        <div class="checks"><article class="check"><span class="tag">39 个完全匹配</span><h3>可以安全沿用 catalog 契约</h3><p>这些页面的公开 ID、读取模式和 Target 标记与当前 catalog 条目一致。</p></article><article class="check"><span class="tag">37 个未单独出页的 catalog 条目</span><h3>不等于缺少文档</h3><p>其中包含基础指南已覆盖的云变体、旧 ID、内部/测试连接器和等待产品决策的候选项。</p></article></div>
+        <div class="checks"><article class="check"><span class="tag">46 个完全匹配</span><h3>可以安全沿用 catalog 契约</h3><p>这些页面的公开 ID、读取模式和 Target 标记与当前 catalog 条目一致。</p></article><article class="check"><span class="tag">30 个未单独出页的 catalog 条目</span><h3>不等于缺少文档</h3><p>其中包含基础指南已覆盖的云变体、旧 ID、内部/测试连接器和等待产品决策的候选项。</p></article></div>
         <div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>优先级</th><th>已发布指南</th><th>文档声明</th><th>最新 catalog 声明</th><th>需要的决策</th></tr></thead><tbody>
           <tr><td><span class="pill warn">P0 · 需核对</span></td><td><strong>PostgreSQL</strong><br /><code>postgres</code></td><td>Source + Target<br /><small>Snapshot、CDC</small></td><td>仅 Source<br /><small>未声明读取模式</small></td><td>确认产品/服务端注册，或更新指南。空 catalog 模式不等于 PostgreSQL 不支持，但不足以支撑当前“代码已证明”的表述。</td></tr>
           <tr><td><span class="pill danger">P0 · 清单缺口</span></td><td><strong>Oracle</strong><br /><code>oracle</code></td><td>Source + Target<br /><small>Snapshot、CDC</small></td><td>没有内置条目</td><td>在把离线配置说成代码已证明前，先找到服务端契约，或补上权威 catalog 条目。</td></tr>
           <tr><td><span class="pill danger">P0 · 清单缺口</span></td><td><strong>SQL Server</strong><br /><code>sqlserver</code></td><td>Source + Target<br /><small>Snapshot、CDC</small></td><td>没有内置条目</td><td>同 Oracle：应先与服务端注册对齐，或增加权威 catalog 条目。</td></tr>
-          <tr><td><span class="pill danger">P0 · ID 不一致</span></td><td><strong>GitHub</strong><br /><code>github</code></td><td>Source<br /><small>API</small></td><td><code>GitHub</code>（大写 G）<br /><small>Source、API</small></td><td>确定唯一、区分大小写的规范 ID。catalog loader 按精确 ID 建索引，当前小写指南 ID 不能命中离线条目。</td></tr>
         </tbody></table></div>
-        <details style="margin-top:16px"><summary>没有独立公开指南的 catalog 条目（37 个）</summary><div class="details-body"><p>这不是“必须补 37 篇页面”的待办列表。它包含云部署变体、旧 ID、内部/测试连接器以及尚待产品优先级决策的候选项。上游文档层面的分类详见 <code>docs/connector-coverage.md</code>。</p><div class="chips" aria-label="仅存在于 catalog 的连接器 ID"><span class="chip">GitHub</span><span class="chip">ai-chat</span><span class="chip">aliyun-adb-mysql</span><span class="chip">aliyun-adb-postgres</span><span class="chip">aliyun-db-mongodb</span><span class="chip">aliyun-rds-mariadb</span><span class="chip">aliyun-rds-mysql</span><span class="chip">aliyun-rds-postgres</span><span class="chip">aws-clickhouse</span><span class="chip">aws-rds-mysql</span><span class="chip">bes-channels</span><span class="chip">coding</span><span class="chip">custom</span><span class="chip">dummy</span><span class="chip">dws</span><span class="chip">file-stream</span><span class="chip">hazelcast</span><span class="chip">highgo</span><span class="chip">http-receiver</span><span class="chip">huawei-gauss-db</span><span class="chip">kafka</span><span class="chip">kafka_avro</span><span class="chip">lark-im</span><span class="chip">lark-task</span><span class="chip">mongodb3</span><span class="chip">polar-db-mysql</span><span class="chip">polar-db-postgres</span><span class="chip">quickapi</span><span class="chip">shein</span><span class="chip">tablestore</span><span class="chip">temu</span><span class="chip">tencent-db-mariadb</span><span class="chip">tencent-db-mongodb</span><span class="chip">tencent-db-postgres</span><span class="chip">vastbase</span><span class="chip">vika</span><span class="chip">yashandb</span></div></div></details>
+        <details style="margin-top:16px"><summary>没有独立公开指南的 catalog 条目（30 个）</summary><div class="details-body"><p>这不是“必须补 30 篇页面”的待办列表。它包含云部署变体、旧 ID、内部/测试连接器以及尚待产品优先级决策的候选项。上游文档层面的分类详见 <code>docs/connector-coverage.md</code>。</p><div class="chips" aria-label="仅存在于 catalog 的连接器 ID"><span class="chip">ai-chat</span><span class="chip">aliyun-adb-mysql</span><span class="chip">aliyun-adb-postgres</span><span class="chip">aliyun-db-mongodb</span><span class="chip">aliyun-rds-mariadb</span><span class="chip">aliyun-rds-mysql</span><span class="chip">aliyun-rds-postgres</span><span class="chip">aws-rds-mysql</span><span class="chip">bes-channels</span><span class="chip">coding</span><span class="chip">dws</span><span class="chip">file-stream</span><span class="chip">highgo</span><span class="chip">http-receiver</span><span class="chip">huawei-gauss-db</span><span class="chip">kafka</span><span class="chip">kafka_avro</span><span class="chip">lark-im</span><span class="chip">lark-task</span><span class="chip">mongodb3</span><span class="chip">polar-db-mysql</span><span class="chip">polar-db-postgres</span><span class="chip">shein</span><span class="chip">tablestore</span><span class="chip">temu</span><span class="chip">tencent-db-mariadb</span><span class="chip">tencent-db-mongodb</span><span class="chip">tencent-db-postgres</span><span class="chip">vastbase</span><span class="chip">yashandb</span></div></div></details>
       </section>
 
       <section id="boundary">
@@ -123,11 +122,11 @@
       <section id="next">
         <h2>建议的后续工作</h2><p class="section-intro">先处理真实性风险，再扩大覆盖面；只有有可执行证据时，才把 Preview 提升为 GA。</p>
         <div class="roadmap">
-          <article class="roadmap-item p0"><div><h3>P0 · 解决 4 个文档 / catalog 差异</h3><p>核对 PostgreSQL 的空角色/模式契约；补齐 Oracle 和 SQL Server 的 catalog 或服务端证据；确定 GitHub 的大小写规范 ID。不要因为离线 catalog 不完整就自动下调一个连接器。</p></div></article>
+          <article class="roadmap-item p0"><div><h3>P0 · 解决剩余 3 个文档 / catalog 差异</h3><p>核对 PostgreSQL 的空角色/模式契约；补齐 Oracle 和 SQL Server 的 catalog 或服务端证据。不要因为离线 catalog 不完整就自动下调一个连接器。</p></div></article>
           <article class="roadmap-item p0"><div><h3>P0 · 决定可执行的命名契约</h3><p>在产品代码中落地 TapState CLI、文件后缀、schema version 和工作目录变量；或者公开临时兼容契约。当前可执行代码和读者示例并不一致。</p></div></article>
           <article class="roadmap-item"><div><h3>P1 · 接入真实连接探针与最小验证矩阵</h3><p>以 engine-backed probe 替换不可用 stub。优先验证 GA：MySQL、PostgreSQL、Oracle、SQL Server、MongoDB、MongoDB Atlas、TiDB、ClickHouse、Doris、Kafka；每项记录环境、版本、命令和结果。</p></div></article>
           <article class="roadmap-item"><div><h3>P1 · 让 catalog 与文档漂移成为 CI 失败项</h3><p>自动比较已发布 ID、模式、角色、字段和默认值；只有服务端契约有意覆盖的情况才允许列入明确例外表。</p></div></article>
-          <article class="roadmap-item"><div><h3>P2 · 处理上游的 33 个延后页面</h3><p>按客户价值、全球适用性与当前契约可用性排序。云变体继续由基础指南覆盖，只有认证、网络、CDC 或兼容性路径实质不同才单独成页。</p></div></article>
+          <article class="roadmap-item"><div><h3>P2 · 处理上游的 28 个延后页面</h3><p>按客户价值、全球适用性与当前契约可用性排序。云变体继续由基础指南覆盖，只有认证、网络、CDC 或兼容性路径实质不同才单独成页。</p></div></article>
         </div>
       </section>
       <footer><strong>方法说明：</strong>将当前文档清单与已快进的官方产品 checkout <code>02f0267</code> 做只读比较。产品 Maven 构建要求 JDK 21，而此环境可用的是 JDK 17，因此没有执行产品测试；本报告是源代码与 catalog 证据报告，不是运行时测试报告。</footer>

@@ -1,0 +1,82 @@
+---
+title: Vika
+description: Configure Vika as a TapState data-writing target connection
+sidebar:
+  order: 53
+ai:
+  kind: connector
+  id: vika
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [target]
+  modes: []
+  aliases: [vika, vika target, vika data write, vika api]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Vika as a catalog-declared data-writing target. The current catalog does not declare a source read mode, so this page does not carry over the upstream source-oriented wording.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed target configuration; runtime verification pending"
+  worksAs="Target"
+  capabilities="Data write"
+  compatibility="Vika API catalog contract"
+/>
+
+<ConnectorCapabilities source="Not declared in the current catalog" target="Data write" />
+
+<Aside type="note" title="Rate limits are service-side">
+  The upstream Vika guide notes table-level API rate limits and usage limits. Keep requests within the limits of the selected Vika plan; local validation does not authenticate, measure rates, or test a write.
+</Aside>
+
+## Before you begin
+
+### Target
+
+1. Choose the Vika space and target tables that the pipeline may write.
+2. Create a credential with the minimum write scope and keep it outside source control.
+3. Confirm the selected Vika plan's table, row, and API-rate limits with the account administrator.
+
+The catalog declares `upsert` and `append` write semantics, but it does not define field mapping, conflict selection, rate-limit handling, or schema evolution behavior.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/operations_vika.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: operations_vika
+connector: vika
+config:
+  hostUrl: https://api.vika.cn
+  spaceId: ${VIKA_SPACE_ID}
+  credential: ${VIKA_CREDENTIAL}
+```
+
+Target connections have no source `mode` or `tables` section. `hostUrl` defaults to `https://api.vika.cn` in the catalog.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope and catalog-known fields. It does not authenticate to Vika, list spaces or tables, enforce a rate limit, map fields, or write a record.
+
+## Limitations
+
+- The catalog declares target capability only. It does not declare source reads, Snapshot, CDC, API mode, or DDL handling.
+- Verify Vika API limits, table permissions, schema mapping, and conflict behavior against the deployed runtime before production use.
+- Keep `credential` in an environment variable or a secret manager.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `hostUrl` | Yes | `https://api.vika.cn` | Vika API base URL. |
+| `spaceId` | Yes | — | Vika space identifier. |
+| `credential` | Yes | — | Vika credential; inject through an environment variable. |

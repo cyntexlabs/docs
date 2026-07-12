@@ -1,0 +1,82 @@
+---
+title: QuickAPI
+description: Configure QuickAPI as a TapState snapshot source from a Postman collection contract
+sidebar:
+  order: 48
+ai:
+  kind: connector
+  id: quickapi
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [snapshot]
+  aliases: [quickapi, quick api, postman collection source, postman api snapshot]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use QuickAPI to describe a one-time source read from a prepared Postman collection. The catalog exposes the collection text and optional token-expiry fields; it declares Snapshot only.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="Snapshot, API collection contract"
+  compatibility="Postman collection JSON upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Collection semantics remain upstream baseline">
+  The upstream guide describes `TAP_TABLE` and token-refresh annotations in a Postman collection. The catalog retains the related text fields, but it does not prove a TapState collection parser, token exchange, or pagination runtime.
+</Aside>
+
+## Before you begin
+
+1. Export the intended Postman collection as JSON.
+2. Ensure each API intended to create a data table carries the upstream `TAP_TABLE` declaration and its required paging annotation.
+3. If the API refreshes a short-lived token, prepare the documented expiry rule and token parameter mapping.
+4. Remove credentials from the exported collection and supply them through a secret manager or runtime-specific mechanism.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/support_quickapi.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: support_quickapi
+connector: quickapi
+config:
+  jsonTxt: ${QUICKAPI_POSTMAN_COLLECTION_JSON}
+  expireStatus: ${QUICKAPI_TOKEN_EXPIRED_RULE}
+  tokenParams: ${QUICKAPI_TOKEN_MAPPING}
+  schemaTxt: ${QUICKAPI_SCHEMA_HINT}
+mode: snapshot
+```
+
+`jsonTxt` is required. The other catalog fields are optional and should be omitted unless their runtime semantics have been confirmed for the deployed connector.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource, Snapshot mode, and field shapes. It does not parse or execute the Postman collection, call an API, refresh a token, follow pagination, or discover tables.
+
+## Limitations
+
+- The catalog declares Snapshot only; it does not declare CDC, API mode, target writes, or DDL behavior.
+- The upstream annotation grammar is not a declared TapState runtime capability. Keep it as integration preparation until a deployed parser is verified.
+- Do not commit collections containing secrets or token values.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `jsonTxt` | Yes | Exported Postman collection JSON. |
+| `expireStatus` | No | Upstream token-expiry response rule. |
+| `tokenParams` | No | Upstream mapping between refreshed token output and collection variables. |
+| `schemaTxt` | No | Optional schema text exposed by the catalog. |

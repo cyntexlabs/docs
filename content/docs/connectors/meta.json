@@ -21,6 +21,7 @@
     "selectdb",
     "doris",
     "clickhouse",
+    "aws-clickhouse",
     "snowflake",
     "bigquery",
     "databend",
@@ -41,10 +42,15 @@
     "lark-doc",
     "alibaba-1688",
     "github",
+    "quickapi",
     "hubspot",
     "metabase",
     "salesforce",
     "zoho-crm",
-    "zoho-desk"
+    "zoho-desk",
+    "custom",
+    "dummy",
+    "hazelcast",
+    "vika"
   ]
 }

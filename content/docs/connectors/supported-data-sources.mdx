@@ -27,7 +27,7 @@ TapState uses these two labels deliberately. The upstream inventory's former **B
 
 - **Source** reads from the listed system. The read mode tells you whether that happens as a one-time Snapshot, Snapshot + CDC, stream, or API read.
 - **Target** means the current connector catalog declares data writing. Check the connector guide before relying on table creation, schema evolution, or a particular write behavior.
-- A dash in **Read mode** means the guide is target-only. It does not imply an undocumented source mode.
+- **Not declared** means the catalog has a source connection contract but does not declare a readable mode. A dash means the guide is target-only. Neither value implies an undocumented source mode.
 
 <Aside type="note" title="Local validation boundary">
   `tapstate validate` checks the resource envelope plus catalog-known connector IDs, modes, and field shapes. It does not prove network reachability, credentials, permissions, API scope, data access, or a live write.

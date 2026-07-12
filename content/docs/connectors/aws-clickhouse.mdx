@@ -1,0 +1,92 @@
+---
+title: ClickHouse Cloud on AWS
+description: Configure ClickHouse Cloud on AWS as a TapState snapshot source or data-writing target
+sidebar:
+  order: 23
+ai:
+  kind: connector
+  id: aws-clickhouse
+  category: warehouses-analytics
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot]
+  aliases: [aws clickhouse, clickhouse cloud aws, aws clickhouse snapshot, aws clickhouse target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use ClickHouse Cloud on AWS for point-in-time reads or as an analytical destination through its dedicated catalog contract.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, Data write"
+  compatibility="ClickHouse Cloud on AWS"
+/>
+
+<ConnectorCapabilities source="Snapshot read" target="Data write" />
+
+<Aside type="note" title="Dedicated cloud contract">
+  This is separate from the generic ClickHouse connector because the catalog declares a distinct ID and default port `8443`. It does not imply a TapState TLS control or a live connection test.
+</Aside>
+
+## Before you begin
+
+### Source
+
+Create a least-privilege ClickHouse Cloud account for the selected database and make its endpoint reachable from the future runtime network. Use Snapshot when you need a bounded copy of existing rows.
+
+### Target
+
+Create a separate writer for the destination database. Grant table creation or alteration privileges only if the pipeline is allowed to manage destination schemas.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/analytics_aws_clickhouse.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: analytics_aws_clickhouse
+connector: aws-clickhouse
+config:
+  host: abc123.us-east-1.aws.clickhouse.cloud
+  port: "8443"
+  database: analytics
+  user: ${CLICKHOUSE_USER}
+  password: ${CLICKHOUSE_PASSWORD}
+  timezone: "+00:00"
+mode: snapshot
+tables:
+  - events
+```
+
+For a target connection, omit `mode` and `tables` and use writer credentials.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the Snapshot mode and catalog-known field shapes. It does not reach the cloud endpoint, authenticate, inspect grants, or verify a target write.
+
+## Limitations
+
+- The catalog declares Snapshot only; it does not declare CDC or DDL handling.
+- The catalog has no explicit TapState transport-encryption field. Do not infer one from the cloud endpoint or port.
+- Test table engines, sort keys, data-type mapping, and destination behavior with representative data before production writes.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host` | Yes | — | ClickHouse Cloud endpoint host. |
+| `port` | Yes | `8443` | Catalog-defined service port; type is string. |
+| `database` | Yes | — | Database name. |
+| `user` | Yes | — | Cloud database account. |
+| `password` | No | — | Password; inject through an environment variable. |
+| `extParams` | No | — | Connector-specific connection parameters. |
+| `timezone` | No | empty | UTC offset used by the connector. |
