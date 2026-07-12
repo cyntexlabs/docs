@@ -24,7 +24,7 @@ Use TiDB for one-time reads, catalog-declared CDC, or data-writing targets.
   maturityLabel="General availability"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Data write"
-  compatibility="TiDB 6.0.0–8.1.9 upstream baseline"
+  compatibility="TiDB 6.0.0–8.1.9"
 />
 
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
@@ -64,7 +64,7 @@ SET GLOBAL tidb_gc_life_time = '24h';
 SHOW GLOBAL VARIABLES LIKE 'tidb_gc_life_time';
 ```
 
-5. Confirm that the runtime host architecture is supported by the TiCDC binary supplied with the connector (`amd64` or `arm64` in the upstream baseline).
+5. Confirm that the runtime host architecture is supported by the TiCDC binary supplied with the connector (`amd64` or `arm64` in the reused connector).
 
 Do not substitute a self-compiled TiCDC binary in a production deployment without compatibility and recovery testing; that changes the connector runtime contract.
 
@@ -118,7 +118,7 @@ tapstate validate --workdir tapstate-work
 ## Limitations
 
 - The catalog declares CDC but does not define its checkpoint, topology, DDL, or failover semantics.
-- Full reads support all versions in the upstream baseline, but integrated TiCDC is documented for TiDB 6.0.0–8.1.9. Validate the exact TiDB, PD, and TiKV topology in staging.
+- Full reads support all versions in the reused connector, but integrated TiCDC is documented for TiDB 6.0.0–8.1.9. Validate the exact TiDB, PD, and TiKV topology in staging.
 - Tables without a non-null primary or unique key do not meet the documented TiCDC row-identity requirement.
 - TiDB GC can remove history needed for restart. Choose `tidb_gc_life_time` from your recovery objective and monitor its operational cost.
 - The catalog does not expose transport-encryption settings.

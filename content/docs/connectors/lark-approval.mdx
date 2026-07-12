@@ -26,7 +26,7 @@ Use Lark Approval as a catalog-declared API source for approval data.
   compatibility="Lark / Feishu Approval API"
 />
 
-<ConnectorCapabilities source="API read" target="Not declared in the current catalog" />
+<ConnectorCapabilities source="API read" target="No documented target role" />
 
 <Aside type="note" title="Selection boundary">
   The catalog exposes optional `code` and `definitionCode` fields but does not define their selection behavior. The guide records their exact names without inventing a UI, authorization exchange, or filtering semantics.
@@ -39,7 +39,7 @@ Use Lark Approval as a catalog-declared API source for approval data.
 3. Have the tenant administrator grant the application the approval-data permissions required by the intended workflow.
 4. If your deployment requires them, obtain the approval `code` and `definitionCode` from the administrator or platform API tooling.
 
-Keep the secret outside source control. The upstream baseline identifies the two app credentials and approval code; it does not establish an interactive TapState authorization flow.
+Keep the secret outside source control. The reused connector identifies the two app credentials and approval code; it does not establish an interactive TapState authorization flow.
 
 ## Create a connection
 

@@ -150,6 +150,22 @@ Before production, use a staging schema to verify:
 4. restart from the saved redo position;
 5. representative `NUMBER`, timestamp, LOB, and empty-string values.
 
+These checks help confirm the database-side prerequisites without changing them:
+
+```sql
+SELECT LOG_MODE, SUPPLEMENTAL_LOG_DATA_MIN
+FROM V$DATABASE;
+
+SELECT DEST_NAME, STATUS, DESTINATION
+FROM V$ARCHIVE_DEST_STATUS
+WHERE STATUS <> 'INACTIVE';
+
+SELECT RESOURCE_NAME, LIMIT
+FROM DBA_PROFILES
+WHERE PROFILE = (SELECT PROFILE FROM DBA_USERS WHERE USERNAME = 'TAPSTATE')
+  AND RESOURCE_NAME = 'CONNECT_TIME';
+```
+
 ## Limitations
 
 - LogMiner and direct raw-log capture have different type, architecture, and operational constraints. This guide documents the LogMiner preparation that can be applied without assuming a TapState-only raw-log component.
@@ -159,6 +175,7 @@ Before production, use a staging schema to verify:
 - DDL and a large burst of DML on the same table can make dictionary reconstruction unreliable. Stage schema changes separately from heavy write windows when possible.
 - RAC LogMiner capture can produce duplicate events during recovery. Downstream writes need stable keys and idempotent handling, especially for tables without primary keys.
 - Archive-log exhaustion stops recoverable CDC. Monitor the recovery area and long-running or uncommitted transactions.
+- A restrictive profile `CONNECT_TIME` can terminate the mining session and interrupt CDC. Use a service-account profile that matches the pipeline's expected lifetime.
 - Partition-table DML can be captured, but adding partitions is not part of the documented DDL baseline.
 - The offline catalog does not expose TLS fields. Configure Oracle Net encryption according to your environment, then use only the field names supplied by your TapState deployment.
 

@@ -26,7 +26,7 @@ Use XLS and XLSX files from local or supported remote storage as a pipeline sour
   compatibility="XLS, XLSX · Local, FTP, SFTP, SMB, S3FS, OSS"
 />
 
-<ConnectorCapabilities source="Snapshot and CDC" target="Not declared in the current catalog" />
+<ConnectorCapabilities source="Snapshot and CDC" target="No documented target role" />
 
 <Aside type="note" title="Local validation boundary">
   The catalog checks modes and connection-field shapes only. It does not inspect workbook sheets, cells, formulas, memory use, remote storage access, or file changes.
@@ -34,7 +34,7 @@ Use XLS and XLSX files from local or supported remote storage as a pipeline sour
 
 ## Before you begin
 
-Place workbooks where the TapState runtime can reach them, then test the intended sheet structure with a representative file. The upstream baseline accepts XLS and XLSX workbooks, including merged cells and formulas, but that is not a substitute for a TapState runtime test.
+Place workbooks where the TapState runtime can reach them, then test the intended sheet structure with a representative file. The reused connector accepts XLS and XLSX workbooks, including merged cells and formulas, but that is not a substitute for a TapState runtime test.
 
 ## Create a connection
 

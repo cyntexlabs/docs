@@ -23,12 +23,12 @@ Use Apache Paimon with local, S3, HDFS, or OSS warehouse storage.
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Data write"
-  compatibility="Apache Paimon 0.6+ · 0.8.2+ recommended upstream baseline"
+  compatibility="Apache Paimon 0.6+ · 0.8.2+ recommended"
 />
 
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
-<Aside type="note" title="Catalog and upstream baseline differ">
+<Aside type="note" title="Source use needs staging validation">
   The current catalog declares source modes and a target role, while the upstream guide focuses on target setup. Use the catalog for local configuration and stage source behavior against the deployed runtime.
 </Aside>
 
@@ -83,7 +83,7 @@ tapstate validate --workdir tapstate-work
 
 - The catalog does not define catalog/metastore fields, CDC checkpoints, schema evolution, compaction, or write conflict semantics.
 - `storageType` selects conditional fields; provide only the matching S3, HDFS, or OSS inputs.
-- The upstream baseline supports DML but not runtime schema evolution. Create or evolve table schemas through an approved external process unless the deployed connector contract states otherwise.
+- The reused connector supports DML but not runtime schema evolution. Create or evolve table schemas through an approved external process unless the deployed connector contract states otherwise.
 - Paimon has primary keys but no secondary indexes. Wide or frequently changing keys affect write layout and compaction.
 - A delete needs a complete before image when soft-delete handling converts it into an update marker. Without it, non-key columns can become `null`.
 - Upstream tuning values for batch size, write threads, and compaction were not measured in TapState and are intentionally not copied as defaults.

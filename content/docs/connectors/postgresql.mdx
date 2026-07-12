@@ -153,6 +153,17 @@ Before a production pipeline, run a staging check that:
 3. observes an insert, update, and delete through CDC;
 4. resumes after a short interruption without losing its replication position.
 
+Use these read-only checks while diagnosing the source:
+
+```sql
+SHOW wal_level;
+SHOW max_replication_slots;
+SHOW max_wal_senders;
+
+SELECT slot_name, plugin, slot_type, active, restart_lsn
+FROM pg_replication_slots;
+```
+
 ## Limitations
 
 - Replication slots retain WAL until consumers advance. Monitor `pg_replication_slots` and disk use, and remove a slot only after confirming that no task still depends on it.
@@ -161,6 +172,7 @@ Before a production pipeline, run a staging check that:
 - `pgoutput`, `wal2json`, and `decoderbufs` can collect supported DDL only when the DDL trigger objects can be created. The physical-WAL path does not provide the same DDL behavior.
 - PostgreSQL string types cannot store the zero byte (`\0`); normalize it before writing if it can appear in source data.
 - A replication slot can be blocked by long-running database work. Investigate materialized-view refreshes and other sessions if slot creation stalls.
+- Do not drop an inactive slot merely because it is inactive; a stopped pipeline may still depend on its position. Remove it only after the owning pipeline has been retired or reset.
 - The catalog does not expose a TLS field. Configure server-side encryption as required, then use the connection contract supplied by your TapState deployment instead of inventing a YAML key.
 
 ## Reference

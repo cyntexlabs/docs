@@ -154,3 +154,29 @@ In staging, read and write one record for every selected serialization path. Ver
 | Composite | `ARRAY`, `MAP`, and source-side `OBJECT` |
 | Date and time | `TIME`, `DATE`, `DATETIME`, `TIMESTAMP` |
 | Other | Source-side `UUID` |
+
+### Structural modes
+
+| `schemaMode` | Record contract |
+|---|---|
+| `STANDARD` | TapState event envelope with operation, event time, table, namespaces, before image, and after image. |
+| `STANDARD_JSON` | JSON representation of the standard event envelope. |
+| `ORIGINAL` | Native Kafka record fields such as partition, timestamp, headers, key, and value. |
+| `CANAL` | Canal-compatible change event with database, table, SQL/type metadata, keys, old values, and new data. |
+| `DEBEZIUM` | Debezium-style envelope with `before`, `after`, `source`, operation, and timestamp. |
+| `FLINK_CDC` | Flink CDC-style record with a data object and `+I`, `-U`, `+U`, or `-D` operation. |
+| `CUSTOM` | Result returned by `analyzeScript(header, key, value, partition)`. |
+
+An `ORIGINAL` record can include:
+
+```json
+{
+  "partition": 3,
+  "timestamp": 1638349200000,
+  "headers": {"trace-id": "abc-123"},
+  "key": "user-123",
+  "value": {"id": 1, "action": "login"}
+}
+```
+
+The source offset and timestamp type are metadata and are not automatically part of the target message body. Verify the exact envelope consumed by downstream applications before switching structural modes.

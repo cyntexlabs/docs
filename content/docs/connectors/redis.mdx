@@ -23,12 +23,12 @@ Use Redis for catalog-declared Snapshot or CDC reads, or as a destination for pi
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Data write"
-  compatibility="Redis 2.8–6.0 upstream baseline"
+  compatibility="Redis 2.8–6.0"
 />
 
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
-<Aside type="note" title="Catalog and upstream baseline differ">
+<Aside type="note" title="Validate source behavior before production">
   The current catalog declares both source modes and a target role. The upstream guide documents Redis as a target only. The catalog determines the local configuration contract; stage any source use against the deployed runtime.
 </Aside>
 

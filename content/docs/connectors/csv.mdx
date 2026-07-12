@@ -67,7 +67,7 @@ tapstate validate --workdir tapstate-work
 ## Limitations
 
 - The catalog exposes Snapshot, CDC, and target roles but does not define a file-change mechanism, deletion behavior, output layout, or write conflict policy.
-- The upstream baseline describes file polling and source types, but that behavior is not published as a TapState runtime guarantee.
+- The reused connector describes file polling and source types, but that behavior is not published as a TapState runtime guarantee.
 - Treat `oss` as a storage protocol option, not an endorsement of a regional deployment; S3-compatible storage is also available through `s3fs`.
 
 ## Reference

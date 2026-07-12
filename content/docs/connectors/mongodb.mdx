@@ -104,7 +104,7 @@ db.createUser({
 
 **3. Size the Oplog recovery window**
 
-Keep enough Oplog history to cover the longest expected interruption; the upstream baseline recommends at least 24 hours. Verify the actual window and monitor it as the write rate changes. See [Change the Size of the Oplog](https://www.mongodb.com/docs/manual/tutorial/change-oplog-window/).
+Keep enough Oplog history to cover the longest expected interruption; the reused connector recommends at least 24 hours. Verify the actual window and monitor it as the write rate changes. See [Change the Size of the Oplog](https://www.mongodb.com/docs/manual/tutorial/change-oplog-window/).
 
 **4. Prepare sharded CDC**
 

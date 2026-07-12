@@ -23,10 +23,10 @@ Use Elasticsearch as a destination for searchable pipeline data.
   maturityLabel="Available for evaluation"
   worksAs="Target"
   capabilities="Data write"
-  compatibility="Elasticsearch 7.6 upstream baseline"
+  compatibility="Elasticsearch 7.6"
 />
 
-<ConnectorCapabilities source="Not declared in the current catalog" target="Data write" />
+<ConnectorCapabilities source="No documented source mode" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
   The bundled catalog declares an Elasticsearch target and validates the documented connection fields. It does not connect to a cluster, verify certificates, or index a document.
@@ -68,7 +68,7 @@ This checks local field shape only. It does not test DNS, TLS negotiation, certi
 ## Limitations
 
 - The catalog declares a target only; it does not declare source reads, Snapshot, CDC, or DDL behavior.
-- The upstream baseline covers Elasticsearch 7.6. Version compatibility and mappings need staging verification.
+- The reused connector covers Elasticsearch 7.6. Version compatibility and mappings need staging verification.
 - The catalog exposes certificate-related fields but not a complete security model. Do not assume defaults for HTTPS, certificate paths, or hostname verification.
 
 ## Reference

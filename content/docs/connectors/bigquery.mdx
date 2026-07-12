@@ -26,7 +26,7 @@ Use BigQuery as a destination for pipeline data with a Google Cloud service acco
   compatibility="Google BigQuery"
 />
 
-<ConnectorCapabilities source="Not declared in the current catalog" target="Data write" />
+<ConnectorCapabilities source="No documented source mode" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
   The bundled catalog declares BigQuery as a target connection. It validates the two documented field shapes only; it does not authenticate to Google Cloud or create a dataset or table.
@@ -36,7 +36,7 @@ Use BigQuery as a destination for pipeline data with a Google Cloud service acco
 
 1. Ensure the TapState runtime can reach Google Cloud APIs.
 2. Create a dedicated Google Cloud service account and JSON key. Keep the key in a secret manager and rotate it according to your security policy.
-3. Grant a custom role scoped to the intended project or dataset. The upstream connector baseline uses these permissions:
+3. Grant a custom role scoped to the intended project or dataset. The reused connector uses these permissions:
 
 ```text
 bigquery.datasets.create
@@ -62,7 +62,7 @@ bigquery.tables.updateData
 
 Remove administrative permissions if your pipeline writes only to pre-created tables and does not manage datasets, routines, or table metadata.
 
-4. Create the destination dataset and tables, or approve the permissions required for your deployment to manage them. The upstream baseline uses a multi-region dataset; verify the required location with the pipeline's other Google Cloud resources to avoid cross-location failures.
+4. Create the destination dataset and tables, or approve the permissions required for your deployment to manage them. The reused connector uses a multi-region dataset; verify the required location with the pipeline's other Google Cloud resources to avoid cross-location failures.
 
 ## Create a connection
 

@@ -23,12 +23,12 @@ Use StarRocks for catalog-declared Snapshot reads or as a destination for analyt
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
   capabilities="Snapshot, Data write"
-  compatibility="StarRocks 3.x upstream baseline"
+  compatibility="StarRocks 3.x"
 />
 
 <ConnectorCapabilities source="Snapshot read" target="Data write" />
 
-<Aside type="note" title="Catalog and upstream baseline differ">
+<Aside type="note" title="Source use needs staging validation">
   The catalog declares Snapshot source and target roles. The upstream guide focuses on target use. Treat a live source read as a staging-test requirement.
 </Aside>
 

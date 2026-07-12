@@ -24,7 +24,7 @@ Use TDengine to copy existing time-series data or keep a target current from the
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Data write"
-  compatibility="TDengine 3.x upstream baseline"
+  compatibility="TDengine 3.x"
 />
 
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
@@ -40,12 +40,12 @@ Use TDengine to copy existing time-series data or keep a target current from the
 <SourceModeTabs>
 <SourceModeTab value="snapshot">
 
-Use **Snapshot** to copy current data once. The upstream baseline uses TDengine's REST endpoint on port `6041`; allow the future runtime to reach that endpoint and create a read account for the selected database.
+Use **Snapshot** to copy current data once. The reused connector uses TDengine's REST endpoint on port `6041`; allow the future runtime to reach that endpoint and create a read account for the selected database.
 
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** when you also need later records. The upstream connector baseline describes TDengine new-data subscriptions, port `6030`, and a TDengine client driver. The catalog exposes `originPort` with default `6030`; confirm the deployed runtime's driver and subscription requirements before relying on this path.
+Use **Snapshot + CDC** when you also need later records. The reused connector describes TDengine new-data subscriptions, port `6030`, and a TDengine client driver. The catalog exposes `originPort` with default `6030`; confirm the deployed runtime's driver and subscription requirements before relying on this path.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -89,8 +89,8 @@ Local validation checks the resource envelope, mode, and catalog-known fields. I
 ## Limitations
 
 - The catalog declares Snapshot and CDC but no DDL contract; this guide does not claim DDL capture or application.
-- The TDengine 3.x, REST-port, and subscription-driver statements are an upstream compatibility baseline, not a TapState runtime test.
-- The upstream baseline notes that TDengine cannot change the width of some column types. Test table and type behavior with representative data before production writes.
+- The TDengine 3.x, REST-port, and subscription-driver statements are an documented compatibility, not a TapState runtime test.
+- The reused connector notes that TDengine cannot change the width of some column types. Test table and type behavior with representative data before production writes.
 
 ## Reference
 

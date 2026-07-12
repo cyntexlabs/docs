@@ -31,6 +31,18 @@ This is the working inventory for the TapState connector directory. It is a docu
 
 The public [supported data sources](/docs/connectors/supported-data-sources) page is generated from the same directory inventory as the connector sidebar. It is the reader-facing source of truth for the published set.
 
+## Content-completeness audit
+
+The 2026-07-12 closure audit compared every published guide with its connector-specific `docs-en` source, the current TapState catalog, and the available connector spec or implementation. The audit found and corrected material omissions in 19 pages, including database permissions, CDC preparation, IAM, message structures, data types, and operational limitations.
+
+- All 49 connector pages pass the structural and LLM-export audit.
+- Every field from the 47 matching catalog entries appears in its guide; the field-coverage check reports zero omissions.
+- Of those 47 connector specs, 45 are unchanged since the catalog's recorded connector checkout. PostgreSQL and OceanBase have newer spec changes that have not yet entered the bundled catalog.
+- PostgreSQL has an incomplete role/mode catalog contract. Oracle and SQL Server have no bundled catalog entry. Their pages keep database preparation and compatibility guidance, but do not invent locally validated field schemas.
+- Legacy UI navigation, Agent behavior, heartbeat controls, unexposed TLS settings, and unverified performance numbers are deliberate exclusions rather than migration omissions.
+
+See the [Chinese connector content audit](reports/connector-content-audit-2026-07-12.zh-CN.html) for the evidence versions, page-level remediation summary, code drift, and remaining runtime work.
+
 ## Covered deployment variants
 
 The following upstream cloud pages are represented by their base guide. They have no separate TapState page because the current documentation does not have sufficient evidence for a different connector contract:

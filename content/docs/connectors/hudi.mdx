@@ -23,10 +23,10 @@ Use Apache Hudi as a catalog-declared destination backed by the configured Hadoo
   maturityLabel="Available for evaluation"
   worksAs="Target"
   capabilities="Data write"
-  compatibility="Apache Hudi 0.11.0 upstream baseline"
+  compatibility="Apache Hudi 0.11.0"
 />
 
-<ConnectorCapabilities source="Not declared in the current catalog" target="Data write" />
+<ConnectorCapabilities source="No documented source mode" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
   The catalog validates this configuration shape. It does not load Hadoop XML, authenticate with Kerberos, reach Hive, create a Hudi table, or write files.
@@ -69,7 +69,7 @@ tapstate validate --workdir tapstate-work
 
 - The catalog declares a target only, with no source mode, CDC, DDL, or table-layout contract.
 - Site XML and Kerberos material are sensitive deployment inputs; do not commit them to a workspace.
-- The upstream baseline is Hudi 0.11.0. Verify metastore integration and exact table behavior in staging.
+- The reused connector is Hudi 0.11.0. Verify metastore integration and exact table behavior in staging.
 
 ## Reference
 

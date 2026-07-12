@@ -24,7 +24,7 @@ Use the current OceanBase connector for MySQL-compatible OceanBase deployments. 
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Data write"
-  compatibility="OceanBase 4.0+ · MySQL-compatible upstream baseline"
+  compatibility="OceanBase 4.0+ · MySQL-compatible"
 />
 
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
@@ -52,7 +52,7 @@ The upstream MySQL-compatible baseline does not require a log service for a one-
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** when the target must start current and then receive later data changes. In addition to the reader access, deploy the OceanBase Binlog Service described by the upstream baseline. It uses OBProxy for client access and `obbinlog` for incremental log conversion.
+Use **Snapshot + CDC** when the target must start current and then receive later data changes. In addition to the reader access, deploy the OceanBase Binlog Service described by the reused connector. It uses OBProxy for client access and `obbinlog` for incremental log conversion.
 
 Record the Root Server list, raw-log server host and port, plus CDC credentials required by your deployment. The catalog exposes these values as `rootServerList`, `rawLogServerHost`, `rawLogServerPort`, `cdcUser`, and `cdcPassword`; validate the service endpoint with the deployed runtime before relying on incremental delivery.
 

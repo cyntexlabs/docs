@@ -23,10 +23,10 @@ Use QuickAPI to describe a one-time source read from a prepared Postman collecti
   maturityLabel="Available for evaluation"
   worksAs="Source"
   capabilities="Snapshot, API collection contract"
-  compatibility="Postman collection JSON upstream baseline"
+  compatibility="Postman collection JSON"
 />
 
-<ConnectorCapabilities source="Snapshot read" target="Not declared in the current catalog" />
+<ConnectorCapabilities source="Snapshot read" target="No documented target role" />
 
 <Aside type="note" title="What is code-backed">
   The reused connector code parses `TAP_TABLE`, pagination tags, `TAP_GET_TOKEN`, token-expiry rules, and token mappings. Local `tapstate validate` still checks only field shapes; it does not execute the collection or prove that a deployed runtime includes the connector package.

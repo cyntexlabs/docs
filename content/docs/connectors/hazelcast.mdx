@@ -23,10 +23,10 @@ The current Hazelcast catalog entry defines connection fields but does not decla
   maturityLabel="Available for evaluation"
   worksAs="Source"
   capabilities="Connection configuration"
-  compatibility="Hazelcast / Hazelcast Cloud catalog contract"
+  compatibility="Hazelcast clusters and Hazelcast Cloud"
 />
 
-<ConnectorCapabilities source="No catalog-declared read mode" target="Not declared in the current catalog" />
+<ConnectorCapabilities source="No documented read mode" target="No documented target role" />
 
 <Aside type="caution" title="Mode and runtime boundary">
   The catalog has no `modes` value for Hazelcast. Offline validation can check supplied field types, but it defers source-mode legality to the server and cannot test a cluster connection.

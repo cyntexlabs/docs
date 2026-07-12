@@ -161,11 +161,37 @@ Before production, verify in a staging table that:
 - Tables with CDC enabled cannot use `TRUNCATE TABLE`, and renaming columns with `sp_rename` is not supported by the reused connector baseline.
 - After a schema change, SQL Server does not automatically rebuild the capture instance. Disable and re-enable table CDC during a controlled window before resuming dependent DML.
 - DDL and DML close together can create a gap because some implicitly committed DDL is not represented in `cdc.ddl_history`.
-- Large values are limited by the SQL Server CDC capture configuration; the upstream baseline calls out a 64 KB default and recommends column-level CDC when large fields are involved.
+- Large values are limited by the SQL Server CDC capture configuration; the reused connector calls out a 64 KB default and recommends column-level CDC when large fields are involved.
 - A task that polls hundreds of capture tables can accumulate latency and load. Split very large table sets and measure the polling interval in staging.
 - `timestamp`/`rowversion` is not supported when SQL Server is the target.
 - SQL Server 2005 does not provide native CDC and is outside this connector baseline.
 - The offline catalog does not expose TLS fields. Configure forced encryption on SQL Server when required, then use only the fields supplied by your TapState deployment.
+
+### Recreate CDC after a table change
+
+Pause dependent writes or coordinate a maintenance window, then discover the current capture instance, disable it, and enable it again:
+
+```sql
+EXEC sys.sp_cdc_help_change_data_capture
+  @source_schema = N'dbo',
+  @source_name = N'orders';
+GO
+
+EXEC sys.sp_cdc_disable_table
+  @source_schema = N'dbo',
+  @source_name = N'orders',
+  @capture_instance = N'dbo_orders';
+GO
+
+EXEC sys.sp_cdc_enable_table
+  @source_schema = N'dbo',
+  @source_name = N'orders',
+  @role_name = N'cdc_reader',
+  @supports_net_changes = 1;
+GO
+```
+
+Recreating a capture instance changes the available change-table history. Verify the pipeline's saved position and run an end-to-end reconciliation before resuming production traffic.
 
 ## Reference
 

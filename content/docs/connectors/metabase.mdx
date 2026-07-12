@@ -23,10 +23,10 @@ Use Metabase as a catalog-declared API source for analytics content.
   maturityLabel="Available for evaluation"
   worksAs="Source"
   capabilities="API read"
-  compatibility="Self-hosted or cloud-registered Metabase upstream baseline"
+  compatibility="Self-hosted or cloud-registered Metabase"
 />
 
-<ConnectorCapabilities source="API read" target="Not declared in the current catalog" />
+<ConnectorCapabilities source="API read" target="No documented target role" />
 
 <Aside type="note" title="Exact inherited field name">
   The catalog field is spelled `matebaseDomainName`. Preserve that spelling in a resource even though it differs from the product name.
@@ -38,7 +38,7 @@ Use Metabase as a catalog-declared API source for analytics content.
 2. Create a least-privilege Metabase account for the intended analytics content.
 3. Record the full HTTP or HTTPS base URL, including a non-default port when applicable.
 
-The upstream baseline identifies a username, password, and HTTP host. It does not establish a TapState UI connection test or a selector for questions, dashboards, or collections.
+The reused connector identifies a username, password, and HTTP host. It does not establish a TapState UI connection test or a selector for questions, dashboards, or collections.
 
 ## Create a connection
 
