@@ -91,3 +91,7 @@ Local validation cannot prove that a queue exists, that the account has virtual-
 | `mqUsername` | No | — | RabbitMQ user. |
 | `mqPassword` | No | — | Password; use an environment variable. |
 | `virtualHost` | No | — | RabbitMQ virtual host. |
+
+### Message data compatibility
+
+The reused connector baseline accepts `OBJECT`, `ARRAY`, `NUMBER`, `INTEGER`, `BOOLEAN`, `STRING` values shorter than 200 characters, and `TEXT`. It documents queue delivery through the default exchange; other routing models need separate runtime evidence.

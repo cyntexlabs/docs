@@ -194,3 +194,14 @@ Offline validation checks resource structure, references, field types, and suppo
 | `sslValidate` | No | — | Validate the server certificate. |
 | `sslCA` | With certificate validation | — | CA certificate material. |
 | `mongodbLoadSchemaSampleSize` | No | `1000` | Documents sampled for schema discovery. |
+
+### Data compatibility
+
+| Family | Supported baseline |
+|---|---|
+| Text and code | `String`, JavaScript, `Symbol` |
+| Numeric | `Double`, `Int32`, `Int64`, `Decimal128` |
+| Composite | `Document`, `Array` |
+| Binary and identifiers | `Binary`, `ObjectId` |
+| Date and time | `Date`, `Timestamp` |
+| Other | `Boolean`, `MinKey`, `MaxKey`, `Null` |

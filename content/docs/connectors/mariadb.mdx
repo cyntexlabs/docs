@@ -68,11 +68,22 @@ Enable row-based binary logging and retain logs longer than the longest credible
 [mysqld]
 server_id       = 223344
 log_bin         = mariadb-bin
+expire_logs_days = 10
+max_binlog_size = 100M
 binlog_format   = ROW
 binlog_row_image = FULL
 ```
 
-Restart MariaDB during an approved maintenance window, then verify `binlog_format` is `ROW`.
+`server_id` must be unique among servers and replication clients. Set `expire_logs_days` to a recovery window longer than the longest expected interruption, and size `max_binlog_size` for your write volume.
+
+Restart MariaDB during an approved maintenance window, then verify the effective settings:
+
+```sql
+SHOW VARIABLES LIKE 'log_bin';
+SHOW VARIABLES LIKE 'binlog_format';
+SHOW VARIABLES LIKE 'binlog_row_image';
+SHOW BINARY LOGS;
+```
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -83,9 +94,13 @@ Create a dedicated writer. Grant table-creation or alteration privileges only wh
 
 ```sql
 CREATE USER 'tapstate_writer'@'%' IDENTIFIED BY 'replace_with_a_secret';
-GRANT SELECT, INSERT, UPDATE, DELETE ON `analytics`.* TO 'tapstate_writer'@'%';
+GRANT SELECT, INSERT, UPDATE, DELETE,
+      ALTER, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, DROP
+ON `analytics`.* TO 'tapstate_writer'@'%';
 FLUSH PRIVILEGES;
 ```
+
+Remove `ALTER`, `CREATE`, routine, temporary-table, and `DROP` privileges when the pipeline must write only to existing tables.
 
 ## Create a connection
 
@@ -123,6 +138,9 @@ Local validation checks the resource, mode, and catalog-known field types. It do
 
 - The catalog declares `snapshot` and `cdc`, but does not declare DDL handling; this page does not claim DDL capture or application.
 - The upstream preparation baseline is MariaDB 10.x. Test versions, replication topology, and data types with representative data before production use.
+- CDC requires `ROW` binary logging with a full row image. Statement- or mixed-format logs do not provide the documented change record.
+- Expired binary logs break resume from the saved position. Monitor log retention and free disk space instead of relying only on a fixed number of days.
+- `server_id` collisions can disrupt replication clients. Assign a stable, unique value in every environment.
 - The catalog does not expose transport-encryption fields. Do not infer a TapState TLS configuration from server-side MariaDB settings.
 
 ## Reference

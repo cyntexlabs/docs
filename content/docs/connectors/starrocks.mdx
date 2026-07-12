@@ -34,7 +34,21 @@ Use StarRocks for catalog-declared Snapshot reads or as a destination for analyt
 
 ## Before you begin
 
-Prepare a user with read or write access to the selected database and verify the Frontend SQL and HTTP endpoints. For targets, decide key model, table type, distribution, and partitioning before production writes.
+### Source
+
+The catalog declares Snapshot reads, while the upstream guide documents target-only use. If your deployment supplies the source contract, grant read access to the selected tables and verify discovery and snapshot completion in staging.
+
+### Target
+
+Create a dedicated user and grant access to the destination database:
+
+```sql
+CREATE USER 'tapstate'@'%' IDENTIFIED BY 'replace_with_a_secret';
+GRANT ALL ON DATABASE analytics TO USER tapstate;
+GRANT ALL ON ALL TABLES IN DATABASE analytics TO USER tapstate;
+```
+
+Replace broad `ALL` grants with the narrower privileges supported by your StarRocks version when tables are pre-created. Allow the runtime to reach FE ports `9030` (SQL) and `8030` (HTTP/HTTPS) and the BE HTTP port `8040` used by loading. Decide key model, distribution, buckets, sort keys, and partitions before production writes; partitioned tables are not automatically designed for you.
 
 ## Create a connection
 
@@ -69,7 +83,9 @@ tapstate validate --workdir tapstate-work
 ## Limitations
 
 - The catalog declares Snapshot only; it does not declare CDC or DDL behavior.
-- The upstream target baseline references Stream Load, but the current catalog does not publish its tuning or delivery semantics.
+- Target writes use Stream Load in the reused connector baseline. Detail/Duplicate-style tables are append-oriented; update and delete behavior depends on the table model.
+- Frequent updates and deletes can be expensive. Validate write semantics against the exact table type instead of relying on the catalog's generic upsert/append labels.
+- Upstream batch-size recommendations were not measured in TapState and are not published as product defaults.
 - Confirm HTTPS behavior, certificate handling, target table design, and type mapping in staging.
 
 ## Reference
@@ -82,3 +98,14 @@ tapstate validate --workdir tapstate-work
 | `useHTTPS` | No | `false` | Catalog HTTPS boolean. |
 | `user`, `password` | No | — | Account and secret. |
 | `backendNum`, `catalog`, `extParams`, `timezone` | No | — | Optional connector fields. |
+
+### Data compatibility
+
+| Family | Supported baseline |
+|---|---|
+| Text | `CHAR`, `VARCHAR`, `STRING`, `TEXT` |
+| Boolean | `BOOLEAN` |
+| Integer | `TINYINT`, `SMALLINT`, `INT`, `BIGINT`, `LARGEINT` |
+| Numeric | `DECIMAL`, `DECIMALV3`, `FLOAT`, `DOUBLE` |
+| Date and time | `DATE`, `DATEV2`, `DATETIME`, `DATETIMEV2` |
+| Aggregate | `HLL`, `BITMAP` |

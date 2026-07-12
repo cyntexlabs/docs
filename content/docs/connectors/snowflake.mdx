@@ -36,11 +36,43 @@ Use Snowflake to read existing tables or to deliver pipeline data into a selecte
 
 ### Source
 
-Use a dedicated role with `USAGE` on the warehouse, database, and schema plus `SELECT` on the selected tables. Snowflake reads consume warehouse compute, so use a warehouse sized and isolated for the expected workload where possible.
+Create a dedicated role and user, then grant access to the compute and source objects:
+
+```sql
+CREATE ROLE IF NOT EXISTS TAPSTATE_READER;
+CREATE USER TAPSTATE_USER
+  PASSWORD = 'replace-with-a-secret'
+  DEFAULT_ROLE = TAPSTATE_READER
+  DEFAULT_WAREHOUSE = TAPSTATE_WH
+  DEFAULT_NAMESPACE = ANALYTICS.PUBLIC
+  MUST_CHANGE_PASSWORD = FALSE;
+GRANT ROLE TAPSTATE_READER TO USER TAPSTATE_USER;
+
+GRANT USAGE ON WAREHOUSE TAPSTATE_WH TO ROLE TAPSTATE_READER;
+GRANT USAGE ON DATABASE ANALYTICS TO ROLE TAPSTATE_READER;
+GRANT USAGE ON SCHEMA ANALYTICS.PUBLIC TO ROLE TAPSTATE_READER;
+GRANT SELECT ON ALL TABLES IN SCHEMA ANALYTICS.PUBLIC TO ROLE TAPSTATE_READER;
+GRANT SELECT ON FUTURE TABLES IN SCHEMA ANALYTICS.PUBLIC TO ROLE TAPSTATE_READER;
+```
+
+Snowflake reads consume warehouse compute, so isolate synchronization work from business queries where practical. Ensure the runtime can reach the account's `*.snowflakecomputing.com` endpoint on port 443.
 
 ### Target
 
-Grant the writer role `USAGE` on the warehouse, database, and schema plus the DML permissions required by the destination tables. Add `CREATE TABLE` or `ALTER` only when automatic destination-table management is approved.
+Grant the writer role access to the warehouse and namespace, then grant only the required table operations:
+
+```sql
+GRANT USAGE ON WAREHOUSE TAPSTATE_WH TO ROLE TAPSTATE_WRITER;
+GRANT USAGE ON DATABASE ANALYTICS TO ROLE TAPSTATE_WRITER;
+GRANT USAGE ON SCHEMA ANALYTICS.PUBLIC TO ROLE TAPSTATE_WRITER;
+GRANT CREATE TABLE ON SCHEMA ANALYTICS.PUBLIC TO ROLE TAPSTATE_WRITER;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE
+  ON ALL TABLES IN SCHEMA ANALYTICS.PUBLIC TO ROLE TAPSTATE_WRITER;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE
+  ON FUTURE TABLES IN SCHEMA ANALYTICS.PUBLIC TO ROLE TAPSTATE_WRITER;
+```
+
+Remove `CREATE TABLE` when targets are pre-created. PAT and key-pair users need the same role grants; configure the Snowflake authentication policy or public key separately.
 
 ## Create a connection
 
@@ -82,6 +114,7 @@ Local validation checks mode, field types, and authentication-method enum values
 
 - The catalog declares Snapshot, not a Snowflake Streams, Change Tracking, or log-based CDC mode.
 - Only physical tables should be assumed for source selection until a deployment proves additional object support.
+- `DECFLOAT`, `UUID`, `TIMESTAMP_LTZ`, `VARIANT`, `GEOGRAPHY`, and `GEOMETRY` are query-side types in the reused connector baseline. Do not rely on automatic target-table creation for them.
 - Do not put passwords, PATs, or private keys in committed resource files.
 
 ## Reference
@@ -100,3 +133,14 @@ Local validation checks mode, field types, and authentication-method enum values
 | `schema` | Yes | `PUBLIC` | Schema name. |
 | `role` | No | — | Role used by the connection. |
 | `timezone` | No | `+00:00` | UTC offset used by the connector. |
+
+### Data compatibility
+
+| Family | Supported baseline |
+|---|---|
+| Integer and numeric | `BIGINT`, `NUMBER`, `FLOAT`, `DECFLOAT` |
+| Text and binary | `TEXT`, `UUID`, `BINARY`, `FILE` |
+| Boolean | `BOOLEAN` |
+| Date and time | `DATE`, `TIME`, `TIMESTAMP_NTZ`, `TIMESTAMP_TZ`, `TIMESTAMP_LTZ` |
+| Semi-structured | `OBJECT`, `ARRAY`, `VARIANT` |
+| Geospatial | `GEOGRAPHY`, `GEOMETRY` |

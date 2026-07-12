@@ -34,7 +34,21 @@ Use Zoho Desk as a catalog-declared Snapshot source for service data.
 
 ## Before you begin
 
-Obtain the Zoho Desk organization ID, client ID, client secret, and authorization code from an administrator. Keep every credential in a secret manager. Confirm organization policy and any webhook configuration separately; it is not validated by this resource.
+1. In Zoho Desk, open the API settings and record the organization ID.
+2. In the Zoho API Console, create a **Self Client** and store its client ID and client secret.
+3. Generate an authorization code for the required Desk scopes. The upstream baseline uses:
+
+```text
+Desk.tickets.ALL,Desk.search.READ,Desk.contacts.READ,
+Desk.contacts.WRITE,Desk.contacts.UPDATE,Desk.contacts.CREATE,
+Desk.tasks.ALL,Desk.basic.READ,Desk.basic.CREATE,
+Desk.settings.ALL,Desk.events.ALL,Desk.articles.READ,
+Desk.articles.CREATE,Desk.articles.UPDATE,Desk.articles.DELETE
+```
+
+Reduce this scope list if your selected modules need less access. Authorization codes expire; generate one immediately before the deployed connection flow exchanges it. Keep every credential in a secret manager.
+
+The upstream connector exposes these table-like modules: `Tickets`, `Departments`, `Products`, `OrganizationFields`, and `Contracts`.
 
 ## Create a connection
 
@@ -68,6 +82,9 @@ Local validation does not authenticate to Zoho Desk, exchange credentials, gener
 ## Limitations
 
 - The current catalog declares Snapshot only; it does not declare CDC, target writes, DDL, or webhook delivery semantics.
+- The upstream connector supports webhook delivery, but a webhook requires a unique externally reachable callback URL and lifecycle management that the current TapState catalog does not describe. Do not promise real-time delivery from this Snapshot-only resource.
+- Reusing one Zoho client ID and secret across many connections can hit Zoho token limits.
+- In the upstream webhook model, deleted records arrive as update events with `IsDel = TRUE`; a later full read does not recreate those deletion events.
 - The catalog exposes `getTokenMsg`, `getRefreshMsg`, and `hookText` but does not document their runtime representation; leave them unset unless the deployed contract specifies values.
 
 ## Reference

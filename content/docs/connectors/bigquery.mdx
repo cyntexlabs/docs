@@ -35,8 +35,34 @@ Use BigQuery as a destination for pipeline data with a Google Cloud service acco
 ## Before you begin
 
 1. Ensure the TapState runtime can reach Google Cloud APIs.
-2. Create a dedicated service account and grant the least privileges required to create jobs and write the intended dataset/tables.
-3. Create the destination dataset and tables, or approve the permissions required for your deployment to manage them.
+2. Create a dedicated Google Cloud service account and JSON key. Keep the key in a secret manager and rotate it according to your security policy.
+3. Grant a custom role scoped to the intended project or dataset. The upstream connector baseline uses these permissions:
+
+```text
+bigquery.datasets.create
+bigquery.datasets.get
+bigquery.datasets.update
+bigquery.jobs.create
+bigquery.jobs.get
+bigquery.jobs.list
+bigquery.jobs.listAll
+bigquery.jobs.delete
+bigquery.jobs.update
+bigquery.routines.get
+bigquery.routines.list
+bigquery.tables.create
+bigquery.tables.delete
+bigquery.tables.get
+bigquery.tables.getData
+bigquery.tables.list
+bigquery.tables.setCategory
+bigquery.tables.update
+bigquery.tables.updateData
+```
+
+Remove administrative permissions if your pipeline writes only to pre-created tables and does not manage datasets, routines, or table metadata.
+
+4. Create the destination dataset and tables, or approve the permissions required for your deployment to manage them. The upstream baseline uses a multi-region dataset; verify the required location with the pipeline's other Google Cloud resources to avoid cross-location failures.
 
 ## Create a connection
 
@@ -66,6 +92,7 @@ Local validation checks the resource envelope and known field shapes. It does no
 
 - The current catalog does not declare a source mode, CDC, or DDL behavior for BigQuery.
 - Dataset location and service-account permissions are enforced by Google Cloud at runtime.
+- A service-account key is a long-lived credential. Store it outside Git, restrict its IAM scope, and rotate or replace it with a deployment-supported workload identity when available.
 - Stage representative target writes to validate data types and table policy before production use.
 
 ## Reference

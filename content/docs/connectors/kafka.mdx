@@ -23,7 +23,7 @@ Use the catalog ID `kafka_enhanced` for current Kafka connections. The legacy `k
   maturityLabel="Production ready"
   worksAs="Source, Target"
   capabilities="Stream read, Stream write, Schema Registry"
-  compatibility="Kafka 2.3+ · Confluent-compatible clients"
+  compatibility="Kafka 2.0–2.5 · Scala 2.12 · Single node or cluster"
 />
 
 <ConnectorCapabilities
@@ -36,9 +36,11 @@ Use the catalog ID `kafka_enhanced` for current Kafka connections. The legacy `k
 ### Source
 
 - Ensure the future TapState runtime network can reach every broker address in `clusterURI`.
-- Choose serializers that match the topic key and value formats.
+- Choose `keySerialization`, `valueSerialization`, and `schemaMode` to match the bytes already stored in each topic.
 - If Schema Registry is enabled, prepare its URL and authentication settings.
 - If SASL or Kerberos is enabled, prepare the matching credentials and Kerberos files.
+
+Kafka has no finite Snapshot/CDC split. A stream can start from the earliest available offset, the current position, or a time-derived offset, but that starting-position policy belongs to the pipeline/runtime contract rather than the connection fields documented here. Confirm it before the first production run.
 
 ### Target
 
@@ -52,13 +54,13 @@ bin/kafka-topics.sh --create \
   --topic my_topic
 ```
 
-The selected `keySerialization`, `valueSerialization`, schema mode, and optional Schema Registry type must match the records written to the topic. For a JSON object value:
+The selected serializers, structural mode, and optional Schema Registry type must match the records written to the topic. For a JSON object value:
 
 ```json
 {"id": 1, "name": "Alice", "amount": 99.50}
 ```
 
-The catalog also exposes binary, string, numeric, UUID, Avro, and Protobuf paths. Offline validation cannot inspect the actual topic encoding.
+The connector can write its standard event envelope, standard JSON, original Kafka records, Canal, Debezium, Flink CDC, or a custom analyzed structure. Choose a format that the downstream consumer already understands; changing it later is a data-contract change.
 
 ## Create a connection
 
@@ -90,12 +92,17 @@ tapstate validate --workdir tapstate-work
 
 Offline validation checks the `stream` mode and catalog-backed field values. It does not connect to brokers, authenticate, inspect topics, or send messages.
 
+In staging, read and write one record for every selected serialization path. Verify its key, headers, partition, timestamp, and value with an independent Kafka consumer before enabling production traffic.
+
 ## Limitations
 
 - Kafka is an unbounded stream; do not model it as Snapshot or CDC.
-- Topic existence, partitioning, replication factor, ACLs, and message compatibility require runtime checks that are not available in the current open-source release.
-- `kafka_enhanced` supports JSON, Avro, and Protobuf registry types through catalog settings; the selected serializers must match the actual topic data.
-- Kerberos files and Schema Registry credentials are catalog fields, but the docs cannot verify them offline.
+- Re-reading an offset can deliver the same record more than once. Use stable keys and idempotent target writes when duplicates are unacceptable.
+- Consumer concurrency is bounded by the available topic partitions. More reader threads do not increase parallelism beyond that partition count.
+- Topic existence, partitioning, replication factor, ACLs, retention, and message compatibility require live broker checks.
+- The connector implementation contains a transactional producer path, but end-to-end exactly-once behavior also depends on the TapState runtime and target pipeline. Verify failure and recovery behavior instead of assuming a catalog flag provides exactly-once delivery.
+- `kafka_enhanced` supports JSON, Avro, and Protobuf Schema Registry types. The registered schema must remain compatible with the actual key/value encoding.
+- Kerberos files, Schema Registry credentials, and custom Kafka client properties are accepted fields, but local validation cannot prove that the broker or registry will accept them.
 
 ## Reference
 
@@ -107,13 +114,19 @@ Offline validation checks the `stream` mode and catalog-backed field values. It 
 | `schemaRegister` | No | `false` | Enable Schema Registry integration. |
 | `schemaRegisterUrl` | With Schema Registry | — | Schema Registry URL. |
 | `registrySchemaType` | No | `JSON` | `JSON`, `AVRO`, or `PROTOBUF`. |
-| `schemaMode` | No | `STANDARD` | Message envelope mode when Schema Registry is disabled. |
-| `keySerialization` | Yes | `Binary` | Key deserializer type. |
-| `valueSerialization` | Yes | `Binary` | Value deserializer type. |
+| `basicAuth` | No | `false` | Enable basic authentication for Schema Registry. |
+| `authCredentialsSource` | No | `USER_INFO` | Use explicit registry credentials or inherit SASL credentials. |
+| `authUserName` | With registry basic auth | — | Schema Registry username. |
+| `authPassword` | With registry basic auth | — | Schema Registry password or secret reference. |
+| `schemaMode` | No | `STANDARD` | `STANDARD`, `STANDARD_JSON`, `ORIGINAL`, `CANAL`, `DEBEZIUM`, `FLINK_CDC`, or `CUSTOM`. |
+| `analyzeScript` | With custom mode | Built-in identity function | Transform Kafka header, key, value, and partition into the custom record structure. |
+| `keySerialization` | Yes | `Binary` | `Binary`, JSON array/object, string, integer family, or UUID. |
+| `valueSerialization` | Yes | `Binary` | `Binary`, JSON array/object, string, integer family, or UUID. |
 | `batchMaxDelay` | Yes | `2000` | Producer batching delay in milliseconds. |
 | `clientId` | No | — | Kafka client ID. |
 | `acksType` | No | `-1` | Producer acknowledgment value: `0`, `1`, `-1`, or `all`. |
 | `compressionType` | No | `lz4` | `disable`, `gzip`, `snappy`, `lz4`, or `zstd`. |
+| `extParams` | No | `[]` | Additional admin, consumer, producer, or shared Kafka client properties. |
 
 ### Authentication settings
 
@@ -128,3 +141,16 @@ Offline validation checks the `stream` mode and catalog-backed field values. It 
 | `krb5Conf` | With Kerberos | — | Kerberos configuration. |
 | `krb5Principal` | With Kerberos | — | Kerberos principal. |
 | `krb5ServiceName` | With Kerberos | — | Kafka Kerberos service name. |
+| `kafkaSaslMechanism` | No | `PLAIN` | Kafka SASL mechanism used by the connector's secondary Kafka client path: `PLAIN`, `SHA256`, or `SHA512`. |
+
+### Data compatibility
+
+| Family | Supported baseline |
+|---|---|
+| Boolean | `BOOLEAN` |
+| Integer and numeric | `SHORT`, `INTEGER`, `LONG`, `FLOAT`, `DOUBLE`, `NUMBER` |
+| Text | `CHAR` as a source, `VARCHAR`, `STRING`, `TEXT` |
+| Binary | `BINARY` |
+| Composite | `ARRAY`, `MAP`, and source-side `OBJECT` |
+| Date and time | `TIME`, `DATE`, `DATETIME`, `TIMESTAMP` |
+| Other | Source-side `UUID` |

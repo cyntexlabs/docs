@@ -28,16 +28,38 @@ Use QuickAPI to describe a one-time source read from a prepared Postman collecti
 
 <ConnectorCapabilities source="Snapshot read" target="Not declared in the current catalog" />
 
-<Aside type="note" title="Collection semantics remain upstream baseline">
-  The upstream guide describes `TAP_TABLE` and token-refresh annotations in a Postman collection. The catalog retains the related text fields, but it does not prove a TapState collection parser, token exchange, or pagination runtime.
+<Aside type="note" title="What is code-backed">
+  The reused connector code parses `TAP_TABLE`, pagination tags, `TAP_GET_TOKEN`, token-expiry rules, and token mappings. Local `tapstate validate` still checks only field shapes; it does not execute the collection or prove that a deployed runtime includes the connector package.
 </Aside>
 
 ## Before you begin
 
-1. Export the intended Postman collection as JSON.
-2. Ensure each API intended to create a data table carries the upstream `TAP_TABLE` declaration and its required paging annotation.
-3. If the API refreshes a short-lived token, prepare the documented expiry rule and token parameter mapping.
-4. Remove credentials from the exported collection and supply them through a secret manager or runtime-specific mechanism.
+1. Export the intended Postman collection as JSON. Keep the collection's `info`, `item`, and `variable` entries; remove unused test events and secrets.
+2. Prefix every list API that should become a table with this pattern:
+
+```text
+TAP_TABLE[TableName](PAGING_MODE:response.path) Human-readable request name
+```
+
+For example, this creates a `Tickets` table from the `data` array in the response:
+
+```text
+TAP_TABLE[Tickets](PAGE_LIMIT:data) Get tickets
+```
+
+3. Match the pagination mode to the API and add the required tag to each relevant request parameter description:
+
+| Paging mode | Required parameter tags | Use |
+|---|---|---|
+| `PAGE_SIZE_PAGE_INDEX` | `TAP_PAGE_SIZE`, `TAP_PAGE_INDEX` | Page number plus page size. |
+| `FROM_TO` | `TAP_PAGE_FROM`, `TAP_PAGE_TO` | Start and end record indexes. |
+| `PAGE_LIMIT` | `TAP_PAGE_OFFSET`, `TAP_PAGE_LIMIT` | Offset plus limit. |
+| `PAGE_TOKEN` | `TAP_PAGE_TOKEN`, `TAP_PAGE_SIZE`, `TAP_HAS_MORE_PAGE` | Cursor/token pagination. |
+| `PAGE_NONE` | None | A non-paginated list response. |
+
+4. Make sure every Postman variable referenced by a URL, header, body, or parameter has a real value supplied at runtime.
+5. If the API uses a short-lived token, prefix its refresh request with `TAP_GET_TOKEN`, then configure both `expireStatus` and `tokenParams`.
+6. Remove credentials from the exported collection and supply them through a secret manager or runtime-specific mechanism.
 
 ## Create a connection
 
@@ -54,7 +76,7 @@ config:
 mode: snapshot
 ```
 
-`jsonTxt` is required. The other catalog fields are optional and should be omitted unless their runtime semantics have been confirmed for the deployed connector.
+`jsonTxt` is required. `schemaTxt` is normally derived from the collection by the connector surface; provide it only when the deployed contract expects a precomputed schema.
 
 ## Validate the configuration
 
@@ -69,7 +91,9 @@ Local validation checks the resource, Snapshot mode, and field shapes. It does n
 ## Limitations
 
 - The catalog declares Snapshot only; it does not declare CDC, API mode, target writes, or DDL behavior.
-- The upstream annotation grammar is not a declared TapState runtime capability. Keep it as integration preparation until a deployed parser is verified.
+- Incorrect response paths or pagination tags can silently omit or repeat rows. Compare page boundaries and record counts with the source API in staging.
+- Token refresh is connector-code-backed, but it depends on the exact expiry expression and response mapping supplied by the user.
+- API rate limits, retries, pagination consistency, and schema drift are controlled by the remote API and are not checked by local validation.
 - Do not commit collections containing secrets or token values.
 
 ## Reference
@@ -80,3 +104,5 @@ Local validation checks the resource, Snapshot mode, and field shapes. It does n
 | `expireStatus` | No | Upstream token-expiry response rule. |
 | `tokenParams` | No | Upstream mapping between refreshed token output and collection variables. |
 | `schemaTxt` | No | Optional schema text exposed by the catalog. |
+
+`expireStatus` accepts response predicates such as `body.errorCode=INVALID_OAUTH`, `header.httpCode=401`, or `code=401`. Multiple conditions can use `&&`; separate lines represent alternatives. `tokenParams` maps a collection variable to the token field returned by the refresh request, for example `accessToken=access_token`.

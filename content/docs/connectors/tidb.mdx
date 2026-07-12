@@ -14,6 +14,7 @@ ai:
 ---
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use TiDB for one-time reads, catalog-declared CDC, or data-writing targets.
 
@@ -36,11 +37,51 @@ Use TiDB for one-time reads, catalog-declared CDC, or data-writing targets.
 
 ### Source
 
-Create a least-privilege account with read access to the selected database. For CDC, confirm the TiDB deployment's change-data prerequisites and the runtime network paths to PD/TiKV with your database administrator; the catalog exposes endpoint fields but does not publish the capture mechanism or retention contract.
+<SourceModeTabs label="Choose the TiDB source read mode">
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** to copy the rows that exist now. Full reads use the TiDB SQL endpoint and support the upstream version baseline beyond the narrower CDC range.
+
+```sql
+CREATE USER 'tapstate_reader'@'%' IDENTIFIED BY 'replace_with_a_secret';
+GRANT SELECT ON orders.* TO 'tapstate_reader'@'%';
+```
+
+Allow the TapState runtime to reach the TiDB SQL service, normally port `4000`. Snapshot does not require PD or TiKV access.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** for TiDB 6.0.0–8.1.9 when existing rows must be followed by ordered row changes. The reused connector integrates TiFlow/TiCDC 8.1.0.
+
+1. Create the reader and grant `SELECT` as shown in the Snapshot tab.
+2. Make PD available to the runtime on port `2379` and TiKV on port `20160`; keep TiDB, PD, TiKV, and the runtime on routable networks.
+3. Ensure every selected table has a primary key or a unique index whose columns are non-null and not virtual.
+4. Keep TiDB GC history longer than the longest expected interruption. The reused connector checks `tidb_gc_life_time` and recommends 24 hours as a starting point:
+
+```sql
+SET GLOBAL tidb_gc_life_time = '24h';
+SHOW GLOBAL VARIABLES LIKE 'tidb_gc_life_time';
+```
+
+5. Confirm that the runtime host architecture is supported by the TiCDC binary supplied with the connector (`amd64` or `arm64` in the upstream baseline).
+
+Do not substitute a self-compiled TiCDC binary in a production deployment without compatibility and recovery testing; that changes the connector runtime contract.
+
+</SourceModeTab>
+</SourceModeTabs>
 
 ### Target
 
-Create a writer with DML privileges on destination tables. Add `CREATE` or `ALTER` only if pipeline-managed tables are approved, and stage the intended primary-key and data-type behavior.
+Create a writer with DML privileges on destination tables:
+
+```sql
+CREATE USER 'tapstate_writer'@'%' IDENTIFIED BY 'replace_with_a_secret';
+GRANT SELECT, INSERT, UPDATE, DELETE, ALTER, CREATE, DROP
+ON analytics.* TO 'tapstate_writer'@'%';
+```
+
+Remove `ALTER`, `CREATE`, and `DROP` when pipeline-managed tables are not approved.
 
 ## Create a connection
 
@@ -77,7 +118,9 @@ tapstate validate --workdir tapstate-work
 ## Limitations
 
 - The catalog declares CDC but does not define its checkpoint, topology, DDL, or failover semantics.
-- The upstream GA matrix is a reusable compatibility baseline; validate the exact TiDB and TiKV topology in staging.
+- Full reads support all versions in the upstream baseline, but integrated TiCDC is documented for TiDB 6.0.0–8.1.9. Validate the exact TiDB, PD, and TiKV topology in staging.
+- Tables without a non-null primary or unique key do not meet the documented TiCDC row-identity requirement.
+- TiDB GC can remove history needed for restart. Choose `tidb_gc_life_time` from your recovery objective and monitor its operational cost.
 - The catalog does not expose transport-encryption settings.
 
 ## Reference
@@ -92,3 +135,15 @@ tapstate validate --workdir tapstate-work
 | `tiKvAddress`, `tiKvPort` | No | `20160` for port | TiKV endpoint fields exposed by the catalog. |
 | `extParams` | No | — | Additional connector parameters. |
 | `timezone` | No | `+00:00` | UTC offset for timezone-naive values. |
+
+### Data compatibility
+
+| Family | Supported baseline |
+|---|---|
+| Integer | Signed and unsigned `TINYINT`, `SMALLINT`, `MEDIUMINT`, `INT`/`INTEGER`, `BIGINT` |
+| Text | `CHAR`, `VARCHAR`, `TEXT`, `TINYTEXT`, `MEDIUMTEXT`, `LONGTEXT`, `CLOB`, `ENUM`, `SET` |
+| Numeric | Signed and unsigned `DECIMAL`, `FLOAT`, `DOUBLE`, plus `REAL` except in full-read baseline |
+| Binary | `BINARY`, `VARBINARY`, `BLOB`, `TINYBLOB`, `MEDIUMBLOB`, `LONGBLOB` |
+| Boolean | `BOOLEAN`, `BIT` |
+| Date and time | `DATE`, `TIME`, `DATETIME`, `TIMESTAMP`, `YEAR` |
+| Structured | `JSON` |

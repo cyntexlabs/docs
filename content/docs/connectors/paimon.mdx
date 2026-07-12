@@ -23,7 +23,7 @@ Use Apache Paimon with local, S3, HDFS, or OSS warehouse storage.
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Data write"
-  compatibility="Apache Paimon 0.9.0 upstream baseline"
+  compatibility="Apache Paimon 0.6+ · 0.8.2+ recommended upstream baseline"
 />
 
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
@@ -34,7 +34,20 @@ Use Apache Paimon with local, S3, HDFS, or OSS warehouse storage.
 
 ## Before you begin
 
-Choose the warehouse location and grant the runtime least-privilege storage access. Confirm the Paimon catalog/metastore arrangement, table primary keys, and any compaction or retention policy with the data-platform team.
+### Source
+
+The TapState catalog declares Snapshot and CDC reads, but the upstream connector guide documents Paimon as a target. Before using it as a source, verify table discovery, the initial position, checkpoint recovery, and schema handling with the exact connector package supplied by your deployment.
+
+### Target
+
+Choose the warehouse location and grant the runtime read/write access only to that path:
+
+- S3 or compatible storage: use `s3://bucket/path` and an endpoint, access key, secret key, and region appropriate for that service.
+- HDFS: use `hdfs://namenode:port/path` and a user that can create and modify files below the warehouse path.
+- OSS: use `oss://bucket/path`; the endpoint should not include the bucket name.
+- Local or NFS: use a path visible from every runtime instance that may execute the pipeline, with enough space for data and compaction work files.
+
+Define a primary key for upserts and deletes. Use partitions for large tables when they match query and retention patterns, and agree on compaction ownership before the first write.
 
 ## Create a connection
 
@@ -70,6 +83,10 @@ tapstate validate --workdir tapstate-work
 
 - The catalog does not define catalog/metastore fields, CDC checkpoints, schema evolution, compaction, or write conflict semantics.
 - `storageType` selects conditional fields; provide only the matching S3, HDFS, or OSS inputs.
+- The upstream baseline supports DML but not runtime schema evolution. Create or evolve table schemas through an approved external process unless the deployed connector contract states otherwise.
+- Paimon has primary keys but no secondary indexes. Wide or frequently changing keys affect write layout and compaction.
+- A delete needs a complete before image when soft-delete handling converts it into an update marker. Without it, non-key columns can become `null`.
+- Upstream tuning values for batch size, write threads, and compaction were not measured in TapState and are intentionally not copied as defaults.
 - Keep storage secrets outside committed resource files.
 
 ## Reference
@@ -82,3 +99,5 @@ tapstate validate --workdir tapstate-work
 | OSS | `ossEndpoint`, `ossAccessKey`, `ossSecretKey` |
 
 `storageType` accepts `s3`, `hdfs`, `oss`, and `local`.
+
+The reused connector baseline supports Paimon 0.6+ data types. Verify precision-sensitive mappings against the table's file format—for example, Parquet logical date representation—before writing production data.

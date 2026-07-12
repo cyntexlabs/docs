@@ -73,3 +73,7 @@ tapstate validate --workdir tapstate-work
 | `mqQueueString` | No | Optional queue selection. |
 | `brokerURL` | Yes | Broker connection string, for example `tcp://host:61616`. |
 | `mqUsername`, `mqPassword` | No | Broker credentials. Keep the password in an environment variable. |
+
+### Message data compatibility
+
+The reused connector baseline accepts `OBJECT`, `ARRAY`, `NUMBER`, `INTEGER`, `BOOLEAN`, `STRING` values shorter than 200 characters, and `TEXT`. Verify the actual message envelope and character encoding with a staging queue.

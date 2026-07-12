@@ -127,3 +127,15 @@ Local validation checks the resource, declared mode, and catalog-known field sha
 | `rawLogServerHost`, `rawLogServerPort` | No | `50051` port | Raw log service endpoint exposed by the catalog. |
 | `cdcUser`, `cdcPassword` | No | `root@sys` user | Catalog-defined CDC service credentials. |
 | `timezone` | No | empty | UTC offset used by the connector. |
+
+### Data compatibility
+
+| Family | Supported baseline |
+|---|---|
+| Text and binary strings | `CHAR`, `VARCHAR`, `TINYTEXT`, `TEXT`, `MEDIUMTEXT`, `LONGTEXT`, `BINARY`, `VARBINARY` |
+| Integer | `TINYINT`, `SMALLINT`, `MEDIUMINT`, `INT`, `BIGINT` |
+| Numeric | `DECIMAL`, `FLOAT`, `DOUBLE` |
+| Date and time | `DATE`, `TIME`, `DATETIME`, `TIMESTAMP`, `YEAR` |
+| Enumerated and structured | `ENUM`, `SET`, `JSON`, `BIT` |
+| Binary large object | `TINYBLOB`, `BLOB`, `MEDIUMBLOB`, `LONGBLOB` |
+| Spatial | `POINT`, `LINESTRING`, `POLYGON`, `GEOMETRY`, `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON`, `GEOMCOLLECTION` |
