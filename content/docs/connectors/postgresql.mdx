@@ -46,9 +46,23 @@ Use PostgreSQL with TapState for snapshots, CDC, DDL capture, target writes, and
 
 Use **Snapshot** to copy the rows that exist now.
 
-1. Create a dedicated login with `CONNECT` access to the database.
-2. Grant `USAGE` on selected schemas and `SELECT` on selected tables.
-3. Grant access to future tables when table discovery must include objects created later.
+Create a dedicated account, then grant it access only to the schemas and tables you intend to copy:
+
+```sql
+CREATE USER tapstate WITH PASSWORD 'replace-with-a-secret';
+
+\c database_name
+GRANT CONNECT ON DATABASE database_name TO tapstate;
+GRANT USAGE ON SCHEMA schema_name TO tapstate;
+GRANT SELECT ON ALL TABLES IN SCHEMA schema_name TO tapstate;
+```
+
+If newly created tables should be discoverable without another grant, set default privileges for the role that creates those tables:
+
+```sql
+ALTER DEFAULT PRIVILEGES FOR ROLE table_owner IN SCHEMA schema_name
+GRANT SELECT ON TABLES TO tapstate;
+```
 
 Snapshot does not require logical WAL, a replication slot, or a decoding plugin.
 
@@ -57,38 +71,133 @@ Snapshot does not require logical WAL, a replication slot, or a decoding plugin.
 
 Use **Snapshot + CDC** to copy existing rows and then follow WAL changes.
 
-1. Grant the Snapshot permissions plus replication access.
-2. Set `wal_level = logical` and size `max_replication_slots` and `max_wal_senders` for the planned tasks.
-3. Choose the supported decoding path—`pgoutput`, `wal2json`, or `decoderbufs`—and install it when required.
-4. Set `REPLICA IDENTITY` appropriately for tables whose updates or deletes must include enough key data.
-5. For DDL capture, prepare the event-trigger and audit-table permissions described by the reused connector.
+Start with the Snapshot grants above, then allow the account to create a replication connection:
+
+```sql
+ALTER USER tapstate REPLICATION;
+```
+
+Choose a decoding method before changing the server:
+
+| Method | PostgreSQL baseline | What to prepare |
+|---|---|---|
+| `pgoutput` | PostgreSQL 10+ | Built in. The account needs publication access; partial publications also require `CREATE PUBLICATION` and ownership of the selected tables. |
+| `wal2json` | PostgreSQL 9.4+ | Install the `wal2json` output plugin on the server. Tables should have primary keys for reliable deletes. |
+| `decoderbufs` | PostgreSQL 9.6+ | Install the Debezium decoderbufs plugin and its server dependencies. |
+| `walminer` | Deployment-specific | Reads physical WAL and requires elevated database access. Confirm availability with your TapState deployment before choosing it. |
+
+For logical decoding, configure PostgreSQL with enough slots and WAL senders for the planned concurrent tasks:
+
+```ini
+# postgresql.conf
+wal_level = logical
+max_replication_slots = 10
+max_wal_senders = 10
+```
+
+Allow the replication account in `pg_hba.conf`, using an address range and authentication method that match your security policy:
+
+```text
+host  replication  tapstate  10.0.0.0/24  scram-sha-256
+```
+
+Restart PostgreSQL when the changed server parameters require it. Then make sure updates and deletes contain a usable row identity. Tables without a suitable primary key usually need:
+
+```sql
+ALTER TABLE schema_name.table_name REPLICA IDENTITY FULL;
+```
+
+When using `pgoutput`, create publications yourself if the deployment will not create them:
+
+```sql
+CREATE PUBLICATION dbz_publication_root
+  FOR ALL TABLES WITH (PUBLISH_VIA_PARTITION_ROOT = TRUE);
+CREATE PUBLICATION dbz_publication FOR ALL TABLES;
+```
+
+DDL capture uses a database event trigger, a trigger function, and the `public._tapdata_ddl_audit` table in the reused connector. Creating event triggers normally requires superuser-equivalent privileges. Confirm that your managed PostgreSQL service permits event triggers before enabling DDL capture.
 
 </SourceModeTab>
 </SourceModeTabs>
 
 ### Target
 
-Prepare a dedicated writer with schema usage, table creation when TapState may create targets, and the required `INSERT`, `UPDATE`, and `DELETE` privileges. Add DDL privileges only when DDL apply is allowed.
+Prepare a dedicated writer for the destination database and schema:
+
+```sql
+CREATE USER tapstate WITH PASSWORD 'replace-with-a-secret';
+
+\c database_name
+GRANT CONNECT ON DATABASE database_name TO tapstate;
+GRANT CREATE, USAGE ON SCHEMA schema_name TO tapstate;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE
+  ON ALL TABLES IN SCHEMA schema_name TO tapstate;
+GRANT USAGE, SELECT, UPDATE
+  ON ALL SEQUENCES IN SCHEMA schema_name TO tapstate;
+```
+
+Grant `ALTER` or ownership only if TapState is expected to evolve existing target tables. If foreign-key checks must be bypassed during a controlled load, review the security impact before setting `session_replication_role`; that setting usually requires elevated privileges.
 
 ## Create a connection
 
-Create the PostgreSQL connection through the connection flow supplied by your TapState deployment. The public offline catalog is incomplete, so this page avoids publishing a mode- or target-specific `.tapstate.yml` example that could be misleading.
+Create the PostgreSQL connection through the connection flow supplied by your TapState deployment. The offline catalog documents the fields in [Connection settings](#connection-settings), but does not declare source modes or target capability. For that reason, this page does not publish a mode-specific `.tapstate.yml` example that local validation could not verify.
 
 ## Validate the configuration
 
-The bundled offline CLI can validate known PostgreSQL field shapes, but cannot validate source modes, target capability, credentials, replication settings, or a live database connection. Confirm those with your deployment's connection validation and a staging run.
+Local validation can check the resource envelope and recognized PostgreSQL field shapes. It cannot test credentials, network reachability, `pg_hba.conf`, replication privileges, publication ownership, slots, or a live target write.
+
+Before a production pipeline, run a staging check that:
+
+1. discovers a selected table;
+2. completes a small snapshot;
+3. observes an insert, update, and delete through CDC;
+4. resumes after a short interruption without losing its replication position.
 
 ## Limitations
 
-- Replication slots retain WAL; monitor disk growth and remove abandoned slots through an approved operational process.
-- Tables without a suitable replica identity can produce incomplete update or delete keys.
-- Connection encryption settings depend on the PostgreSQL connector contract supplied by your deployment; this page does not assume a field name or TLS behavior.
+- Replication slots retain WAL until consumers advance. Monitor `pg_replication_slots` and disk use, and remove a slot only after confirming that no task still depends on it.
+- Tables without a suitable replica identity can produce incomplete keys for updates and deletes. `REPLICA IDENTITY FULL` increases WAL volume and should be evaluated on busy tables.
+- Capturing changes from partitioned parent tables requires PostgreSQL 13+ with `pgoutput` in the reused connector baseline.
+- `pgoutput`, `wal2json`, and `decoderbufs` can collect supported DDL only when the DDL trigger objects can be created. The physical-WAL path does not provide the same DDL behavior.
+- PostgreSQL string types cannot store the zero byte (`\0`); normalize it before writing if it can appear in source data.
+- A replication slot can be blocked by long-running database work. Investigate materialized-view refreshes and other sessions if slot creation stalls.
+- The catalog does not expose a TLS field. Configure server-side encryption as required, then use the connection contract supplied by your TapState deployment instead of inventing a YAML key.
 
 ## Reference
 
-| Signal | Supported baseline |
+### Connection settings
+
+These names come from the bundled `postgres` catalog. Conditional fields should be supplied only for the selected deployment and log-plugin path.
+
+| Field | Required | Default | Use |
+|---|---:|---|---|
+| `deploymentMode` | No | `standalone` | Standalone or primary/standby addressing. |
+| `host` | Yes | — | PostgreSQL host for standalone mode. |
+| `port` | Yes | `5432` | PostgreSQL port for standalone mode. |
+| `masterSlaveAddress` | No | — | Host and port list for a primary/standby deployment. |
+| `database` | Yes | — | Database name. |
+| `schema` | Yes | — | Schema to discover. |
+| `user` | No | — | Database account. |
+| `password` | No | — | Database password or secret reference. |
+| `logPluginName` | No | `pgoutput` | Incremental decoding method. |
+| `pgtoHost` | No | `127.0.0.1` | Helper host used by the physical-WAL path when that path is supplied by the deployment. |
+| `pgtoPort` | No | `9876` | Helper port used by the physical-WAL path. |
+| `partPublication` | No | `false` | Use per-table or partial publications with `pgoutput`. |
+| `globalPublicationName` | Yes | `dbz_publication` | Publication name used by the global publication path. |
+| `extParams` | No | — | Additional connection parameters accepted by the connector. |
+| `timezone` | No | Empty | Session timezone used for temporal conversion. |
+| `allowReplication` | No | `true` | Whether the connection may use PostgreSQL replication. |
+| `defaultWalLogSize` | No | `102400` | Default WAL-size threshold used by the connector monitor. |
+
+### Data compatibility
+
+| Family | Supported baseline |
 |---|---|
-| Source modes | Snapshot and CDC |
-| Target | Data write and DDL apply |
-| DDL | Capture and apply |
-| Versions | PostgreSQL 9.4–16 |
+| Text | `character`, `character varying`, `text` |
+| Numeric | `smallint`, `integer`, `bigint`, `numeric`, `real`, `double precision` |
+| Binary and bit | `bytea`, `bit`, `bit varying` |
+| Date and time | `date`, `time`, `timestamp`, `timestamptz`, `interval` |
+| Spatial and network | `geometry`, `point`, `polygon`, `circle`, `path`, `box`, `line`, `lseg`, `inet`, `cidr`, `macaddr` |
+| Structured and other | `uuid`, `xml`, `json`, `jsonb`, arrays, OID and reg* identifier types, `tsvector`, `tsquery` |
+
+Target writes and the `wal2json` path do not support the `tsvector`, `tsquery`, `regproc`, `regprocedure`, `regoper`, `regoperator`, `regclass`, `regtype`, `regconfig`, or `regdictionary` baseline types. The `walminer` baseline also excludes arrays and `oid`. Verify uncommon extension types with representative data before migration.

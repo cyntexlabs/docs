@@ -46,9 +46,22 @@ Use Oracle with TapState for snapshots, CDC, DDL capture, target writes, and DDL
 
 Use **Snapshot** to copy the rows that exist now.
 
-1. Create a dedicated Oracle account and grant session access.
-2. Grant dictionary and object-read permissions required for the selected schemas and tables.
-3. In multitenant environments, create the account and grants in the correct CDB or PDB context.
+Create a dedicated account in the database or pluggable database that contains the source objects:
+
+```sql
+CREATE USER tapstate IDENTIFIED BY "replace-with-a-secret";
+GRANT CREATE SESSION TO tapstate;
+GRANT SELECT ON V_$DATABASE TO tapstate;
+```
+
+Grant `SELECT` on the selected tables. If the account must discover objects across schemas, use narrowly scoped object grants where possible; `SELECT ANY TABLE` is broader:
+
+```sql
+GRANT SELECT ON app_schema.orders TO tapstate;
+GRANT SELECT ON app_schema.customers TO tapstate;
+```
+
+For a common user in a multitenant database, create the account in `CDB$ROOT` with the required common-user prefix and apply grants in the correct container. Confirm whether one TapState connection represents a single PDB or a common account before granting `CONTAINER=ALL`.
 
 Snapshot does not require ARCHIVELOG, supplemental logging, or LogMiner.
 
@@ -57,20 +70,69 @@ Snapshot does not require ARCHIVELOG, supplemental logging, or LogMiner.
 
 Use **Snapshot + CDC** to copy existing rows and then capture redo-log changes.
 
-1. Grant the Snapshot permissions plus the LogMiner and transaction-log access required by your selected CDC method.
-2. Enable `ARCHIVELOG` and database-level supplemental logging.
-3. Enable supplemental logging for participating tables and verify that archived logs cover the recovery window.
-4. Grant `LOGMINING` on Oracle 12c and later when using LogMiner.
-5. Prepare DDL-capture permissions only when DDL collection is required.
+Start with the Snapshot account, then grant the catalog and transaction access used by the LogMiner baseline:
 
-Oracle CDC methods have different architecture and operational requirements. Confirm the method configured by your TapState deployment before applying method-specific settings.
+```sql
+GRANT CREATE SESSION,
+      ALTER SESSION,
+      EXECUTE_CATALOG_ROLE,
+      SELECT ANY DICTIONARY,
+      SELECT ANY TRANSACTION
+TO tapstate;
+
+-- Oracle 12c and later
+GRANT LOGMINING TO tapstate;
+```
+
+Replace broad grants with equivalent object-level access when your security policy requires it, and test that the account can read the required `V$` views for the selected CDC implementation.
+
+Enable ARCHIVELOG during an approved maintenance window. First check the current state:
+
+```sql
+SELECT LOG_MODE FROM V$DATABASE;
+```
+
+If it is not `ARCHIVELOG`, restart and enable it as a privileged administrator:
+
+```sql
+SHUTDOWN IMMEDIATE;
+STARTUP MOUNT;
+ALTER DATABASE ARCHIVELOG;
+ALTER DATABASE OPEN;
+```
+
+Enable supplemental logging so redo records contain the keys needed to identify changed rows:
+
+```sql
+ALTER DATABASE ADD SUPPLEMENTAL LOG DATA (PRIMARY KEY) COLUMNS;
+
+-- Use full logging for a table without a reliable key.
+ALTER TABLE app_schema.orders
+  ADD SUPPLEMENTAL LOG DATA (ALL) COLUMNS;
+
+ALTER SYSTEM SWITCH LOGFILE;
+```
+
+For a PDB, switch to the intended container before applying table-level logging. Size the archive destination for the longest expected outage and confirm that archived logs remain available until TapState has consumed them.
+
+The reused connector baseline also describes a direct raw-log path. It requires a separately installed component and different permissions, but the public TapState catalog does not expose that contract. Do not prepare or select it unless your deployment explicitly provides it.
+
+DDL capture has additional dictionary and object requirements. Enable it only when the connector contract supplied by your deployment exposes DDL collection.
 
 </SourceModeTab>
 </SourceModeTabs>
 
 ### Target
 
-Prepare a dedicated writer with session, object creation, and DML privileges for the destination schema. Add `ALTER` and other DDL privileges only when DDL apply is explicitly allowed.
+For a dedicated target schema, create the account and grant only the operations the pipeline needs:
+
+```sql
+CREATE USER tapstate IDENTIFIED BY "replace-with-a-secret";
+GRANT CREATE SESSION, CREATE TABLE TO tapstate;
+ALTER USER tapstate QUOTA UNLIMITED ON target_tablespace;
+```
+
+If TapState writes into another owner's schema, grant object-level `SELECT`, `INSERT`, `UPDATE`, and `DELETE` privileges on the destination tables. Add `CREATE ANY TABLE`, index privileges, or `ALTER` only when the pipeline is explicitly allowed to create or evolve objects; avoid `UNLIMITED TABLESPACE` when a bounded quota is sufficient.
 
 ## Create a connection
 
@@ -78,19 +140,47 @@ Create the Oracle connection through the connection flow supplied by your TapSta
 
 ## Validate the configuration
 
-The bundled offline CLI cannot validate Oracle field names, modes, credentials, logging, supplemental logging, or LogMiner access. Use your deployment's connection validation and a staging run to confirm them.
+The bundled offline CLI can validate the resource envelope, but not Oracle field names, credentials, service resolution, logging, supplemental logging, or LogMiner access.
+
+Before production, use a staging schema to verify:
+
+1. table discovery and a small snapshot;
+2. an insert, update, and delete through CDC;
+3. a log switch while the task is running;
+4. restart from the saved redo position;
+5. representative `NUMBER`, timestamp, LOB, and empty-string values.
 
 ## Limitations
 
-- LogMiner and raw-log capture have different type, architecture, and operational constraints.
-- Oracle empty strings become `NULL`; heterogeneous targets and constraints require staging tests.
-- Connection encryption settings depend on the Oracle connector contract supplied by your deployment; this page does not assume a field name or TLS behavior.
+- LogMiner and direct raw-log capture have different type, architecture, and operational constraints. This guide documents the LogMiner preparation that can be applied without assuming a TapState-only raw-log component.
+- With LogMiner, table and column identifiers longer than 30 characters can be affected by Oracle LogMiner limits in some versions and configurations.
+- `INTERVAL` and `XMLTYPE` are not supported by the LogMiner baseline. The direct raw-log baseline does not support `TIMESTAMP WITH LOCAL TIME ZONE`.
+- Oracle empty strings become `NULL`. A source `NOT NULL` string column can therefore fail when written to Oracle if the source contains empty strings.
+- DDL and a large burst of DML on the same table can make dictionary reconstruction unreliable. Stage schema changes separately from heavy write windows when possible.
+- RAC LogMiner capture can produce duplicate events during recovery. Downstream writes need stable keys and idempotent handling, especially for tables without primary keys.
+- Archive-log exhaustion stops recoverable CDC. Monitor the recovery area and long-running or uncommitted transactions.
+- Partition-table DML can be captured, but adding partitions is not part of the documented DDL baseline.
+- The offline catalog does not expose TLS fields. Configure Oracle Net encryption according to your environment, then use only the field names supplied by your TapState deployment.
 
 ## Reference
 
+### Compatibility
+
 | Signal | Supported baseline |
 |---|---|
-| Source modes | Snapshot and CDC |
-| Target | Data write and DDL apply |
-| DDL | Capture and apply |
 | Versions | Oracle 9i, 10g, 11g, 12c, 18c, 19c+ |
+| Architectures | Single instance and RAC; primary nodes in Data Guard, Active Data Guard, and ASM deployments |
+| Source modes | Snapshot and CDC |
+| Target | Insert, update, and delete; object creation and DDL apply depend on granted privileges |
+| DDL | Add, rename, alter, and drop columns |
+
+### Data compatibility
+
+| Family | Supported baseline |
+|---|---|
+| Text | `VARCHAR2`, `CHAR`, `NVARCHAR2`, `NCHAR`, `CLOB`, `NCLOB` |
+| Numeric | `NUMBER`, `INTEGER`, `FLOAT`, `BINARY_FLOAT`, `BINARY_DOUBLE` |
+| Date and time | `DATE`, `TIMESTAMP`, `TIMESTAMP WITH TIME ZONE`, `TIMESTAMP WITH LOCAL TIME ZONE`, `INTERVAL` |
+| Other | `BLOB`, `XMLTYPE` |
+
+Oracle targets do not support `TIMESTAMP WITH LOCAL TIME ZONE` or `INTERVAL` in the reused connector baseline. Method-specific source exclusions are listed in [Limitations](#limitations).

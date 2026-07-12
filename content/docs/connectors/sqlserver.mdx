@@ -46,9 +46,23 @@ Use SQL Server with TapState for snapshots, CDC, DDL capture, target writes, and
 
 Use **Snapshot** to copy the rows that exist now.
 
-1. Create a dedicated SQL Server login and database user.
-2. Grant `CONNECT` and read access to the selected schemas or tables.
-3. Ensure the future TapState runtime can reach the SQL Server listener and database.
+Create a login and map it to a user in the source database:
+
+```sql
+CREATE LOGIN tapstate
+  WITH PASSWORD = 'replace-with-a-secret',
+       DEFAULT_DATABASE = database_name;
+GO
+
+USE database_name;
+GO
+CREATE USER tapstate FOR LOGIN tapstate WITH DEFAULT_SCHEMA = dbo;
+GRANT CONNECT TO tapstate;
+GRANT SELECT ON SCHEMA::dbo TO tapstate;
+GO
+```
+
+Use object-level `SELECT` grants instead of a schema grant when the account should read only a subset of tables.
 
 Snapshot does not require SQL Server Agent or database/table CDC.
 
@@ -57,18 +71,74 @@ Snapshot does not require SQL Server Agent or database/table CDC.
 
 Use **Snapshot + CDC** to copy existing rows and then follow SQL Server CDC changes.
 
-1. Grant the Snapshot permissions plus access to the CDC metadata and change tables required by the reused connector.
-2. Ensure SQL Server Agent is running.
-3. Enable CDC on the database and every participating table.
-4. Set CDC cleanup retention longer than the longest expected interruption.
-5. Prepare DDL-capture permissions only when schema changes must be collected.
+Start with the Snapshot account and grant read access to the CDC schema:
+
+```sql
+USE database_name;
+GRANT SELECT ON SCHEMA::cdc TO tapstate;
+GO
+```
+
+Make sure SQL Server Agent is running. On Linux, install and enable the Agent service for the SQL Server version in use.
+
+Enable CDC on the database, then on each selected table:
+
+```sql
+USE database_name;
+GO
+EXEC sys.sp_cdc_enable_db;
+GO
+
+EXEC sys.sp_cdc_enable_table
+  @source_schema = N'dbo',
+  @source_name = N'orders',
+  @capture_instance = NULL,
+  @role_name = N'cdc_reader',
+  @supports_net_changes = 1;
+GO
+```
+
+For a table without a primary key, set `@supports_net_changes = 0`. If `@role_name` is not `NULL`, add the TapState user to that database role.
+
+Confirm that CDC is enabled and discover the generated capture instance:
+
+```sql
+SELECT name, is_cdc_enabled
+FROM sys.databases
+WHERE name = N'database_name';
+
+EXEC sys.sp_cdc_help_change_data_capture
+  @source_schema = N'dbo',
+  @source_name = N'orders';
+```
+
+Set cleanup retention longer than the longest planned outage. The value is in minutes; this example keeps two days:
+
+```sql
+EXEC sys.sp_cdc_change_job
+  @job_type = N'cleanup',
+  @retention = 2880;
+```
+
+Check the transaction log growth limit and available disk space before enabling a large number of tables. SQL Server CDC polling cost grows with the number of capture instances.
 
 </SourceModeTab>
 </SourceModeTabs>
 
 ### Target
 
-Prepare a dedicated writer with database access and the required `INSERT`, `UPDATE`, and `DELETE` privileges. Add object-creation and alteration privileges only when TapState is allowed to create or evolve target tables.
+Create a login and database user as shown for the source, then grant target privileges:
+
+```sql
+USE database_name;
+GO
+GRANT CREATE TABLE TO tapstate;
+GRANT SELECT, INSERT, UPDATE, DELETE, ALTER
+  ON SCHEMA::dbo TO tapstate;
+GO
+```
+
+Remove `CREATE TABLE` or `ALTER` when TapState must write only to pre-created tables. Grant access to other schemas explicitly.
 
 ## Create a connection
 
@@ -76,19 +146,46 @@ Create the SQL Server connection through the connection flow supplied by your Ta
 
 ## Validate the configuration
 
-The bundled offline CLI cannot validate SQL Server field names, modes, SQL Server Agent, database/table CDC, credentials, or retention. Use your deployment's connection validation and a staging run to confirm them.
+The bundled offline CLI can validate the resource envelope, but not SQL Server field names, credentials, listener reachability, SQL Server Agent, CDC enablement, or retention.
+
+Before production, verify in a staging table that:
+
+1. the account can discover and snapshot the table;
+2. the capture instance produces insert, update, and delete rows;
+3. the cleanup window exceeds the tested recovery time;
+4. the target account can perform the intended DML and only the intended DDL.
 
 ## Limitations
 
-- CDC must be enabled and retained for every participating table; expired change-table positions require a new snapshot.
-- SQL Server edition and deployment constraints must be verified against the eventual TapState runtime.
-- Connection encryption settings depend on the SQL Server connector contract supplied by your deployment; this page does not assume a field name or TLS behavior.
+- CDC must be enabled and retained for every participating table. If cleanup removes the saved position, recovery requires a new snapshot.
+- Tables with CDC enabled cannot use `TRUNCATE TABLE`, and renaming columns with `sp_rename` is not supported by the reused connector baseline.
+- After a schema change, SQL Server does not automatically rebuild the capture instance. Disable and re-enable table CDC during a controlled window before resuming dependent DML.
+- DDL and DML close together can create a gap because some implicitly committed DDL is not represented in `cdc.ddl_history`.
+- Large values are limited by the SQL Server CDC capture configuration; the upstream baseline calls out a 64 KB default and recommends column-level CDC when large fields are involved.
+- A task that polls hundreds of capture tables can accumulate latency and load. Split very large table sets and measure the polling interval in staging.
+- `timestamp`/`rowversion` is not supported when SQL Server is the target.
+- SQL Server 2005 does not provide native CDC and is outside this connector baseline.
+- The offline catalog does not expose TLS fields. Configure forced encryption on SQL Server when required, then use only the fields supplied by your TapState deployment.
 
 ## Reference
 
+### Compatibility
+
 | Signal | Supported baseline |
 |---|---|
-| Source modes | Snapshot and CDC |
-| Target | Data write and DDL apply |
-| DDL | Capture and apply |
 | Versions | SQL Server 2008, 2008 R2, 2012, 2014, 2016, 2017, 2019, 2022 |
+| Architecture | Single node |
+| Source modes | Snapshot and CDC |
+| Target | Insert, update, delete, and optional table creation |
+| DDL | Add, rename, alter, and drop columns, subject to CDC limitations |
+
+### Data compatibility
+
+| Family | Supported baseline |
+|---|---|
+| Text | `char`, `varchar`, `nchar`, `nvarchar`, `text`, `ntext`, `varchar(max)`, `nvarchar(max)` |
+| Integer | `tinyint`, `smallint`, `int`, `bigint` |
+| Decimal | `decimal`, `numeric`, `money`, `real`, `float` |
+| Date and time | `date`, `time`, `datetime`, `datetime2`, `smalldatetime`, `datetimeoffset` |
+| Binary | `binary`, `varbinary`, `varbinary(max)`, `timestamp`/`rowversion` |
+| Other | `uniqueidentifier`, `bit`, `image`, `xml`, `geography` |
