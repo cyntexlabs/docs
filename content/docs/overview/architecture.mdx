@@ -1,15 +1,17 @@
 ---
 title: Architecture Overview
 description: TapState's four-layer runtime architecture — Engine, Store, Serve, and Manager
-sidebar:
-  order: 2
 ---
+
+import { Aside } from '@/components/mdx';
 
 ![TapState Runtime Architecture](/assets/architecture-diagram.svg)
 
-This page describes the target runtime architecture. The current open-source repository implements the shared resource model, connector catalog, schema, and offline CLI; Manager, Engine, Store, and Serve runtime behavior remains phased work unless a section explicitly identifies current implementation evidence.
-
 TapState is organized into four cooperating layers: **Engine** (data movement), **Store** (persistence), **Serve** (data access), and **Manager** (control plane). Each layer has a clear responsibility boundary and communicates through well-defined interfaces.
+
+<Aside type="note" title="Target architecture">
+  This page describes the full runtime being built along the [Roadmap](/docs/overview/roadmap). The current release ships the shared resource model, connector catalog, schema, and offline CLI — see [Release Status](/docs/overview/release-status).
+</Aside>
 
 ---
 
@@ -35,7 +37,7 @@ The Engine is the data-movement core. All data captured from source systems flow
 
 ### CDC Capture
 
-The target runtime captures database transaction logs such as MySQL binlog, PostgreSQL WAL, and MongoDB Oplog when the selected connector exposes CDC. Latency and source impact depend on the connector, workload, and deployment and require runtime measurement.
+The runtime captures database transaction logs such as MySQL binlog, PostgreSQL WAL, and MongoDB Oplog when the selected connector exposes CDC. Latency and source impact depend on the connector, workload, and deployment; TapState publishes measured numbers rather than blanket claims.
 
 Supported capture modes:
 
@@ -49,12 +51,12 @@ Supported capture modes:
 
 ### Change Log Buffer
 
-The central in-memory buffer for all captured change events. Built on **Hazelcast Ringbuffer**, it:
+The central in-memory buffer for all captured change events. Built on a **Hazelcast Ringbuffer**, it:
 
 - Decouples capture throughput from downstream processing speed
 - Fans out to multiple consumers (Transform, Materialize) without re-reading the source
-- Persists the change log to **Change Log Store** for durability and replay
-- Syncs a replica to **Source Replica Store** for join lookups
+- Persists the change log to the **Change Log Store** for durability and replay
+- Syncs a replica to the **Source Replica Store** for join lookups
 
 The buffer is the single coordination point that allows Transform and Materialize to operate independently at their own pace.
 
@@ -62,7 +64,7 @@ The buffer is the single coordination point that allows Transform and Materializ
 
 An in-memory cache populated from the **Source Replica Store**. When a pipeline needs to join or enrich a change event with data from another table (e.g., enrich an `orders` event with the matching `customer` record), the engine performs a **join lookup** against this cache rather than querying the source database.
 
-This design is critical for CDC performance: source databases are never queried during steady-state processing.
+This design is central to CDC performance: source databases are never queried during steady-state processing.
 
 ### Transform
 
@@ -107,7 +109,7 @@ The output of the Materialize stage — pre-joined, pre-filtered, always-current
 
 ### Queryable Backup Store
 
-A unified, queryable backup spanning all three stores. Backed by **MongoDB** (single source of truth for offsets, task definitions, and metadata). In the GA phase, **Paimon** integration adds an external incremental data lake layer for finance-grade historical audit and analytics.
+A unified, queryable backup spanning all three stores, backed by **MongoDB** (the single source of truth for offsets, task definitions, and metadata). In the GA phase, **Paimon** integration adds an external incremental data lake layer for finance-grade historical audit and analytics.
 
 ---
 
@@ -141,34 +143,6 @@ The Query Context Server is backed directly by the **Materialized View Store** �
 
 ---
 
-## Code-Level Module Layout
+## Going deeper
 
-At the source code level, TapState uses a **ports-and-adapters** architecture with strictly unidirectional dependencies across six rings:
-
-```
-core          ← Domain model, DSL pipeline, lifecycle contracts (zero frameworks)
-  └─ spi      ← Extension point interfaces (PDK / connector SPI)
-       └─ adapters   ← Connector implementations, DuckDB adapter
-            └─ runtime      ← Task execution engine (Hz Ringbuffer, scheduler)
-                 └─ control  ← CRUD, lifecycle management, status reads
-                      └─ surface   ← CLI / REST API / MCP server / Web UI
-```
-
-Enforced by **ArchUnit + Maven enforcer** on every CI run — no accidental coupling allowed.
-
----
-
-## Technology Stack
-
-| Component | Technology |
-|---|---|
-| Language | Java 21 |
-| Native binary | GraalVM native-image (Oracle GraalVM 21.0.11) |
-| Build | Maven mono-repo + enforcer + `${revision}` flatten |
-| In-memory buffer | Hazelcast 5.7.0 (custom fork, pure Apache 2.0) |
-| Source of truth DB | MongoDB (replica set) |
-| DSL expressions | CEL (dev.cel 0.10.1) |
-| JavaScript runtime | GraalVM JS (in-process, no subprocess) |
-| CLI framework | picocli 4.7.7 + JLine 3.26.3 |
-| External data lake | Apache Paimon (GA phase) |
-| Testing | JUnit 5 + AssertJ + ArchUnit |
+For the code-level module layout, technology stack, and high-availability design, see [Engineering Internals](/docs/reference/internals). For how data is tiered across memory, persistence, and the data lake, see the [Storage Model](/docs/concepts/storage).

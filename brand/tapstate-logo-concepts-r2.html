@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tapstate — Logo Concepts R2</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0e13; --panel:#10161f; --line:#1d2733; --mint:#2dd4bf; --text:#e8eef4; --muted:#8494a7; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:Inter,system-ui,sans-serif; padding:56px 48px 80px; }
+  h1 { font-family:'Space Grotesk'; font-size:28px; letter-spacing:-.02em; }
+  .sub { color:var(--muted); margin-top:6px; font-size:14px; max-width:640px; line-height:1.5; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(460px,1fr)); gap:24px; margin-top:40px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:24px; }
+  .card h2 { font-family:'Space Grotesk'; font-size:17px; letter-spacing:.01em; }
+  .card h2 span { color:var(--mint); margin-right:8px; }
+  .card p { color:var(--muted); font-size:13px; line-height:1.55; margin-top:6px; min-height:56px; }
+  .row { display:flex; gap:14px; margin-top:16px; }
+  .tile { border-radius:10px; display:flex; align-items:center; justify-content:center; }
+  .dark  { background:var(--bg); border:1px solid var(--line); --dim:#33415e; --ink:#e8eef4; }
+  .light { background:#f4f7fa; --dim:#b9c5d4; --ink:#101820; }
+  .hero { flex:0 0 150px; height:150px; }
+  .stack { flex:1; display:flex; flex-direction:column; gap:14px; }
+  .lockup { height:76px; gap:14px; padding:0 22px; justify-content:flex-start; }
+  .wordmark { font-family:'Space Grotesk'; font-weight:600; font-size:26px; letter-spacing:-.03em; color:var(--ink); }
+  .wordmark b { font-weight:600; color:var(--mint); }
+  .light .wordmark b { color:#0F766E; } /* mint is never text on light — use accent-ink */
+  .tests { height:60px; gap:18px; }
+  .tests small { color:var(--muted); font-size:10px; margin-left:-10px; }
+  footer { margin-top:48px; color:var(--muted); font-size:13px; line-height:1.6; max-width:640px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="m-a" viewBox="0 0 64 64">
+      <polygon points="32,28 56,40 32,52 8,40" fill="none" stroke="var(--dim)" stroke-width="3" stroke-linejoin="round"/>
+      <polygon points="32,18 56,30 32,42 8,30" fill="var(--bgfill,#0a0e13)" stroke="var(--dim)" stroke-width="3" stroke-linejoin="round"/>
+      <polygon points="32,8 56,20 32,32 8,20" fill="rgba(45,212,191,.14)" stroke="var(--mint,#2dd4bf)" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="32" cy="20" r="7" fill="#2dd4bf" opacity=".25"/>
+      <circle cx="32" cy="20" r="3.6" fill="#2dd4bf"/>
+    </symbol>
+    <symbol id="m-b" viewBox="0 0 64 64">
+      <rect x="10" y="10" width="44" height="11" rx="5.5" fill="#2dd4bf"/>
+      <rect x="26.5" y="26" width="11" height="8" rx="4" fill="#2dd4bf" opacity=".75"/>
+      <rect x="26.5" y="38" width="11" height="8" rx="4" fill="#2dd4bf" opacity=".45"/>
+      <rect x="26.5" y="50" width="11" height="8" rx="4" fill="#2dd4bf" opacity=".22"/>
+    </symbol>
+    <symbol id="m-c" viewBox="0 0 64 64">
+      <rect x="8"  y="13"   width="34" height="9" rx="4.5" fill="var(--dim)"/>
+      <rect x="22" y="27.5" width="34" height="9" rx="4.5" fill="#2dd4bf"/>
+      <rect x="8"  y="42"   width="34" height="9" rx="4.5" fill="var(--dim)"/>
+    </symbol>
+    <symbol id="m-d" viewBox="0 0 64 64">
+      <polygon points="32,36 56,47 32,58 8,47" fill="rgba(45,212,191,.14)" stroke="#2dd4bf" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M17,30 A17,17 0 0 1 47,30" fill="none" stroke="var(--dim)" stroke-width="3.4" stroke-linecap="round"/>
+      <path d="M24,25 A10.5,10.5 0 0 1 40,25" fill="none" stroke="#2dd4bf" stroke-width="3.4" stroke-linecap="round" opacity=".65"/>
+      <circle cx="32" cy="30" r="4.2" fill="#2dd4bf"/>
+    </symbol>
+    <symbol id="m-e" viewBox="0 0 64 64">
+      <g stroke="var(--dim)" stroke-width="4.5" stroke-linecap="round">
+        <path d="M12,24 H25 M39,24 H52"/>
+        <path d="M12,36 H25 M39,36 H52"/>
+        <path d="M12,48 H25 M39,48 H52"/>
+      </g>
+      <path d="M32,14 V47" stroke="#2dd4bf" stroke-width="4.5" stroke-linecap="round"/>
+      <circle cx="32" cy="11" r="5.5" fill="#2dd4bf"/>
+      <circle cx="32" cy="53" r="4" fill="none" stroke="#2dd4bf" stroke-width="3"/>
+    </symbol>
+  </defs>
+</svg>
+
+<h1>Tapstate — logo concepts, round 2</h1>
+<p class="sub">Five marks on the layer/substrate metaphor. Mint #2dd4bf on dark #0a0e13, matching deck v7. Each shown as hero mark, lockup with lowercase wordmark (terminal-test spirit), 16–32&nbsp;px legibility test, and light-background variant.</p>
+
+<div class="grid">
+
+  <div class="card">
+    <h2><span>A</span>Live Layer</h2>
+    <p>Isometric stack — the substrate agents run on — with a live dot glowing on the top plane: the layer, plus the point of current truth. Direct continuity with the deck's live-dot Slide 1.</p>
+    <div class="row">
+      <div class="tile dark hero"><svg width="110" height="110"><use href="#m-a"/></svg></div>
+      <div class="stack">
+        <div class="tile dark lockup"><svg width="44" height="44"><use href="#m-a"/></svg><span class="wordmark">tapstate</span></div>
+        <div class="row" style="margin-top:0">
+          <div class="tile dark tests" style="flex:1"><svg width="32" height="32"><use href="#m-a"/></svg><svg width="24" height="24"><use href="#m-a"/></svg><svg width="16" height="16"><use href="#m-a"/></svg><small>32·24·16</small></div>
+          <div class="tile light tests" style="flex:1; --bgfill:#f4f7fa"><svg width="44" height="44"><use href="#m-a"/></svg><span class="wordmark" style="font-size:18px">tapstate</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span>B</span>Strata T</h2>
+    <p>A "T" built from layers: the wide mint bar is the serving layer on top; the stem descends into depth, fading — the tap reaching down to the source. Monogram doubles as app icon with zero extra work.</p>
+    <div class="row">
+      <div class="tile dark hero"><svg width="110" height="110"><use href="#m-b"/></svg></div>
+      <div class="stack">
+        <div class="tile dark lockup"><svg width="44" height="44"><use href="#m-b"/></svg><span class="wordmark">tapstate</span></div>
+        <div class="row" style="margin-top:0">
+          <div class="tile dark tests" style="flex:1"><svg width="32" height="32"><use href="#m-b"/></svg><svg width="24" height="24"><use href="#m-b"/></svg><svg width="16" height="16"><use href="#m-b"/></svg><small>32·24·16</small></div>
+          <div class="tile light tests" style="flex:1"><svg width="44" height="44"><use href="#m-b"/></svg><span class="wordmark" style="font-size:18px">tapstate</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span>C</span>Live Slice</h2>
+    <p>Three strata; the mint one is pulled out of the stack — the live layer being served to agents while the substrate stays put. Flattest and most ownable of the set; bulletproof at 16&nbsp;px.</p>
+    <div class="row">
+      <div class="tile dark hero"><svg width="110" height="110"><use href="#m-c"/></svg></div>
+      <div class="stack">
+        <div class="tile dark lockup"><svg width="44" height="44"><use href="#m-c"/></svg><span class="wordmark">tap<b>state</b></span></div>
+        <div class="row" style="margin-top:0">
+          <div class="tile dark tests" style="flex:1"><svg width="32" height="32"><use href="#m-c"/></svg><svg width="24" height="24"><use href="#m-c"/></svg><svg width="16" height="16"><use href="#m-c"/></svg><small>32·24·16</small></div>
+          <div class="tile light tests" style="flex:1"><svg width="44" height="44"><use href="#m-c"/></svg><span class="wordmark" style="font-size:18px">tap<b>state</b></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span>D</span>Pulse Plane</h2>
+    <p>One plane — the layer — broadcasting live state upward as a rising signal. Reads "always-on freshness" fastest; the wifi-adjacent arcs make it instantly legible to non-technical audiences too.</p>
+    <div class="row">
+      <div class="tile dark hero"><svg width="110" height="110"><use href="#m-d"/></svg></div>
+      <div class="stack">
+        <div class="tile dark lockup"><svg width="44" height="44"><use href="#m-d"/></svg><span class="wordmark">tapstate</span></div>
+        <div class="row" style="margin-top:0">
+          <div class="tile dark tests" style="flex:1"><svg width="32" height="32"><use href="#m-d"/></svg><svg width="24" height="24"><use href="#m-d"/></svg><svg width="16" height="16"><use href="#m-d"/></svg><small>32·24·16</small></div>
+          <div class="tile light tests" style="flex:1"><svg width="44" height="44"><use href="#m-d"/></svg><span class="wordmark" style="font-size:18px">tapstate</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span>E</span>Tapline</h2>
+    <p>The mint line passes clean through three strata: live state (solid dot) on top, the tapped source (open ring) below — "under the wall" drawn as geometry. Most narrative of the five; pairs perfectly with the Slide 3 visual.</p>
+    <div class="row">
+      <div class="tile dark hero"><svg width="110" height="110"><use href="#m-e"/></svg></div>
+      <div class="stack">
+        <div class="tile dark lockup"><svg width="44" height="44"><use href="#m-e"/></svg><span class="wordmark">tapstate</span></div>
+        <div class="row" style="margin-top:0">
+          <div class="tile dark tests" style="flex:1"><svg width="32" height="32"><use href="#m-e"/></svg><svg width="24" height="24"><use href="#m-e"/></svg><svg width="16" height="16"><use href="#m-e"/></svg><small>32·24·16</small></div>
+          <div class="tile light tests" style="flex:1"><svg width="44" height="44"><use href="#m-e"/></svg><span class="wordmark" style="font-size:18px">tapstate</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Wordmark set in Space Grotesk 600, lowercase, −3% tracking. Concept C shows the optional two-tone treatment (tap<span style="color:var(--mint)">state</span>) — applicable to any concept. Pick a direction (or a hybrid) and round 2 delivers: refined geometry, outlined-type SVGs, PNG exports at all sizes, favicon, and a deck-cover drop-in.
+</footer>
+
+</body>
+</html>

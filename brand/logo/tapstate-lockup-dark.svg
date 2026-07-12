@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 64" width="232" height="64">
+  <!-- tapstate lockup — dark surfaces. Type renders via webfont when viewed as a document;
+       final production version should use outlined paths (requires Space Grotesk license/export). -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&amp;display=swap');
+    text { font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif; font-weight:600; font-size:30px; letter-spacing:-0.9px; }
+  </style>
+  <rect x="8"  y="13"   width="34" height="9" rx="4.5" fill="#33415E"/>
+  <rect x="22" y="27.5" width="34" height="9" rx="4.5" fill="#2DD4BF"/>
+  <rect x="8"  y="42"   width="34" height="9" rx="4.5" fill="#33415E"/>
+  <text x="70" y="43" fill="#E8EEF4">tap<tspan fill="#2DD4BF">state</tspan></text>
+</svg>

@@ -1,0 +1,46 @@
+---
+title: Release Status
+description: The single source of truth for what TapState ships today versus what is in progress
+---
+
+import { Aside } from '@/components/mdx';
+
+This page is the single source of truth for the gap between TapState's target architecture and the current open-source release. Documentation pages describe the full product; when a page covers behavior that is not yet shipped, it carries a short callout pointing here.
+
+## Shipped today: the offline authoring layer
+
+The current release is a native CLI (`cyntex`) with a complete offline loop for the declarative resources the runtime will execute:
+
+| Capability | Status |
+|---|---|
+| Scaffold resources (`new`, interactive and non-interactive) | ✅ Shipped |
+| Validate structure, references, connector config, mode combinations (`validate`) | ✅ Shipped |
+| Inspect workspaces and resources (`ls`, `desc`) | ✅ Shipped |
+| Field-level grammar documentation (`explain`) | ✅ Shipped |
+| Embedded connector catalog with capability checks | ✅ Shipped |
+| JSON Schema for editor completion and diagnostics | ✅ Shipped |
+| Coded diagnostics with machine-readable JSON/YAML output | ✅ Shipped |
+| AI-readable docs (`llms.txt`, page-level Markdown) | ✅ Shipped |
+
+## Not yet shipped: the runtime
+
+| Capability | Status |
+|---|---|
+| Live database connections and credential tests | 🔄 In progress — see [Roadmap](/docs/overview/roadmap) |
+| Pipeline execution (snapshot, CDC, transforms) | 🔄 In progress (POC exit criteria) |
+| Materialized views and the serving layer | ⏳ Planned (Beta/GA) |
+| MCP control plane, live status, lag metrics, logs | ⏳ Planned (Alpha: read-only; Beta: full) |
+| Web console | ⏳ Planned (Beta) |
+| REST/GraphQL API server, data lake integration, HA | ⏳ Planned (GA) |
+
+CLI commands that require a server currently exit with code `3` and say so.
+
+## How to read claims in these docs
+
+- **Authoring behavior** (scaffolding, validation, diagnostics, schema) is present tense and verified against the shipped CLI.
+- **Runtime behavior** (capture, transform, serve, control plane) describes the target architecture being built along the [Roadmap](/docs/overview/roadmap).
+- **Performance, latency, exactly-once delivery, source impact, and uptime** figures are published only with runtime measurements behind them. If a number isn't here or on a measurement page, treat it as not yet claimed.
+
+## Installation note
+
+A hosted installer at `install.tapstate.dev` is planned. Until it is published, build the CLI from source as shown in the [Quickstart](/docs/overview/quickstart).

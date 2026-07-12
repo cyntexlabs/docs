@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tapstate — Color System Proposal (fixes for R1 caveats)</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0e13; --panel:#10161f; --line:#1d2733; --text:#e8eef4; --muted:#8494a7;
+    --mint-old:#2dd4bf;      /* Tailwind teal-400 — retired */
+    --mint:#1ED9D2;          /* accent / dark surfaces, hue 178 */
+    --teal-ink:#0B7F79;      /* accent / light surfaces, AA on white */
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:Inter,system-ui,sans-serif; padding:56px 48px 80px; }
+  h1 { font-family:'Space Grotesk'; font-size:28px; letter-spacing:-.02em; }
+  h2 { font-family:'Space Grotesk'; font-size:17px; margin-bottom:4px; }
+  h2 span { color:var(--mint); margin-right:8px; }
+  .sub, p.note { color:var(--muted); margin-top:6px; font-size:14px; max-width:680px; line-height:1.5; }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:24px; margin-top:24px; }
+  .row { display:flex; gap:14px; margin-top:16px; flex-wrap:wrap; align-items:stretch; }
+  .sw { border-radius:10px; padding:14px 16px; min-width:160px; }
+  .sw b { display:block; font-family:'Space Grotesk'; font-size:13px; }
+  .sw small { font-size:11px; opacity:.75; }
+  .dk { background:var(--bg); border:1px solid var(--line); }
+  .lt { background:#ffffff; color:#101820; }
+  table { border-collapse:collapse; margin-top:14px; font-size:13px; }
+  td,th { border:1px solid var(--line); padding:8px 12px; text-align:left; }
+  th { color:var(--muted); font-weight:500; }
+  code { font-family:ui-monospace,Menlo,monospace; font-size:12px; }
+  .chip { display:inline-block; width:14px; height:14px; border-radius:4px; vertical-align:-2px; margin-right:8px; border:1px solid rgba(255,255,255,.15); }
+  .lineup { display:flex; gap:26px; align-items:center; padding:18px 22px; }
+  .lineup .m { display:flex; flex-direction:column; align-items:center; gap:8px; font-size:10px; color:var(--muted); }
+  .wordmark { font-family:'Space Grotesk'; font-weight:600; font-size:24px; letter-spacing:-.03em; }
+  .wordmark b { font-weight:600; color:var(--mint); }
+  a.demo { color:var(--teal-ink); font-weight:500; }
+  .lt p { font-size:13px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<h1>tapstate — color system proposal</h1>
+<p class="sub">Fixes for the three R1 caveats: a custom hue (not Tailwind teal-400), a light-mode accent that passes AA, and a lineup test against the neighborhood. Contrast ratios computed, not eyeballed.</p>
+
+<section>
+  <h2><span>1</span>Hue shift: retire teal-400, own 178°</h2>
+  <p class="note">6° cyan-ward from the Tailwind default, 25° from Supabase green, 10° short of Tailwind cyan-400. Contrast on the dark bg improves.</p>
+  <div class="row">
+    <div class="sw dk"><span class="chip" style="background:#2dd4bf"></span><b>OLD #2DD4BF</b><small>Tailwind teal-400 · hue 172° · 10.4:1</small></div>
+    <div class="sw dk"><span class="chip" style="background:#1ED9D2"></span><b>NEW #1ED9D2</b><small>custom · hue 178° · 11.0:1 on #0A0E13</small></div>
+    <div class="sw dk" style="display:flex;align-items:center"><span class="wordmark">tap<b>state</b></span></div>
+  </div>
+</section>
+
+<section>
+  <h2><span>2</span>Two-token accent: dark and light surfaces</h2>
+  <p class="note">Rule: mint is never text on light backgrounds — marks, fills, and strokes only. The dark teal carries links and accents in light mode.</p>
+  <table>
+    <tr><th>Token</th><th>Value</th><th>Use</th><th>Contrast</th></tr>
+    <tr><td><code>--ts-accent</code></td><td><span class="chip" style="background:#1ED9D2"></span><code>#1ED9D2</code></td><td>Dark surfaces: links, highlights, mark</td><td>11.0:1 on <code>#0A0E13</code> (AAA)</td></tr>
+    <tr><td><code>--ts-accent-ink</code></td><td><span class="chip" style="background:#0B7F79"></span><code>#0B7F79</code></td><td>Light surfaces: links, accents, small text</td><td>4.85:1 on white (AA)</td></tr>
+    <tr><td><code>--ts-bg</code></td><td><span class="chip" style="background:#0a0e13"></span><code>#0A0E13</code></td><td>Dark background (unchanged, matches deck v7)</td><td>—</td></tr>
+    <tr><td><code>--ts-panel</code> / <code>--ts-line</code></td><td><code>#10161F</code> / <code>#1D2733</code></td><td>Dark cards / borders (unchanged)</td><td>—</td></tr>
+  </table>
+  <div class="row">
+    <div class="sw lt" style="flex:1;min-width:300px">
+      <p><b style="font-family:'Space Grotesk'">Light-mode demo.</b> Body text in near-black, with an <a class="demo" href="#">accent link in #0B7F79</a> that passes AA at normal text size. The mark itself keeps the mint:
+      <svg width="20" height="20" viewBox="0 0 64 64" style="vertical-align:-4px">
+        <rect x="8" y="13" width="34" height="9" rx="4.5" fill="#b9c5d4"/>
+        <rect x="22" y="27.5" width="34" height="9" rx="4.5" fill="#1ED9D2"/>
+        <rect x="8" y="42" width="34" height="9" rx="4.5" fill="#b9c5d4"/>
+      </svg>
+      — graphics may stay bright; text may not. On tinted backgrounds (e.g. <code>#F4F7FA</code>) the ratio drops to 4.5:1, so keep light-mode content surfaces white or darken the accent one step.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span>3</span>The lineup test</h2>
+  <p class="note">Neighborhood accents at a glance. The hue shift buys separation from Supabase; separation from Netlify-style teals must come from geometry (concepts C/E) and the two-tone wordmark, not from color.</p>
+  <div class="row">
+    <div class="dk lineup" style="flex:1">
+      <div class="m"><span class="chip" style="width:26px;height:26px;background:#3ECF8E"></span>Supabase 153°</div>
+      <div class="m"><span class="chip" style="width:26px;height:26px;background:#00C7B7"></span>Netlify ~176°</div>
+      <div class="m"><span class="chip" style="width:26px;height:26px;background:#2dd4bf"></span>teal-400 172°</div>
+      <div class="m"><span class="chip" style="width:26px;height:26px;background:#1ED9D2;outline:2px solid #e8eef4;outline-offset:3px"></span><b style="color:#e8eef4">tapstate 178°</b></div>
+      <div class="m"><span class="chip" style="width:26px;height:26px;background:#22d3ee"></span>cyan-400 188°</div>
+      <div class="m">
+        <svg width="26" height="26" viewBox="0 0 64 64">
+          <rect x="8" y="13" width="34" height="9" rx="4.5" fill="#33415e"/>
+          <rect x="22" y="27.5" width="34" height="9" rx="4.5" fill="#1ED9D2"/>
+          <rect x="8" y="42" width="34" height="9" rx="4.5" fill="#33415e"/>
+        </svg>
+        mark carries identity
+      </div>
+    </div>
+  </div>
+  <p class="note" style="margin-top:14px">Before locking: place the chosen mark at 24&nbsp;px in a row beside Supabase, Netlify, Materialize, Estuary, and Redpanda logos. If it is identifiable at a glance, ship it.</p>
+</section>
+
+<footer style="margin-top:32px;color:var(--muted);font-size:13px;line-height:1.6;max-width:680px">
+  Recommended pairing: concept <b style="color:#e8eef4">C (Live Slice)</b> or <b style="color:#e8eef4">E (Tapline)</b> geometry + two-tone wordmark + this token pair. Next step on approval: apply <code>--ts-accent</code>/<code>--ts-accent-ink</code> to the docs site theme and regenerate the R1 concepts at hue 178° for a final side-by-side.
+</footer>
+
+</body>
+</html>
