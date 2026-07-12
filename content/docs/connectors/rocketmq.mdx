@@ -1,0 +1,78 @@
+---
+title: Apache RocketMQ
+description: Configure Apache RocketMQ as a TapState stream source or target
+sidebar:
+  order: 33
+ai:
+  kind: connector
+  id: rocketmq
+  category: streaming-messaging
+  maturity: preview
+  useAs: [source, target]
+  modes: [stream]
+  aliases: [apache rocketmq, rocketmq, rocketmq stream, rocketmq topic, rocketmq source, rocketmq target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Apache RocketMQ to read or write topic messages through the catalog-declared stream connector.
+
+<ConnectorProfile
+  category="Streaming & messaging"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Stream read, Stream write"
+  compatibility="RocketMQ 4.9.x+ upstream baseline"
+/>
+
+<ConnectorCapabilities source="Stream read" target="Stream write" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog validates Stream mode and the documented fields. It does not reach a NameServer, test TLS, authenticate, discover topics, or consume/publish messages.
+</Aside>
+
+## Before you begin
+
+Create a least-privilege RocketMQ account and confirm which topics the runtime may access. Confirm the NameServer endpoint, port, and any TLS policy with the RocketMQ administrator.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/events_rocketmq.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: events_rocketmq
+connector: rocketmq
+config:
+  mqTopicString: orders.events
+  mqHost: nameserver.rocketmq.internal
+  mqPort: "9876"
+  mqUsername: ${ROCKETMQ_USER}
+  mqPassword: ${ROCKETMQ_PASSWORD}
+  useTLS: false
+mode: stream
+```
+
+For a target-only connection, omit `mode`. Set `useTLS: true` only when the endpoint and runtime are configured for it.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog does not declare message ordering, retries, consumer groups, delivery guarantees, CDC, or DDL behavior.
+- `useTLS` is a catalog boolean but certificate, trust, and hostname-verification fields are not published. Validate TLS against the deployment.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `mqTopicString` | No | — | Optional topic selection. |
+| `mqHost`, `mqPort` | Yes | — | RocketMQ NameServer host and port. |
+| `mqUsername`, `mqPassword` | No | — | Account credentials; use an environment variable for the password. |
+| `useTLS` | No | `false` | Catalog TLS boolean. |

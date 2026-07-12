@@ -5,14 +5,14 @@ sidebar:
   order: 3
 ---
 
-The current TapState AI workflow is offline and human-reviewable. An assistant can discover the docs, draft `.cyn.yml` resources, run deterministic validation, and repair coded diagnostics. Live apply, run, status, and MCP lifecycle operations require a later server runtime.
+The current TapState AI workflow is offline and human-reviewable. An assistant can discover the docs, draft `.tapstate.yml` resources, run deterministic validation, and repair coded diagnostics. Live apply, run, status, and MCP lifecycle operations require a later server runtime.
 
 ## Recommended workflow
 
 ```text
 1. Give the assistant llms.txt or the relevant page Markdown
 2. Describe one source, target, and desired data outcome
-3. Generate or scaffold .cyn.yml resources
+3. Generate or scaffold .tapstate.yml resources
 4. Run tapstate validate
 5. Feed coded diagnostics back to the assistant
 6. Review the final diff before keeping it
@@ -57,7 +57,7 @@ On failure, give the assistant the diagnostic `code`, location, message, and sol
 
 ## Use the schema and explain command
 
-Associate `*.cyn.yml` with the bundled JSON Schema for editor completion. For a focused question, use:
+Associate `*.tapstate.yml` with the bundled JSON Schema for editor completion. For a focused question, use:
 
 ```bash
 tapstate explain source.mode

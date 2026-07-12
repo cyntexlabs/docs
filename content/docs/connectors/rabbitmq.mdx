@@ -1,0 +1,93 @@
+---
+title: RabbitMQ
+description: Configure RabbitMQ as a TapState stream source or target
+sidebar:
+  order: 31
+ai:
+  kind: connector
+  id: rabbitmq
+  category: streaming-messaging
+  maturity: preview
+  useAs: [source, target]
+  modes: [stream]
+  aliases: [rabbitmq, rabbitmq stream, rabbitmq queue, amqp, rabbitmq source, rabbitmq target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use RabbitMQ to read or write streaming queue messages.
+
+<ConnectorProfile
+  category="Streaming & messaging"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Stream read, Stream write"
+  compatibility="RabbitMQ 3.8.x+ upstream baseline"
+/>
+
+<ConnectorCapabilities source="Stream read" target="Stream write" />
+
+<Aside type="note" title="Local validation boundary">
+  The bundled catalog validates Stream mode and the listed field shapes. It does not connect to AMQP, call the management API, enumerate queues, or publish/consume a message.
+</Aside>
+
+## Before you begin
+
+Create a dedicated user with AMQP access to the intended virtual host and management-API access if the deployed connector requires queue metadata. The upstream baseline uses these commands for the default virtual host:
+
+```bash
+rabbitmqctl add_user tapstate_reader replace_with_a_secret
+rabbitmqctl set_permissions -p / tapstate_reader ".*" ".*" ".*"
+rabbitmqctl set_user_tags tapstate_reader management
+```
+
+Use narrower permissions in production and verify the correct AMQP and management endpoint ports with your RabbitMQ deployment.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/events_rabbitmq.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: events_rabbitmq
+connector: rabbitmq
+config:
+  mqQueueString: orders.events
+  mqHost: rabbitmq.internal
+  mqPort: "5672"
+  apiPort: "8090"
+  mqUsername: ${RABBITMQ_USER}
+  mqPassword: ${RABBITMQ_PASSWORD}
+  virtualHost: "/"
+mode: stream
+```
+
+For a target connection, omit `mode`. The catalog default for `apiPort` is `8090`, which differs from the upstream UI guide's example; retain the catalog contract and stage the deployed endpoint before production use.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation cannot prove that a queue exists, that the account has virtual-host access, or that message bodies match the runtime's accepted shape.
+
+## Limitations
+
+- The upstream baseline supports JSON object message bodies and direct routing through the default exchange. Treat custom exchanges, routing keys, and more complex message routing as unverified in TapState.
+- The catalog does not declare Snapshot, CDC, DDL, acknowledgement, or delivery-guarantee semantics.
+- Do not put broker credentials in a committed `.tapstate.yml` file.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `mqQueueString` | No | — | Comma-separated queue selection, if supported by the deployment. |
+| `mqHost` | Yes | — | RabbitMQ host. |
+| `mqPort` | Yes | — | AMQP port; catalog type is string. |
+| `apiPort` | Yes | `8090` | Management/API port in the current catalog. |
+| `mqUsername` | No | — | RabbitMQ user. |
+| `mqPassword` | No | — | Password; use an environment variable. |
+| `virtualHost` | No | — | RabbitMQ virtual host. |

@@ -23,7 +23,7 @@ This page is generated from the TapState DSL JSON Schema and supports automated 
 | `PipelineResource.settings.schedule` | string | no |  |  |
 | `PipelineResource.source` | array<string>\|string | yes |  |  |
 | `PipelineResource.transforms` | array<object> | no |  |  |
-| `PipelineResource.version` | const | yes |  | `cyntex/v1` |
+| `PipelineResource.version` | const | yes |  | `tapstate/v1` |
 | `PipelineResource.view` | object | no |  |  |
 | `ServeResource.experimental` | object | no |  |  |
 | `ServeResource.id` | string | yes |  |  |
@@ -34,7 +34,7 @@ This page is generated from the TapState DSL JSON Schema and supports automated 
 | `ServeResource.push` | array<object> | no |  |  |
 | `ServeResource.query` | array<object> | no |  |  |
 | `ServeResource.sync` | array<object> | no |  |  |
-| `ServeResource.version` | const | yes |  | `cyntex/v1` |
+| `ServeResource.version` | const | yes |  | `tapstate/v1` |
 | `SourceResource.config` | object | no |  |  |
 | `SourceResource.connector` | string | yes |  |  |
 | `SourceResource.experimental` | object | no |  |  |
@@ -51,7 +51,7 @@ This page is generated from the TapState DSL JSON Schema and supports automated 
 | `SourceResource.srs.retention` | string | no |  |  |
 | `SourceResource.srs.schema_evolution` | string | no |  | `ignore`, `track` |
 | `SourceResource.tables` | array<object\|string> | no |  |  |
-| `SourceResource.version` | const | yes |  | `cyntex/v1` |
+| `SourceResource.version` | const | yes |  | `tapstate/v1` |
 | `TransformResource.experimental` | object | no |  |  |
 | `TransformResource.id` | string | yes |  |  |
 | `TransformResource.kind` | const | yes |  | `transform` |
@@ -59,7 +59,7 @@ This page is generated from the TapState DSL JSON Schema and supports automated 
 | `TransformResource.metadata.description` | string | no |  |  |
 | `TransformResource.metadata.labels` | object | no |  |  |
 | `TransformResource.options` | object | no |  |  |
-| `TransformResource.version` | const | yes |  | `cyntex/v1` |
+| `TransformResource.version` | const | yes |  | `tapstate/v1` |
 | `ViewResource.experimental` | object | no |  |  |
 | `ViewResource.id` | string | yes |  |  |
 | `ViewResource.kind` | const | yes |  | `view` |
@@ -78,4 +78,4 @@ This page is generated from the TapState DSL JSON Schema and supports automated 
 | `ViewResource.storage.warm` | object | no |  |  |
 | `ViewResource.storage.warm.collection` | string | yes |  |  |
 | `ViewResource.storage.warm.indexes` | array<string> | no |  |  |
-| `ViewResource.version` | const | yes |  | `cyntex/v1` |
+| `ViewResource.version` | const | yes |  | `tapstate/v1` |

@@ -1,0 +1,72 @@
+---
+title: GitHub
+description: Configure GitHub as a TapState API source
+sidebar:
+  order: 42
+ai:
+  kind: connector
+  id: github
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [api]
+  aliases: [github, github api, github source, github issues, github pull requests]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use GitHub as a catalog-declared API source for repository data.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="API read"
+  compatibility="GitHub API"
+/>
+
+<ConnectorCapabilities source="API read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Authorization boundary">
+  The catalog's connector ID is case-sensitive: `GitHub`. It requires a field named `code`, but the current TapState product surface does not publish an interactive OAuth exchange. Do not treat local validation as authorization.
+</Aside>
+
+## Before you begin
+
+Decide which organization and repositories the integration may read, then arrange the required GitHub authorization with an administrator. Keep the resulting credential out of source control and grant only the scopes needed for the objects you intend to ingest.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/engineering_github.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: engineering_github
+connector: GitHub
+config:
+  code: ${GITHUB_AUTHORIZATION_CODE}
+mode: api
+```
+
+`code` is the complete catalog contract. Its exchange, refresh, and scope behavior must be confirmed with the deployed runtime before production use.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+The local check validates resource shape and API mode. It does not open a browser, authenticate to GitHub, check scopes, discover repositories, or read issues and pull requests.
+
+## Limitations
+
+- The catalog declares an API source only; target writes, Snapshot, CDC, DDL, and rate-limit behavior are not declared.
+- The upstream baseline describes an interactive authorization flow, which is not presented here as a TapState UI or CLI capability.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `code` | Yes | Catalog-defined authorization value. Store it in a secret-aware environment variable. |

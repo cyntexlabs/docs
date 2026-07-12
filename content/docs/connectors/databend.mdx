@@ -1,0 +1,76 @@
+---
+title: Databend
+description: Configure Databend as a TapState data-writing target
+sidebar:
+  order: 24
+ai:
+  kind: connector
+  id: databend
+  category: warehouses-analytics
+  maturity: preview
+  useAs: [target]
+  modes: []
+  aliases: [databend, databend target, databend warehouse]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Databend as a destination for analytical pipeline data.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Target"
+  capabilities="Data write"
+  compatibility="Databend 0.9+ upstream baseline"
+/>
+
+<ConnectorCapabilities source="Not declared in the current catalog" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog declares a target role and validates field shapes. It does not connect to Databend, authenticate, create a table, or execute a write.
+</Aside>
+
+## Before you begin
+
+Create a dedicated Databend account with rights to write the destination database. Grant table-creation privileges only when automatic table management is explicitly approved.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/warehouse_databend.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: warehouse_databend
+connector: databend
+config:
+  host: databend.internal
+  port: 8000
+  database: analytics
+  user: ${DATABEND_USER}
+  password: ${DATABEND_PASSWORD}
+```
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog declares no source mode, CDC, DDL behavior, or transport-encryption field.
+- The upstream baseline is Databend 0.9+. Verify exact server version, target types, and privileges before production use.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `host` | Yes | Databend host. |
+| `port` | Yes | Databend port; catalog type is number. |
+| `database` | Yes | Destination database. |
+| `user` | Yes | Database user. |
+| `password` | No | Password; use an environment variable. |
+| `extParams` | No | Additional connector parameters. |

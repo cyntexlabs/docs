@@ -49,8 +49,8 @@ The upstream SelectDB baseline uses a database account that can write the select
 
 ### Snapshot source
 
-```yaml title="tapstate-work/source/orders_selectdb.cyn.yml"
-version: cyntex/v1
+```yaml title="tapstate-work/source/orders_selectdb.tapstate.yml"
+version: tapstate/v1
 kind: source
 id: orders_selectdb
 connector: selectdb
@@ -68,8 +68,8 @@ tables:
 
 ### Target connection
 
-```yaml title="tapstate-work/source/warehouse_selectdb.cyn.yml"
-version: cyntex/v1
+```yaml title="tapstate-work/source/warehouse_selectdb.tapstate.yml"
+version: tapstate/v1
 kind: source
 id: warehouse_selectdb
 connector: selectdb

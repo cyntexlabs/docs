@@ -19,18 +19,43 @@ Choose a connector by the system you need to read from or write to. Each page le
   <LinkCard title="MongoDB" href="/docs/connectors/mongodb" description="Snapshot and Oplog-based CDC; data-writing target." />
   <LinkCard title="MongoDB Atlas" href="/docs/connectors/mongodb-atlas" description="Atlas-managed Oplog CDC; data-writing target." />
   <LinkCard title="openGauss" href="/docs/connectors/opengauss" description="Catalog-backed Snapshot source and data-writing target." />
+  <LinkCard title="MariaDB" href="/docs/connectors/mariadb" description="Snapshot and CDC source; data-writing target." />
+  <LinkCard title="TiDB" href="/docs/connectors/tidb" description="GA Snapshot and CDC source; data-writing target." />
+  <LinkCard title="Redis" href="/docs/connectors/redis" description="Catalog-backed Snapshot and CDC source; data-writing target." />
+  <LinkCard title="Elasticsearch" href="/docs/connectors/elasticsearch" description="Catalog-backed data-writing target." />
 </CardGrid>
 
 ## Warehouses & analytics
 
 <CardGrid>
   <LinkCard title="SelectDB" href="/docs/connectors/selectdb" description="Catalog-backed Snapshot source and data-writing target." />
+  <LinkCard title="Apache Doris" href="/docs/connectors/doris" description="GA Snapshot source and data-writing target." />
+  <LinkCard title="ClickHouse" href="/docs/connectors/clickhouse" description="GA Snapshot source and data-writing target." />
+  <LinkCard title="Snowflake" href="/docs/connectors/snowflake" description="Preview Snapshot source and data-writing target." />
+  <LinkCard title="BigQuery" href="/docs/connectors/bigquery" description="Preview data-writing target." />
+  <LinkCard title="Databend" href="/docs/connectors/databend" description="Preview data-writing target." />
+  <LinkCard title="Greenplum" href="/docs/connectors/greenplum" description="Preview Snapshot source and data-writing target." />
+  <LinkCard title="Apache Hudi" href="/docs/connectors/hudi" description="Preview data-writing target." />
+  <LinkCard title="Apache Paimon" href="/docs/connectors/paimon" description="Preview Snapshot and CDC source; data-writing target." />
+  <LinkCard title="StarRocks" href="/docs/connectors/starrocks" description="Preview Snapshot source and data-writing target." />
 </CardGrid>
 
 ## Streaming & messaging
 
 <CardGrid>
   <LinkCard title="Kafka" href="/docs/connectors/kafka" description="Read from and write to Confluent-compatible Kafka streams." />
+  <LinkCard title="Apache ActiveMQ" href="/docs/connectors/activemq" description="Catalog-backed stream source and target." />
+  <LinkCard title="RabbitMQ" href="/docs/connectors/rabbitmq" description="Catalog-backed stream source and target." />
+  <LinkCard title="Apache RocketMQ" href="/docs/connectors/rocketmq" description="Catalog-backed stream source and target." />
+</CardGrid>
+
+## Files
+
+<CardGrid>
+  <LinkCard title="CSV" href="/docs/connectors/csv" description="Read or write delimited files across local and remote storage protocols." />
+  <LinkCard title="JSON" href="/docs/connectors/json" description="Read structured JSON files from supported storage protocols." />
+  <LinkCard title="Excel" href="/docs/connectors/excel" description="Read XLS and XLSX files from supported storage protocols." />
+  <LinkCard title="XML" href="/docs/connectors/xml" description="Read structured XML files from supported storage protocols." />
 </CardGrid>
 
 ## SaaS, business & commerce APIs
@@ -38,6 +63,11 @@ Choose a connector by the system you need to read from or write to. Each page le
 <CardGrid>
   <LinkCard title="Lark Bitable" href="/docs/connectors/feishu-bitable" description="Read one Lark or Feishu Bitable table through its API." />
   <LinkCard title="Alibaba 1688" href="/docs/connectors/alibaba-1688" description="Read authorized marketplace data through the 1688 API." />
+  <LinkCard title="GitHub" href="/docs/connectors/github" description="Read repository API data through a catalog-declared API source." />
+  <LinkCard title="HubSpot" href="/docs/connectors/hubspot" description="Read CRM API data through a catalog-declared API source." />
+  <LinkCard title="Salesforce" href="/docs/connectors/salesforce" description="Read CRM API data through a catalog-declared API source." />
+  <LinkCard title="Zoho CRM" href="/docs/connectors/zoho-crm" description="Read CRM API data through a catalog-declared API source." />
+  <LinkCard title="Zoho Desk" href="/docs/connectors/zoho-desk" description="Read service data through a catalog-declared Snapshot source." />
 </CardGrid>
 
 ## How capability claims are made
@@ -51,7 +81,7 @@ Choose a connector by the system you need to read from or write to. Each page le
 
 ## Create and validate a connection
 
-Connection resources are `.cyn.yml` files. Use the exact connector ID and field names from the page's Reference section. A target is represented by the same `kind: source` connection resource without a reader `mode` or `tables` section.
+Connection resources are `.tapstate.yml` files. Use the exact connector ID and field names from the page's Reference section. A target is represented by the same `kind: source` connection resource without a reader `mode` or `tables` section.
 
 ```bash
 tapstate validate --workdir tapstate-work

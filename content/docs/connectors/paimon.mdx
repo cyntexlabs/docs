@@ -1,0 +1,84 @@
+---
+title: Apache Paimon
+description: Configure Apache Paimon as a TapState snapshot or CDC source and data-writing target
+sidebar:
+  order: 27
+ai:
+  kind: connector
+  id: paimon
+  category: warehouses-analytics
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot, cdc]
+  aliases: [apache paimon, paimon, paimon snapshot, paimon cdc, paimon target, paimon s3, paimon hdfs]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Apache Paimon with local, S3, HDFS, or OSS warehouse storage.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, Data write"
+  compatibility="Apache Paimon 0.9.0 upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
+
+<Aside type="note" title="Catalog and upstream baseline differ">
+  The current catalog declares source modes and a target role, while the upstream guide focuses on target setup. Use the catalog for local configuration and stage source behavior against the deployed runtime.
+</Aside>
+
+## Before you begin
+
+Choose the warehouse location and grant the runtime least-privilege storage access. Confirm the Paimon catalog/metastore arrangement, table primary keys, and any compaction or retention policy with the data-platform team.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/lake_paimon.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: lake_paimon
+connector: paimon
+config:
+  warehouse: s3://company-lake/paimon
+  storageType: s3
+  s3Endpoint: https://s3.amazonaws.com
+  s3AccessKey: ${S3_ACCESS_KEY}
+  s3SecretKey: ${S3_SECRET_KEY}
+  s3Region: us-east-1
+  database: default
+mode: snapshot
+tables:
+  - orders
+```
+
+Use `mode: cdc` only after staging it. For target-only use, omit `mode` and `tables`.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog does not define catalog/metastore fields, CDC checkpoints, schema evolution, compaction, or write conflict semantics.
+- `storageType` selects conditional fields; provide only the matching S3, HDFS, or OSS inputs.
+- Keep storage secrets outside committed resource files.
+
+## Reference
+
+| Storage | Fields |
+|---|---|
+| Common | `warehouse`, `storageType`, `database` (default `default`) |
+| S3 | `s3Endpoint`, `s3AccessKey`, `s3SecretKey`, `s3Region`, `s3Properties` |
+| HDFS | `hdfsHost`, `hdfsPort` (default `9000`), `hdfsUser` (default `hadoop`) |
+| OSS | `ossEndpoint`, `ossAccessKey`, `ossSecretKey` |
+
+`storageType` accepts `s3`, `hdfs`, `oss`, and `local`.

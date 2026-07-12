@@ -1,0 +1,83 @@
+---
+title: Apache Hudi
+description: Configure Apache Hudi as a TapState data-writing target
+sidebar:
+  order: 26
+ai:
+  kind: connector
+  id: hudi
+  category: warehouses-analytics
+  maturity: preview
+  useAs: [target]
+  modes: []
+  aliases: [apache hudi, hudi, hudi target, hudi hive, hudi kerberos]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Apache Hudi as a catalog-declared destination backed by the configured Hadoop and Hive environment.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Target"
+  capabilities="Data write"
+  compatibility="Apache Hudi 0.11.0 upstream baseline"
+/>
+
+<ConnectorCapabilities source="Not declared in the current catalog" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog validates this configuration shape. It does not load Hadoop XML, authenticate with Kerberos, reach Hive, create a Hudi table, or write files.
+</Aside>
+
+## Before you begin
+
+Obtain the cluster address, destination database, Hadoop and Hive site configuration, and a least-privilege account. If Kerberos is enabled, obtain the keytab, Kerberos configuration, and principal from the platform administrator.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/lake_hudi.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: lake_hudi
+connector: hudi
+config:
+  nameSrvAddr: hive-metastore.internal:9083
+  database: analytics
+  user: ${HUDI_USER}
+  password: ${HUDI_PASSWORD}
+  krb5: false
+  hadoopCoreSiteXML: ${HADOOP_CORE_SITE_XML}
+  hdfsSiteXML: ${HDFS_SITE_XML}
+  hiveSiteXML: ${HIVE_SITE_XML}
+  ssl: true
+```
+
+When `krb5: true`, also provide `krb5Keytab`, `krb5Conf`, and `principal`.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog declares a target only, with no source mode, CDC, DDL, or table-layout contract.
+- Site XML and Kerberos material are sensitive deployment inputs; do not commit them to a workspace.
+- The upstream baseline is Hudi 0.11.0. Verify metastore integration and exact table behavior in staging.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `nameSrvAddr`, `database` | Yes | — | Cluster/metastore address and destination database. |
+| `user`, `password` | No | — | Account and secret. |
+| `krb5` | No | `false` | Enable Kerberos-related fields. |
+| `krb5Keytab`, `krb5Conf`, `principal` | With Kerberos | — | Keytab, Kerberos config, and Hive principal. |
+| `hadoopCoreSiteXML`, `hdfsSiteXML`, `hiveSiteXML` | Yes | — | Hadoop/HDFS/Hive configuration material. |
+| `ssl`, `extParams`, `timezone` | No | `true`, empty timezone | Optional connector settings. |

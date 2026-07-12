@@ -1,0 +1,76 @@
+---
+title: BigQuery
+description: Configure BigQuery as a TapState data-writing target
+sidebar:
+  order: 23
+ai:
+  kind: connector
+  id: bigquery
+  category: warehouses-analytics
+  maturity: preview
+  useAs: [target]
+  modes: []
+  aliases: [bigquery, google bigquery, bigquery target, bigquery service account]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use BigQuery as a destination for pipeline data with a Google Cloud service account and an existing dataset/table set.
+
+<ConnectorProfile
+  category="Warehouses & analytics"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Target"
+  capabilities="Data write"
+  compatibility="Google BigQuery"
+/>
+
+<ConnectorCapabilities source="Not declared in the current catalog" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The bundled catalog declares BigQuery as a target connection. It validates the two documented field shapes only; it does not authenticate to Google Cloud or create a dataset or table.
+</Aside>
+
+## Before you begin
+
+1. Ensure the TapState runtime can reach Google Cloud APIs.
+2. Create a dedicated service account and grant the least privileges required to create jobs and write the intended dataset/tables.
+3. Create the destination dataset and tables, or approve the permissions required for your deployment to manage them.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/warehouse_bigquery.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: warehouse_bigquery
+connector: bigquery
+config:
+  serviceAccount: ${BIGQUERY_SERVICE_ACCOUNT_JSON}
+  tableSet: project_id.dataset_id
+```
+
+Keep the service-account JSON in an environment variable or secret store, never in a committed workspace file.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope and known field shapes. It does not validate JSON credentials, IAM roles, project access, dataset location, or an actual BigQuery write.
+
+## Limitations
+
+- The current catalog does not declare a source mode, CDC, or DDL behavior for BigQuery.
+- Dataset location and service-account permissions are enforced by Google Cloud at runtime.
+- Stage representative target writes to validate data types and table policy before production use.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `serviceAccount` | Yes | Service-account JSON credentials. Supply through an environment variable. |
+| `tableSet` | Yes | BigQuery project/dataset/table scope required by the connector. |

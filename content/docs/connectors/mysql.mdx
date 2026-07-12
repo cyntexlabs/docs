@@ -135,7 +135,7 @@ FLUSH PRIVILEGES;
 
 ## Create a connection
 
-TapState stores each MySQL connection as a `.cyn.yml` file in the workspace. Create a source connection when TapState reads MySQL; create a target connection when a pipeline writes to MySQL.
+TapState stores each MySQL connection as a `.tapstate.yml` file in the workspace. Create a source connection when TapState reads MySQL; create a target connection when a pipeline writes to MySQL.
 
 ### Source connection
 
@@ -157,10 +157,10 @@ tapstate new --non-interactive \
 
 For a Snapshot-only source, change `--mode cdc` to `--mode snapshot`. The generated connection uses the same MySQL fields; only the read mode and CDC options differ.
 
-Edit `tapstate-work/source/orders_source.cyn.yml` to select tables and the reading behavior:
+Edit `tapstate-work/source/orders_source.tapstate.yml` to select tables and the reading behavior:
 
-```yaml title="tapstate-work/source/orders_source.cyn.yml"
-version: cyntex/v1
+```yaml title="tapstate-work/source/orders_source.tapstate.yml"
+version: tapstate/v1
 kind: source
 id: orders_source
 connector: mysql
@@ -225,10 +225,10 @@ tapstate new --non-interactive \
   --workdir tapstate-work
 ```
 
-The command creates `tapstate-work/source/analytics_mysql.cyn.yml`:
+The command creates `tapstate-work/source/analytics_mysql.tapstate.yml`:
 
-```yaml title="tapstate-work/source/analytics_mysql.cyn.yml"
-version: cyntex/v1
+```yaml title="tapstate-work/source/analytics_mysql.tapstate.yml"
+version: tapstate/v1
 kind: source
 id: analytics_mysql
 connector: mysql

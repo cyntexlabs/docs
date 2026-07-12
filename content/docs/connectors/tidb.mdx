@@ -1,0 +1,94 @@
+---
+title: TiDB
+description: Configure TiDB as a TapState snapshot or CDC source and data-writing target
+sidebar:
+  order: 10
+ai:
+  kind: connector
+  id: tidb
+  category: databases
+  maturity: ga
+  useAs: [source, target]
+  modes: [snapshot, cdc]
+  aliases: [tidb, tidb snapshot, tidb cdc, tidb source, tidb target, tikv, pd]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use TiDB for one-time reads, catalog-declared CDC, or data-writing targets.
+
+<ConnectorProfile
+  category="Databases"
+  maturity="GA"
+  maturityLabel="GA upstream baseline; catalog-backed configuration"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, Data write"
+  compatibility="TiDB 6.0.0–8.1.9 upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog validates modes and this connection schema. It does not query PD or TiKV, validate a CDC position, test credentials, or write to TiDB.
+</Aside>
+
+## Before you begin
+
+### Source
+
+Create a least-privilege account with read access to the selected database. For CDC, confirm the TiDB deployment's change-data prerequisites and the runtime network paths to PD/TiKV with your database administrator; the catalog exposes endpoint fields but does not publish the capture mechanism or retention contract.
+
+### Target
+
+Create a writer with DML privileges on destination tables. Add `CREATE` or `ALTER` only if pipeline-managed tables are approved, and stage the intended primary-key and data-type behavior.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/orders_tidb.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: orders_tidb
+connector: tidb
+config:
+  host: tidb.internal
+  port: "4000"
+  database: orders
+  user: ${TIDB_USER}
+  password: ${TIDB_PASSWORD}
+  pdServer: pd.internal:2379
+  tiKvAddress: tikv.internal
+  tiKvPort: "20160"
+  timezone: "+00:00"
+mode: cdc
+tables:
+  - orders
+```
+
+Use `mode: snapshot` for a one-time read. For target-only use, omit `mode` and `tables`.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+## Limitations
+
+- The catalog declares CDC but does not define its checkpoint, topology, DDL, or failover semantics.
+- The upstream GA matrix is a reusable compatibility baseline; validate the exact TiDB and TiKV topology in staging.
+- The catalog does not expose transport-encryption settings.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host` | Yes | — | TiDB SQL host. |
+| `port` | Yes | `4000` | TiDB SQL port; catalog type is string. |
+| `database` | Yes | — | Database name. |
+| `user`, `password` | No | — | Connection account and secret. |
+| `pdServer` | No | — | PD endpoint exposed by the catalog. |
+| `tiKvAddress`, `tiKvPort` | No | `20160` for port | TiKV endpoint fields exposed by the catalog. |
+| `extParams` | No | — | Additional connector parameters. |
+| `timezone` | No | `+00:00` | UTC offset for timezone-naive values. |

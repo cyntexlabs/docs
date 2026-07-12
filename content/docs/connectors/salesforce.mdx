@@ -1,0 +1,72 @@
+---
+title: Salesforce
+description: Configure Salesforce as a TapState API source
+sidebar:
+  order: 44
+ai:
+  kind: connector
+  id: salesforce
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [api]
+  aliases: [salesforce, salesforce api, salesforce crm, salesforce source]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Salesforce as a catalog-declared API source for CRM data.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="API read"
+  compatibility="Salesforce API"
+/>
+
+<ConnectorCapabilities source="API read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Authorization boundary">
+  The local resource needs `code`. The upstream page shows an interactive authorization flow, but the current TapState catalog does not expose its browser exchange or refresh handling.
+</Aside>
+
+## Before you begin
+
+Have a Salesforce administrator approve the connected account and least-privilege object access. Ensure the authorization value is stored in a secret manager or environment variable.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/revenue_salesforce.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: revenue_salesforce
+connector: salesforce
+config:
+  code: ${SALESFORCE_AUTHORIZATION_CODE}
+mode: api
+```
+
+Confirm authentication expiry, refresh, object selection, and incremental behavior with the deployed runtime before using this connection for production data.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the API mode and `code` field shape only. It does not authenticate, test scopes, enumerate objects, or read CRM records.
+
+## Limitations
+
+- The catalog declares API source only; it does not declare target writes, Snapshot, CDC, DDL, or rate-limit behavior.
+- The old UI's authorization workflow is upstream baseline evidence, not a TapState product claim.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `code` | Yes | Catalog-defined authorization value. Keep it outside committed files. |
