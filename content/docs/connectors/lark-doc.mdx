@@ -1,0 +1,78 @@
+---
+title: Lark Doc
+description: Configure Lark Doc as a TapState API source
+sidebar:
+  order: 43
+ai:
+  kind: connector
+  id: lark-doc
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [api]
+  aliases: [lark doc, lark docs, feishu doc, lark doc api, lark doc source]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Lark Doc as a catalog-declared API source for document content.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="API read"
+  compatibility="Lark / Feishu Open Platform"
+/>
+
+<ConnectorCapabilities source="API read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Runtime access is outside local validation">
+  The catalog declares an API source with application credentials. It does not declare a document selector, a target, or a credential test; those behaviors must be confirmed in the deployed connector contract.
+</Aside>
+
+## Before you begin
+
+1. Create or select a Lark/Feishu self-built application and copy its App ID and App Secret.
+2. Set the application's visibility scope so intended content owners are included.
+3. Grant the least document, drive, or wiki permissions that the intended read requires.
+4. Review the platform's API frequency limits before scheduling downstream reads.
+
+The upstream baseline also recommends publishing the app and assigning any required document or wiki administrator role. Confirm the exact permission model with the tenant administrator before a production run.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/knowledge_lark.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: knowledge_lark
+connector: lark-doc
+config:
+  app_id: ${LARK_APP_ID}
+  app_secret: ${LARK_APP_SECRET}
+mode: api
+```
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope, API mode, and catalog-known field names. It does not authenticate to Lark/Feishu, test app publication or permissions, enumerate documents, or retrieve content.
+
+## Limitations
+
+- The catalog declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- Document visibility, tenant policy, rate limits, and API responses are enforced by Lark/Feishu at runtime.
+- Do not commit App Secret values in a `.tapstate.yml` file.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `app_id` | Yes | Self-built application App ID. |
+| `app_secret` | Yes | Application secret; inject through an environment variable. |

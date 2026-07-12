@@ -1,0 +1,129 @@
+---
+title: OceanBase
+description: Configure MySQL-compatible OceanBase as a TapState snapshot or CDC source and data-writing target
+sidebar:
+  order: 10
+ai:
+  kind: connector
+  id: oceanbase
+  category: databases
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot, cdc]
+  aliases: [oceanbase, oceanbase mysql mode, oceanbase snapshot, oceanbase cdc, oceanbase source, oceanbase target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
+
+Use the current OceanBase connector for MySQL-compatible OceanBase deployments. It can copy current rows or use its declared CDC mode after the required log service is prepared.
+
+<ConnectorProfile
+  category="Databases"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, Data write"
+  compatibility="OceanBase 4.0+ · MySQL-compatible upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
+
+<Aside type="note" title="Mode boundary">
+  The catalog implementation is the MySQL-compatible OceanBase connector. It does not establish an Oracle-compatible mode, DDL behavior, a connection test, or a TapState UI for the advanced settings in the upstream guide.
+</Aside>
+
+## Before you begin
+
+### Source
+
+<SourceModeTabs>
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** when you need the rows that exist now. Allow the future runtime network to reach the selected tenant, then create a least-privilege reader:
+
+```sql
+CREATE USER 'tapstate_reader' IDENTIFIED BY 'replace_with_a_secret';
+GRANT SELECT ON `orders`.* TO 'tapstate_reader';
+```
+
+The upstream MySQL-compatible baseline does not require a log service for a one-time copy.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** when the target must start current and then receive later data changes. In addition to the reader access, deploy the OceanBase Binlog Service described by the upstream baseline. It uses OBProxy for client access and `obbinlog` for incremental log conversion.
+
+Record the Root Server list, raw-log server host and port, plus CDC credentials required by your deployment. The catalog exposes these values as `rootServerList`, `rawLogServerHost`, `rawLogServerPort`, `cdcUser`, and `cdcPassword`; validate the service endpoint with the deployed runtime before relying on incremental delivery.
+
+</SourceModeTab>
+</SourceModeTabs>
+
+### Target
+
+Create a dedicated writer for the destination database. Grant schema-management privileges only when a pipeline is explicitly allowed to create or alter destination tables.
+
+```sql
+CREATE USER 'tapstate_writer' IDENTIFIED BY 'replace_with_a_secret';
+GRANT ALL ON `analytics`.* TO 'tapstate_writer';
+```
+
+Scope that grant more narrowly where the tenant's authorization model allows it.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/orders_oceanbase.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: orders_oceanbase
+connector: oceanbase
+config:
+  host: obproxy.internal
+  port: "2881"
+  tenant: sales
+  database: orders
+  user: ${OCEANBASE_READER_USER}
+  password: ${OCEANBASE_READER_PASSWORD}
+  rootServerList: ob-root-1.internal:2882,ob-root-2.internal:2882
+  rawLogServerHost: oblog.internal
+  rawLogServerPort: "50051"
+  cdcUser: root@sys
+  cdcPassword: ${OCEANBASE_CDC_PASSWORD}
+  timezone: "+00:00"
+mode: cdc
+tables:
+  - orders
+```
+
+Use `mode: snapshot` for a one-time copy. For a target connection, omit `mode` and `tables`, and use the writer credentials. CDC-specific values are optional catalog fields; set them only for the deployed service topology that needs them.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource, declared mode, and catalog-known field shapes. It does not reach OBProxy, check a tenant allowlist, verify Binlog Service deployment, authenticate CDC credentials, or write destination data.
+
+## Limitations
+
+- This page covers the MySQL-compatible catalog implementation only. The upstream Oracle-compatible OceanBase guide needs a separate current connector contract before publication.
+- The catalog declares Snapshot and CDC but no DDL contract. This guide does not claim DDL capture or application.
+- Treat tenant access, cluster topology, Binlog Service setup, and type compatibility as deployment-specific. Test them with representative data before production use.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host` | Yes | — | OceanBase endpoint, commonly an OBProxy host. |
+| `port` | Yes | `2881` | OceanBase service port; catalog type is string. |
+| `tenant` | No | — | OceanBase logical tenant. |
+| `database` | Yes | — | Database name. |
+| `user`, `password` | `user` yes | — | Tenant account and optional password; inject the password through an environment variable. |
+| `extParams` | No | — | Connector-specific connection parameters. |
+| `rootServerList` | No | — | Catalog-defined OceanBase Root Server list for a CDC deployment. |
+| `rawLogServerHost`, `rawLogServerPort` | No | `50051` port | Raw log service endpoint exposed by the catalog. |
+| `cdcUser`, `cdcPassword` | No | `root@sys` user | Catalog-defined CDC service credentials. |
+| `timezone` | No | empty | UTC offset used by the connector. |

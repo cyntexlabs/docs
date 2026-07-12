@@ -1,0 +1,84 @@
+---
+title: Lark Approval
+description: Configure Lark Approval as a TapState API source
+sidebar:
+  order: 42
+ai:
+  kind: connector
+  id: lark-approval
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [api]
+  aliases: [lark approval, feishu approval, lark approval api, lark approval source]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Lark Approval as a catalog-declared API source for approval data.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="API read"
+  compatibility="Lark / Feishu Approval API"
+/>
+
+<ConnectorCapabilities source="API read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Selection boundary">
+  The catalog exposes optional `code` and `definitionCode` fields but does not define their selection behavior. The guide records their exact names without inventing a UI, authorization exchange, or filtering semantics.
+</Aside>
+
+## Before you begin
+
+1. Create or select a Lark/Feishu self-built application.
+2. Copy the App ID and App Secret from the application's credentials page.
+3. Have the tenant administrator grant the application the approval-data permissions required by the intended workflow.
+4. If your deployment requires them, obtain the approval `code` and `definitionCode` from the administrator or platform API tooling.
+
+Keep the secret outside source control. The upstream baseline identifies the two app credentials and approval code; it does not establish an interactive TapState authorization flow.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/purchase_approvals.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: purchase_approvals
+connector: lark-approval
+config:
+  app_id: ${LARK_APP_ID}
+  app_secret: ${LARK_APP_SECRET}
+  code: ${LARK_APPROVAL_CODE}
+  definitionCode: ${LARK_APPROVAL_DEFINITION_CODE}
+mode: api
+```
+
+`code` and `definitionCode` are optional catalog fields. Omit either one unless the deployed connector contract requires it.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope, API mode, and catalog-known fields. It does not authenticate to Lark/Feishu, inspect app scopes, validate approval codes, or retrieve approval records.
+
+## Limitations
+
+- The current catalog declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- Lark/Feishu enforces application visibility, tenant policy, and API rate limits at runtime.
+- Do not commit App Secret values in a `.tapstate.yml` file.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `app_id` | Yes | Self-built application App ID. |
+| `app_secret` | Yes | Application secret; inject through an environment variable. |
+| `code` | No | Catalog-defined approval code. |
+| `definitionCode` | No | Catalog-defined approval definition code. |

@@ -1,0 +1,85 @@
+---
+title: Azure Cosmos DB
+description: Configure Azure Cosmos DB as a TapState snapshot source
+sidebar:
+  order: 8
+ai:
+  kind: connector
+  id: azure-cosmosdb
+  category: databases
+  maturity: preview
+  useAs: [source]
+  modes: [snapshot]
+  aliases: [azure cosmos db, cosmos db, cosmos snapshot, azure cosmos source]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Azure Cosmos DB to copy the records that exist now from a NoSQL account and database.
+
+<ConnectorProfile
+  category="Databases"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="Snapshot, Resource discovery"
+  compatibility="Azure Cosmos DB for NoSQL upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog declares a Snapshot source and validates the four documented fields. It does not sign in to Azure, check account permissions, list containers, or read records.
+</Aside>
+
+## Before you begin
+
+### Source
+
+1. Select an Azure Cosmos DB account that uses the NoSQL API and the database to read.
+2. Copy the account host and a key with the smallest practical read permission.
+3. Choose the consistency level that matches the account policy. The catalog default is `Session`.
+
+Keep the account key in a secret manager. The upstream guide establishes the NoSQL API baseline; it does not establish a TapState connection test or an additional authentication field.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/catalog_cosmos.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: catalog_cosmos
+connector: azure-cosmosdb
+config:
+  host: catalog-prod.documents.azure.com:443
+  accountKey: ${COSMOS_ACCOUNT_KEY}
+  databaseName: catalog
+  consistencyLevel: Session
+mode: snapshot
+tables:
+  - products
+```
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope, Snapshot mode, and catalog-known field shapes. It does not test DNS, network access, account keys, Azure RBAC, container selection, or query results.
+
+## Limitations
+
+- The catalog declares Snapshot only; it does not declare CDC, target writes, or DDL handling.
+- Treat consistency, partitioning, capacity settings, and API rate limits as deployment concerns. Confirm them against the selected Cosmos account before running a production pipeline.
+- The catalog does not expose a TapState TLS setting. Do not infer one from Azure endpoint conventions.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host` | Yes | — | Azure Cosmos DB account host. |
+| `accountKey` | Yes | — | Account key; supply through an environment variable. |
+| `databaseName` | Yes | — | Cosmos database name. |
+| `consistencyLevel` | Yes | `Session` | `Strong`, `BoundedStaleness`, `Session`, `Eventual`, or `ConsistentPrefix`. |

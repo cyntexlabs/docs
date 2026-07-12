@@ -1,0 +1,108 @@
+---
+title: TDengine
+description: Configure TDengine as a TapState snapshot or CDC source and data-writing target
+sidebar:
+  order: 16
+ai:
+  kind: connector
+  id: tdengine
+  category: databases
+  maturity: preview
+  useAs: [source, target]
+  modes: [snapshot, cdc]
+  aliases: [tdengine, tdengine snapshot, tdengine cdc, tdengine source, tdengine target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
+
+Use TDengine to copy existing time-series data or keep a target current from the connector's declared CDC mode.
+
+<ConnectorProfile
+  category="Databases"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source, Target"
+  capabilities="Snapshot, CDC, Data write"
+  compatibility="TDengine 3.x upstream baseline"
+/>
+
+<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
+
+<Aside type="note" title="Local validation boundary">
+  The catalog declares Snapshot and CDC and validates their configuration shape. It does not connect to TDengine, install a client driver, subscribe to changes, or verify a target write.
+</Aside>
+
+## Before you begin
+
+### Source
+
+<SourceModeTabs>
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** to copy current data once. The upstream baseline uses TDengine's REST endpoint on port `6041`; allow the future runtime to reach that endpoint and create a read account for the selected database.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** when you also need later records. The upstream connector baseline describes TDengine new-data subscriptions, port `6030`, and a TDengine client driver. The catalog exposes `originPort` with default `6030`; confirm the deployed runtime's driver and subscription requirements before relying on this path.
+
+</SourceModeTab>
+</SourceModeTabs>
+
+### Target
+
+Create a dedicated writer for the destination database. Decide whether the pipeline may create normal, super, or child tables before granting schema-management privileges.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/telemetry_tdengine.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: telemetry_tdengine
+connector: tdengine
+config:
+  host: tdengine.internal
+  port: "6041"
+  database: telemetry
+  user: ${TDENGINE_USER}
+  password: ${TDENGINE_PASSWORD}
+  loadTableOptions: [NORMAL_TABLE, SUPER_TABLE, CHILD_TABLE]
+  originPort: "6030"
+mode: cdc
+tables:
+  - readings
+```
+
+Use `mode: snapshot` for a one-time copy. For a target connection, omit `mode` and `tables`, then use destination credentials.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope, mode, and catalog-known fields. It does not test REST access, the native subscription port, a driver installation, permissions, or record delivery.
+
+## Limitations
+
+- The catalog declares Snapshot and CDC but no DDL contract; this guide does not claim DDL capture or application.
+- The TDengine 3.x, REST-port, and subscription-driver statements are an upstream compatibility baseline, not a TapState runtime test.
+- The upstream baseline notes that TDengine cannot change the width of some column types. Test table and type behavior with representative data before production writes.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---|---|---|
+| `host` | Yes | — | TDengine host. |
+| `port` | Yes | `6041` | REST endpoint port. |
+| `database` | Yes | — | Database name. |
+| `user` | Yes | — | Database account. |
+| `password` | No | — | Account password; supply through an environment variable. |
+| `loadTableOptions` | No | normal, super, and child tables | Table families to load. |
+| `supportWebSocket` | No | `false` | Catalog boolean setting; confirm runtime behavior before changing it. |
+| `originPort` | No | `6030` | Upstream subscription baseline port. |
+| `extParams` | No | — | Connector-specific parameters. |
+| `timezone` | No | empty | UTC offset used by the connector. |

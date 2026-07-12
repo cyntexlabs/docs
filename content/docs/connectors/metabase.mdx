@@ -1,0 +1,79 @@
+---
+title: Metabase
+description: Configure Metabase as a TapState API source
+sidebar:
+  order: 47
+ai:
+  kind: connector
+  id: metabase
+  category: saas-business-commerce-apis
+  maturity: preview
+  useAs: [source]
+  modes: [api]
+  aliases: [metabase, metabase api, metabase source, metabase analytics]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use Metabase as a catalog-declared API source for analytics content.
+
+<ConnectorProfile
+  category="SaaS, business & commerce APIs"
+  maturity="Preview"
+  maturityLabel="Catalog-backed configuration; runtime verification pending"
+  worksAs="Source"
+  capabilities="API read"
+  compatibility="Self-hosted or cloud-registered Metabase upstream baseline"
+/>
+
+<ConnectorCapabilities source="API read" target="Not declared in the current catalog" />
+
+<Aside type="note" title="Exact inherited field name">
+  The catalog field is spelled `matebaseDomainName`. Preserve that spelling in a resource even though it differs from the product name.
+</Aside>
+
+## Before you begin
+
+1. Confirm the Metabase instance is reachable by the future TapState runtime, whether it is self-hosted or cloud-registered.
+2. Create a least-privilege Metabase account for the intended analytics content.
+3. Record the full HTTP or HTTPS base URL, including a non-default port when applicable.
+
+The upstream baseline identifies a username, password, and HTTP host. It does not establish a TapState UI connection test or a selector for questions, dashboards, or collections.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/finance_metabase.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: finance_metabase
+connector: metabase
+config:
+  username: ${METABASE_USERNAME}
+  password: ${METABASE_PASSWORD}
+  matebaseDomainName: https://metabase.internal.example
+mode: api
+```
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Local validation checks the resource envelope, API mode, and catalog-known fields. It does not reach Metabase, authenticate the user, list collections, or read analytics content.
+
+## Limitations
+
+- The catalog declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- The catalog does not expose a TapState TLS option. Use the URL and your deployment's network policy; do not assume an unlisted connector setting.
+- Metabase permissions and API limits are evaluated by the service at runtime.
+
+## Reference
+
+| Field | Required | Use |
+|---|---|---|
+| `username` | Yes | Metabase login account. |
+| `password` | Yes | Login password; inject through an environment variable. |
+| `matebaseDomainName` | Yes | Full Metabase HTTP or HTTPS base URL. The inherited spelling is exact. |

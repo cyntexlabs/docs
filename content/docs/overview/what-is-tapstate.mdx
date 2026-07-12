@@ -57,13 +57,13 @@ For thirty years the consumer of enterprise data was a human reading a dashboard
 
 ## Provenance
 
-TapState is built on the engine behind [Tapdata](https://tapdata.io), a log-based CDC and live-data platform running production workloads for enterprises across APAC. This is not a demo built for the AI era — it is production-hardened infrastructure being brought to open source. You will notice the heritage in the code: resources use the `cyntex/v1` schema and the CLI binary is `cyntex`, the engine's original project codename.
+TapState is built for teams that need a reviewable, declarative path from operational changes to continuously fresh data. It combines an offline authoring workflow with connector contracts and runtime-oriented resource definitions, without requiring a separate stack of bespoke integration assets.
 
 ## What ships today
 
 The current release delivers the authoring layer of that data path, and it stands on its own:
 
-- **A reviewable data contract.** Sources and pipelines are ordinary `.cyn.yml` files that work with Git review, environment-variable substitution, and automated generation:
+- **A reviewable data contract.** Sources and pipelines are ordinary `.tapstate.yml` files that work with Git review, environment-variable substitution, and automated generation:
 
   ```text
   tapstate-work/

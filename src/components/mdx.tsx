@@ -1,8 +1,14 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import Link from 'next/link';
-import { BadgeCheck, CircleAlert, CircleCheck, Database } from 'lucide-react';
+import { BadgeCheck, CircleAlert, CircleCheck, Database, FileText, RadioTower, Store, TableProperties } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { MDXComponents } from 'mdx/types';
+import {
+  connectorCategories,
+  connectorMaturityCounts,
+  getConnectorsByCategory,
+  type ConnectorCategoryId,
+} from '@/lib/connector-directory';
 
 type AsideType = 'note' | 'tip' | 'caution' | 'danger';
 
@@ -276,6 +282,112 @@ Unknown field 'unexpected' at unexpected.`}
   );
 }
 
+const categoryPresentation: Record<
+  ConnectorCategoryId,
+  { icon: typeof Database; iconClassName: string }
+> = {
+  databases: {
+    icon: Database,
+    iconClassName: 'bg-sky-50 text-sky-700 dark:bg-sky-950/45 dark:text-sky-300',
+  },
+  'warehouses-analytics': {
+    icon: TableProperties,
+    iconClassName: 'bg-violet-50 text-violet-700 dark:bg-violet-950/45 dark:text-violet-300',
+  },
+  'streaming-messaging': {
+    icon: RadioTower,
+    iconClassName: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-950/45 dark:text-cyan-300',
+  },
+  files: {
+    icon: FileText,
+    iconClassName: 'bg-amber-50 text-amber-800 dark:bg-amber-950/45 dark:text-amber-200',
+  },
+  'saas-business-commerce-apis': {
+    icon: Store,
+    iconClassName: 'bg-rose-50 text-rose-700 dark:bg-rose-950/45 dark:text-rose-300',
+  },
+};
+
+function DirectoryMaturity({ maturity }: { maturity: 'ga' | 'preview' }) {
+  const isGa = maturity === 'ga';
+  return (
+    <span
+      className={
+        isGa
+          ? 'inline-flex rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/45 dark:text-emerald-300'
+          : 'inline-flex rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-900 dark:border-amber-800 dark:bg-amber-950/45 dark:text-amber-200'
+      }
+    >
+      {isGa ? 'GA' : 'Preview'}
+    </span>
+  );
+}
+
+/** A compact, filter-free support directory. The canonical data lives in connector-directory.ts. */
+export function SupportedConnectorMatrix() {
+  const maturityCounts = connectorMaturityCounts();
+
+  return (
+    <section aria-label="Supported data sources" className="not-prose my-8">
+      <div className="mb-8 flex flex-wrap items-center gap-2 text-sm text-fd-muted-foreground">
+        <span className="font-medium text-fd-foreground">{maturityCounts.ga + maturityCounts.preview} documented connectors</span>
+        <span aria-hidden="true">·</span>
+        <span className="inline-flex items-center gap-1.5"><DirectoryMaturity maturity="ga" /> {maturityCounts.ga}</span>
+        <span className="inline-flex items-center gap-1.5"><DirectoryMaturity maturity="preview" /> {maturityCounts.preview}</span>
+      </div>
+
+      <div className="space-y-9">
+        {connectorCategories.map((category) => {
+          const Icon = categoryPresentation[category.id].icon;
+          const connectors = getConnectorsByCategory(category.id);
+
+          return (
+            <section key={category.id} aria-labelledby={`connector-category-${category.id}`} className="border-t border-fd-border pt-5">
+              <header className="mb-3 flex items-start gap-3">
+                <span className={`mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${categoryPresentation[category.id].iconClassName}`}>
+                  <Icon aria-hidden="true" className="size-4" strokeWidth={2} />
+                </span>
+                <div>
+                  <h2 id={`connector-category-${category.id}`} className="m-0 text-base font-semibold tracking-tight text-fd-foreground">
+                    {category.label}
+                  </h2>
+                  <p className="mb-0 mt-1 text-sm leading-6 text-fd-muted-foreground">{category.description}</p>
+                </div>
+              </header>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[38rem] border-collapse text-left text-sm">
+                  <thead className="border-b border-fd-border text-xs font-medium uppercase tracking-[0.08em] text-fd-muted-foreground">
+                    <tr>
+                      <th className="px-0 py-2.5 font-medium">Connector</th>
+                      <th className="px-3 py-2.5 font-medium">Maturity</th>
+                      <th className="px-3 py-2.5 font-medium">Works as</th>
+                      <th className="px-3 py-2.5 font-medium">Read mode</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-fd-border/80">
+                    {connectors.map((connector) => (
+                      <tr key={connector.slug} className="transition-colors hover:bg-fd-accent/40">
+                        <th className="px-0 py-2.5 font-medium text-fd-foreground">
+                          <Link href={`/docs/connectors/${connector.slug}`} className="no-underline hover:text-fd-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
+                            {connector.title}
+                          </Link>
+                        </th>
+                        <td className="px-3 py-2.5"><DirectoryMaturity maturity={connector.maturity} /></td>
+                        <td className="px-3 py-2.5 text-fd-muted-foreground">{connector.useAs.map((role) => role[0].toUpperCase() + role.slice(1)).join(' + ')}</td>
+                        <td className="px-3 py-2.5 text-fd-muted-foreground">{connector.modes.length > 0 ? connector.modes.join(' · ') : '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
@@ -286,6 +398,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ConnectorProfile,
     ConnectorCapabilities,
     ValidationStatusGuide,
+    SupportedConnectorMatrix,
     ...components,
   } satisfies MDXComponents;
 }

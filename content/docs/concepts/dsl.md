@@ -3,7 +3,7 @@ title: DSL & Pipelines
 description: Core concepts of the TapState DSL — resource model, dual-layer storage, and pipeline lifecycle
 ---
 
-TapState pipelines are described in a declarative YAML DSL. Files use the extension `.cyn.yml` and the schema version `cyntex/v1` — named for the engine's original project codename. For complete syntax, see the [DSL Grammar Reference](/docs/reference/dsl-grammar).
+TapState pipelines are described in a declarative YAML DSL. Files use the extension `.tapstate.yml` and the schema version `tapstate/v1`. For complete syntax, see the [DSL Grammar Reference](/docs/reference/dsl-grammar).
 
 ## Core Concepts
 
@@ -16,7 +16,7 @@ TapState pipelines are described in a declarative YAML DSL. Files use the extens
 ## Example
 
 ```yaml
-version: cyntex/v1
+version: tapstate/v1
 kind: pipeline
 id: my-pipeline
 source: mysql-prod
@@ -29,7 +29,7 @@ sync:
       collection: user_profiles
 ```
 
-A matching `kind: source` resource with `id: mysql-prod` supplies the connection; `cyntex validate` confirms the reference closes and every field is legal for the connector.
+A matching `kind: source` resource with `id: mysql-prod` supplies the connection; `tapstate validate` confirms the reference closes and every field is legal for the connector.
 
 ## Why a declarative contract
 

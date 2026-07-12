@@ -63,7 +63,7 @@ The source database is **never queried** during steady-state processing. The Loo
 The server architecture keeps an authoring copy and a canonical stored copy:
 
 ```text
-Local .cyn.yml file          TapState resource store
+Local .tapstate.yml file     TapState resource store
 (authoring draft)    ──→     (official store, single source of truth)
                     apply
 ```

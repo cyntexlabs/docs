@@ -1,6 +1,12 @@
 import { docs } from 'collections/server';
+import type { Folder, Item, Node } from 'fumadocs-core/page-tree';
 import { loader } from 'fumadocs-core/source';
 import { llms } from 'fumadocs-core/source';
+import {
+  connectorCategories,
+  connectorDirectory,
+  renderSupportedConnectorMatrixForLLM,
+} from './connector-directory';
 import {
   docsBaseUrl,
   docsContentRoute,
@@ -8,10 +14,54 @@ import {
   docsRoute,
 } from './shared';
 
+function groupConnectorNavigation(node: Folder, folderPath: string): Folder {
+  if (folderPath !== 'connectors') return node;
+
+  const pages = new Map(
+    node.children
+      .filter((child): child is Item => child.type === 'page')
+      .map((child) => [child.url, child]),
+  );
+  const groupedUrls = new Set<string>();
+  const groups: Folder[] = connectorCategories.map((category) => {
+    const children = connectorDirectory.flatMap((connector) => {
+      if (connector.category !== category.id) return [];
+      const url = `${docsRoute}/connectors/${connector.slug}`;
+      const page = pages.get(url);
+      if (!page) return [];
+      groupedUrls.add(url);
+      return [page];
+    });
+
+    return {
+      type: 'folder',
+      $id: `connector-group-${category.id}`,
+      name: category.label,
+      description: category.description,
+      collapsible: true,
+      defaultOpen: false,
+      children,
+    } satisfies Folder;
+  }).filter((group) => group.children.length > 0);
+
+  const directPages = node.children.filter(
+    (child): child is Item => child.type === 'page' && !groupedUrls.has(child.url),
+  );
+  const remainingNodes = node.children.filter((child) => child.type !== 'page') as Node[];
+
+  return {
+    ...node,
+    children: [...directPages, ...groups, ...remainingNodes],
+  };
+}
+
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
   baseUrl: docsRoute,
   source: docs.toFumadocsSource(),
+  pageTree: {
+    transformers: [{ folder: groupConnectorNavigation }],
+  },
   plugins: [],
 });
 
@@ -90,6 +140,7 @@ function cleanMdxForLLM(markdown: string) {
 
 - **Valid:** \`valid: 3 resources in tapstate-work\`. Exit code 0; workspace structure, references, and known mode/config rules passed.
 - **Needs attention:** \`invalid: orders_source.tapstate.yml:12:1 dsl.unknown-field\`. Exit code 1; the CLI prints the message and a suggested fix before you validate again.`)
+    .replace(/<SupportedConnectorMatrix\s*\/>/g, renderSupportedConnectorMatrixForLLM())
     .replace(/<ConnectorProfile\s+([\s\S]*?)\/>/g, (_match, attrs: string) => {
       return renderConnectorProfileForLLM(attrs);
     })

@@ -1,0 +1,36 @@
+---
+title: Supported data sources
+description: Compare documented TapState connectors by category, maturity, role, and read mode
+sidebar:
+  order: 2
+ai:
+  kind: guide
+  id: supported-data-sources
+  maturity: ga
+  aliases: [supported connectors, connector matrix, connector compatibility, supported databases, supported data sources]
+---
+
+import { Aside, SupportedConnectorMatrix } from '@/components/mdx';
+
+Use this directory to choose a connector before you design a pipeline. It records the public documentation contract, not a promise that a local configuration check has reached a live system.
+
+<SupportedConnectorMatrix />
+
+## Maturity labels
+
+- **GA** means the connector has a stable, generally available documentation contract and a mature upstream baseline.
+- **Preview** means the connector is publicly documented and catalog-backed, but broader TapState runtime verification is still pending.
+
+TapState uses these two labels deliberately. The upstream inventory's former **Beta** group maps to **Preview**, a clearer customer-facing term. We do not show **Alpha** until a connector has a documented, limited-access contract; a label should explain an actual support expectation, not create a third ambiguous state.
+
+## How to read roles and modes
+
+- **Source** reads from the listed system. The read mode tells you whether that happens as a one-time Snapshot, Snapshot + CDC, stream, or API read.
+- **Target** means the current connector catalog declares data writing. Check the connector guide before relying on table creation, schema evolution, or a particular write behavior.
+- A dash in **Read mode** means the guide is target-only. It does not imply an undocumented source mode.
+
+<Aside type="note" title="Local validation boundary">
+  `tapstate validate` checks the resource envelope plus catalog-known connector IDs, modes, and field shapes. It does not prove network reachability, credentials, permissions, API scope, data access, or a live write.
+</Aside>
+
+For setup and limitations, open the individual connector guide. The sidebar groups all guides into collapsible categories matching this directory.
