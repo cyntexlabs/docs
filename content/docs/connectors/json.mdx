@@ -14,6 +14,7 @@ ai:
 ---
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use JSON files from local or supported remote storage as a source for structured pipeline data.
 
@@ -34,7 +35,20 @@ Use JSON files from local or supported remote storage as a source for structured
 
 ## Before you begin
 
-Make the JSON files available to the TapState runtime and grant the minimum path or bucket access. Keep records structurally consistent within a dataset; stage nested arrays and objects with the destination schema before production use.
+### Source
+
+<SourceModeTabs label="Choose the JSON source read mode">
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** to read the files that match the configured path now. Make them available to the TapState runtime and grant the minimum path or bucket access. Keep records structurally consistent within a dataset; stage nested arrays and objects with the destination schema before production use.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** only after testing file-change behavior in the deployed runtime. The catalog does not define a watcher, file-replacement policy, deletion event, or JSON parse-error policy, so test each case with representative files.
+
+</SourceModeTab>
+</SourceModeTabs>
 
 ## Create a connection
 
@@ -55,7 +69,7 @@ config:
 mode: snapshot
 ```
 
-Use `mode: cdc` only after staging file-change behavior for the deployed runtime.
+Use `mode: cdc` after completing the staged file-change checks above.
 
 ## Validate the configuration
 

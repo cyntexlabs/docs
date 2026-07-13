@@ -144,5 +144,5 @@ The command validates the local resource structure, `snapshot` mode, and known c
 | `user` | No | — | Database user. Prefer an environment variable. |
 | `password` | No | — | Database password. Prefer an environment variable. |
 | `extParams` | No | — | Connector-specific connection parameters. |
-| `logPluginName` | Yes | `pgoutput` | Catalog enum: `pgoutput`, `decoderbufs`, and listed `wal2json` variants. |
+| `logPluginName` | Yes | `pgoutput` | Catalog enum: `pgoutput`, `decoderbufs`, `wal2json`, `wal2json_rds`, `wal2json_streaming`, and `wal2json_rds_streaming`. This Snapshot-only guide does not establish a CDC path. |
 | `timezone` | No | empty | UTC offset used by the connector. |

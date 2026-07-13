@@ -14,6 +14,7 @@ ai:
 ---
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Redis for catalog-declared Snapshot or CDC reads, or as a destination for pipeline data. Validate the intended key model and source semantics in a staging environment before production use.
 
@@ -28,15 +29,22 @@ Use Redis for catalog-declared Snapshot or CDC reads, or as a destination for pi
 
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
-<Aside type="note" title="Validate source behavior before production">
-  The current catalog declares both source modes and a target role. The upstream guide documents Redis as a target only. The catalog determines the local configuration contract; stage any source use against the deployed runtime.
-</Aside>
-
 ## Before you begin
 
 ### Source
 
-Confirm the key namespace, value encoding, and account access needed for the data you intend to read. The catalog does not expose a Redis source-selection or CDC-position setting, so this page does not claim a specific Redis change-capture mechanism.
+<SourceModeTabs label="Choose the Redis source read mode">
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** to read the intended key namespace once. Confirm the value encoding and account access needed for the data you intend to read.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** only after staging source behavior with the deployed runtime. The catalog declares `cdc`, but does not expose a Redis source-selection or CDC-position setting, so this guide does not claim Redis Streams, keyspace notifications, or a replication-log mechanism.
+
+</SourceModeTab>
+</SourceModeTabs>
 
 ### Target
 
@@ -73,7 +81,7 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-The local check validates field shape and the selected mode. It does not authenticate to Redis, discover cluster members, validate an ACL, or read/write keys.
+Local validation checks field shape and the selected mode. It does not authenticate to Redis, discover cluster members, validate an ACL, or read or write keys.
 
 ## Limitations
 

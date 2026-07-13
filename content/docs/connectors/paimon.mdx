@@ -14,6 +14,7 @@ ai:
 ---
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Apache Paimon with local, S3, HDFS, or OSS warehouse storage.
 
@@ -28,15 +29,22 @@ Use Apache Paimon with local, S3, HDFS, or OSS warehouse storage.
 
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
-<Aside type="note" title="Source use needs staging validation">
-  The current catalog declares source modes and a target role, while the upstream guide focuses on target setup. Use the catalog for local configuration and stage source behavior against the deployed runtime.
-</Aside>
-
 ## Before you begin
 
 ### Source
 
-The TapState catalog declares Snapshot and CDC reads, but the upstream connector guide documents Paimon as a target. Before using it as a source, verify table discovery, the initial position, checkpoint recovery, and schema handling with the exact connector package supplied by your deployment.
+<SourceModeTabs label="Choose the Apache Paimon source read mode">
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** only after verifying table discovery and a complete read against the exact connector package supplied by your deployment. The catalog declares this mode, while the upstream guide focuses on target setup.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** only after staging the initial position, checkpoint recovery, source schema handling, and replay behavior. The catalog declares `cdc` but does not define its checkpoint or change-log contract.
+
+</SourceModeTab>
+</SourceModeTabs>
 
 ### Target
 
@@ -78,6 +86,8 @@ tapstate validate --workdir tapstate-work
 ```
 
 <ValidationStatusGuide />
+
+Local validation checks the resource envelope, the catalog-backed modes, and recognized Paimon fields. It does not inspect a metastore, discover tables, verify a checkpoint, access storage, or write data.
 
 ## Limitations
 

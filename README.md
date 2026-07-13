@@ -49,6 +49,8 @@ TAPSTATE_CATALOG_DIR=/path/to/tapstate/core/core-catalog/src/main/resources/cata
   npm run connectors:check
 ```
 
+Use the same catalog path with `npm run connectors:coverage` to verify the canonical connector-page structure: profile, role-specific preparation, mode-specific CDC paths, validation boundary, limitations, and reference.
+
 Preview the production export locally:
 
 ```bash

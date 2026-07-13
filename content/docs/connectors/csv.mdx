@@ -14,6 +14,7 @@ ai:
 ---
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use CSV files from local storage, FTP, SFTP, SMB, S3-compatible storage, or OSS as a pipeline source or target.
 
@@ -34,7 +35,24 @@ Use CSV files from local storage, FTP, SFTP, SMB, S3-compatible storage, or OSS 
 
 ## Before you begin
 
-Place files where the TapState runtime can reach them. For remote storage, use a dedicated account restricted to the required path or bucket. For CSV sources, make headers and delimiters consistent across files in the same logical dataset.
+### Source
+
+<SourceModeTabs label="Choose the CSV source read mode">
+<SourceModeTab value="snapshot">
+
+Use **Snapshot** to read the files that match the configured path now. Place files where the TapState runtime can reach them. For remote storage, use a dedicated account restricted to the required path or bucket. Keep headers and delimiters consistent across files in the same logical dataset.
+
+</SourceModeTab>
+<SourceModeTab value="snapshot-cdc">
+
+Use **Snapshot + CDC** only after staging the deployed file-change behavior. The catalog declares `cdc`, but does not define the watcher, polling interval, changed-file policy, or deletion behavior. Confirm those semantics with a controlled add, replace, rename, and delete in the actual storage system.
+
+</SourceModeTab>
+</SourceModeTabs>
+
+### Target
+
+Choose an output path and storage account with write access limited to that location. Before production, agree on the naming, overwrite, partitioning, and conflict policy with downstream file consumers.
 
 ## Create a connection
 
@@ -54,7 +72,7 @@ config:
 mode: snapshot
 ```
 
-Use `mode: cdc` only after staging the deployed file-change behavior. For a target connection, omit `mode`; validate naming, overwrite, and write semantics with the runtime before production use.
+For a target connection, omit `mode`; validate naming, overwrite, and write semantics with the runtime before production use.
 
 ## Validate the configuration
 

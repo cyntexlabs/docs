@@ -84,6 +84,7 @@ Choose a decoding method before changing the server:
 | `pgoutput` | PostgreSQL 10+ | Built in. The account needs publication access; partial publications also require `CREATE PUBLICATION` and ownership of the selected tables. |
 | `wal2json` | PostgreSQL 9.4+ | Install the `wal2json` output plugin on the server. Tables should have primary keys for reliable deletes. |
 | `decoderbufs` | PostgreSQL 9.6+ | Install the Debezium decoderbufs plugin and its server dependencies. |
+| `wal2json_rds`, `wal2json_streaming`, `wal2json_rds_streaming` | Deployment-specific | Catalog-declared variants for managed or streaming paths. The catalog does not define their server setup; select one only when the deployment supplies the matching contract. |
 | `walminer` | Deployment-specific | Reads physical WAL and requires elevated database access. Confirm availability with your TapState deployment before choosing it. |
 | `physical` | Deployment-specific | Uses the physical-WAL CDC path. Select it only when that path is enabled and supported in your environment. |
 
@@ -117,6 +118,34 @@ CREATE PUBLICATION dbz_publication FOR ALL TABLES;
 ```
 
 DDL capture uses a database event trigger, a trigger function, and the `public._tapdata_ddl_audit` table. Creating event triggers normally requires superuser-equivalent privileges. Confirm that your managed PostgreSQL service permits event triggers before enabling DDL capture.
+
+#### Install and test `wal2json`
+
+The following is an upstream baseline for PostgreSQL 12 on CentOS 7. It is not a TapState runtime installation command: adapt the package names, compiler toolchain, PostgreSQL path, and service name to the server you operate.
+
+```bash
+# PostgreSQL development headers and the build toolchain
+yum install -y postgresql12-devel devtoolset-7-llvm centos-release-scl devtoolset-7-gcc* llvm5.0
+export PATH="$PATH:/usr/pgsql-12/bin"
+
+# Build and install the output plugin
+git clone https://github.com/eulerto/wal2json.git
+cd wal2json
+scl enable devtoolset-7 bash
+make && make install
+```
+
+Set `wal_level = logical`, configure slots and senders as above, add the replication rule to `pg_hba.conf`, then restart PostgreSQL during an approved maintenance window. On PostgreSQL 9.4–9.6, explicitly set both `max_replication_slots` and `max_wal_senders`; `10` is a common starting value, not a universal capacity recommendation.
+
+Verify the plugin before creating a production connection:
+
+```sql
+SELECT * FROM pg_create_logical_replication_slot('tapstate_plugin_check', 'wal2json');
+SELECT * FROM pg_logical_slot_peek_changes('tapstate_plugin_check', NULL, NULL);
+SELECT * FROM pg_drop_replication_slot('tapstate_plugin_check');
+```
+
+Do not leave this test slot behind. A slot retains WAL until it advances or is removed.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -213,7 +242,7 @@ Conditional fields should be supplied only for the selected deployment and log-p
 | `schema` | Yes | — | Schema to discover. |
 | `user` | No | — | Database account. |
 | `password` | No | — | Database password or secret reference. |
-| `logPluginName` | No | `pgoutput` | Incremental decoding method; includes the deployment-specific `physical` option. |
+| `logPluginName` | No | `pgoutput` | Incremental method: `pgoutput`, `wal2json`, `decoderbufs`, `walminer`, `physical`, or the deployment-specific `wal2json_rds`, `wal2json_streaming`, and `wal2json_rds_streaming` variants. |
 | `pgtoHost` | No | `127.0.0.1` | Helper host used by the physical-WAL path when that path is supplied by the deployment. |
 | `pgtoPort` | No | `9876` | Helper port used by the physical-WAL path. |
 | `partPublication` | No | `false` | Use per-table or partial publications with `pgoutput`. |

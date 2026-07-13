@@ -34,7 +34,13 @@ Use Apache ActiveMQ to read or write queue messages through the catalog-declared
 
 ## Before you begin
 
-Create a broker account restricted to the intended queues and decide which queue names the pipeline may access. The reused connector accepts JSON-object messages and queue mode; test message shape and acknowledgement behavior with the deployed runtime.
+### Source
+
+Create a broker account restricted to consuming from the intended queues. The reused connector accepts JSON-object messages and queue mode; test message shape and acknowledgement behavior with the deployed runtime.
+
+### Target
+
+Grant the same account permission to publish only to the intended queues. Pre-create production queues with the retention, durability, and dead-letter policy required by downstream consumers.
 
 ## Create a connection
 

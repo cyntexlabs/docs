@@ -34,7 +34,13 @@ Use Greenplum for point-in-time table reads or as a target for analytical data.
 
 ## Before you begin
 
-Create separate reader and writer accounts limited to the selected schema. The upstream guide exposes a `logPluginName` setting for incremental work, but the current catalog declares Snapshot only; do not configure an incremental path based on that field alone.
+### Source
+
+Create a reader account limited to the selected schema. The upstream guide exposes a `logPluginName` setting for incremental work, but the current catalog declares Snapshot only; do not configure an incremental path based on that field alone.
+
+### Target
+
+Create a separate writer account limited to the destination schema. Grant DDL privileges only when the pipeline is approved to manage destination tables.
 
 ## Create a connection
 
@@ -77,5 +83,5 @@ tapstate validate --workdir tapstate-work
 |---|---|---|---|
 | `host`, `port`, `database`, `schema` | Yes | — | Greenplum endpoint and selected schema. |
 | `user`, `password` | No | — | Connection account and secret. |
-| `logPluginName` | Yes | `pgoutput` | Plugin enum includes `pgoutput`, `wal2json`, and related variants. |
+| `logPluginName` | Yes | `pgoutput` | Catalog enum: `pgoutput`, `decoderbufs`, `wal2json`, `wal2json_rds`, `wal2json_streaming`, and `wal2json_rds_streaming`. This Snapshot-only guide does not establish a CDC path. |
 | `extParams`, `timezone` | No | empty timezone | Extra parameters and UTC offset. |

@@ -80,6 +80,8 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
+Local validation checks the resource envelope, Snapshot mode, and catalog-defined field shapes. It does not authenticate to StarRocks, discover source tables, access FE or BE endpoints, or load a target row.
+
 ## Limitations
 
 - The catalog declares Snapshot only; it does not declare CDC or DDL behavior.

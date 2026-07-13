@@ -34,6 +34,8 @@ Use BigQuery as a destination for pipeline data with a Google Cloud service acco
 
 ## Before you begin
 
+### Target
+
 1. Ensure the TapState runtime can reach Google Cloud APIs.
 2. Create a dedicated Google Cloud service account and JSON key. Keep the key in a secret manager and rotate it according to your security policy.
 3. Grant a custom role scoped to the intended project or dataset. The reused connector uses these permissions:

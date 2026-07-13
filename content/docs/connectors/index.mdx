@@ -1,28 +1,35 @@
 ---
-title: Connectors
-description: Choose and configure a TapState connector by system type and data-delivery outcome
+title: Connector directory
+description: Compare and configure TapState connectors by category, maturity, role, and read mode
 sidebar:
   order: 1
+ai:
+  kind: guide
+  id: connector-directory
+  maturity: ga
+  aliases: [connector directory, supported connectors, connector matrix, connector compatibility, supported databases, supported data sources]
 ---
 
-import { CardGrid, LinkCard } from '@/components/mdx';
+import { Aside, SupportedConnectorMatrix } from '@/components/mdx';
 
-Choose a connector by the system you need to read from or write to. Each guide separates what the local catalog can validate from the preparation that must be completed in the source or target system.
+Choose a connector before designing a pipeline. This directory records the public documentation contract; it is not a promise that a local configuration check has reached a live system.
 
-<CardGrid>
-  <LinkCard title="Supported data sources" href="/docs/connectors/supported-data-sources" description="Compare every documented connector by maturity, role, and read mode." />
-  <LinkCard title="How connection validation works" href="/docs/overview/release-status" description="Understand what local validation checks before a runtime is available." />
-</CardGrid>
+<SupportedConnectorMatrix />
 
-## Browse by category
+## Maturity labels
 
-The sidebar groups the directory into collapsible categories. Open the category that matches your integration task, then use the profile on each connector page for the exact roles and modes.
+- **GA** means the connector has a stable, generally available contract intended for production use.
+- **Preview** means the connector is ready to evaluate, but its configuration or behavior may still change before GA. Validate production workloads with the connector contract supplied by your TapState deployment.
+- **Deprecated** means the connector remains documented for existing deployments, but new work should use its named replacement.
 
-## Read the directory correctly
+TapState uses GA and Preview for current connectors. The upstream inventory's former **Beta** group maps to **Preview**, a clearer customer-facing term. **Deprecated** is retained only when a current catalog explicitly marks a legacy connector that customers may still need to maintain. We do not show **Alpha** until a connector has a documented, limited-access contract.
 
-| Signal | Meaning |
-|---|---|
-| Maturity | **GA** is a stable, generally available contract. **Preview** is available for evaluation, but its configuration or behavior may change before GA. |
-| Source | The documented way to read data: Snapshot, CDC, stream, or API. |
-| Target | The current catalog declares data writing; details remain on the individual guide. |
-| Schema changes | DDL handling only when it is explicitly evidenced; otherwise it is not claimed. |
+## How to read roles and modes
+
+- **Source** reads from the listed system. The read mode tells you whether that happens as a one-time Snapshot, Snapshot + CDC, stream, or API read.
+- **Target** means the current catalog declares data writing. Check the connector guide before relying on table creation, schema evolution, or a particular write behavior.
+- **Not declared** means the catalog has a source connection contract but does not declare a readable mode. A dash means the guide is target-only. Neither value implies an undocumented source mode.
+
+<Aside type="note" title="Validation boundary">
+  `tapstate validate` checks the resource envelope plus catalog-known connector IDs, modes, and field shapes. It does not prove network reachability, credentials, permissions, API scope, data access, or a live write. Individual guides state the preparation and runtime checks required for that system.
+</Aside>

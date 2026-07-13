@@ -34,7 +34,9 @@ Use RabbitMQ to read or write streaming queue messages.
 
 ## Before you begin
 
-Create a dedicated user with AMQP access to the intended virtual host and management-API access if the deployed connector requires queue metadata. The reused connector uses these commands for the default virtual host:
+### Source
+
+Create a dedicated user with AMQP read access to the intended virtual host and management-API access if the deployed connector requires queue metadata. The reused connector uses these commands for the default virtual host:
 
 ```bash
 rabbitmqctl add_user tapstate_reader replace_with_a_secret
@@ -43,6 +45,10 @@ rabbitmqctl set_user_tags tapstate_reader management
 ```
 
 Use narrower permissions in production and verify the correct AMQP and management endpoint ports with your RabbitMQ deployment.
+
+### Target
+
+Grant the destination account permission to publish only to the intended exchanges and queues. Pre-create production queues, bindings, durability, and dead-letter policy before enabling delivery.
 
 ## Create a connection
 

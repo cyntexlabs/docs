@@ -52,6 +52,8 @@ ALTER USER tapstate_reader REPLICATION;
 
 Configure logical WAL, enough replication slots and senders for concurrent pipelines, and a `pg_hba.conf` rule that allows the runtime network. For `pgoutput`, make sure the required publication exists and selected tables have a suitable replica identity.
 
+`logPluginName` selects the decoding path. `pgoutput` is built in; `wal2json` and `decoderbufs` require the corresponding server plugin. The catalog also accepts `wal2json_rds`, `wal2json_streaming`, and `wal2json_rds_streaming`; these names alone do not define a PolarDB server setup, so select them only when the deployment provides the matching managed-service contract. Test the selected plugin with one insert, update, and delete before enabling a production pipeline.
+
 </SourceModeTab>
 </SourceModeTabs>
 
@@ -115,5 +117,5 @@ Run a staging snapshot and verify an insert, update, and delete through the sele
 | `database`, `schema` | Yes | — | Database and schema to discover. |
 | `user`, `password` | User no | — | Database credentials. |
 | `extParams` | No | — | Additional connection parameters. |
-| `logPluginName` | Yes | `pgoutput` | Decoding method: `pgoutput`, `decoderbufs`, or a supported `wal2json` variant. |
+| `logPluginName` | Yes | `pgoutput` | Decoding method: `pgoutput`, `decoderbufs`, `wal2json`, `wal2json_rds`, `wal2json_streaming`, or `wal2json_rds_streaming`. |
 | `timezone` | No | Empty | UTC offset for temporal conversion. |
