@@ -13,7 +13,7 @@ ai:
   aliases: [mongodb atlas snapshot, mongodb atlas cdc, atlas oplog, atlas source, atlas target]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Connect a MongoDB Atlas cluster as a TapState source or target for snapshots and CDC through the Atlas-managed Oplog.
@@ -23,7 +23,7 @@ Connect a MongoDB Atlas cluster as a TapState source or target for snapshots and
   maturity="GA"
   maturityLabel="Production ready"
   worksAs="Source, Target"
-  capabilities="Snapshot, CDC, Schema discovery"
+  capabilities="Snapshot, CDC, Schema discovery, Data write"
   compatibility="MongoDB Atlas 5.0.15+ · SRV and standard URI"
 />
 
@@ -81,7 +81,7 @@ Use **Snapshot + CDC** when the target must start with existing documents and co
 **2. Create a CDC reader**
 
 - In **Database Access**, create a password user.
-- Select `Read Any Database`, or a custom role that can read the selected database and the Oplog path required by the reused connector.
+- Select `Read Any Database`, or a custom role that can read the selected database and the Oplog path required by the connector.
 
 **3. Copy an application URI with a database path**
 
@@ -115,9 +115,6 @@ config:
   # The database name must be specified in the URI path (e.g., /mydb above).
   # Omitting the database from the URI will cause a connection error.
 
-options:
-  start_from: latest
-
 tables:
   - users
   - /orders_.*/
@@ -129,14 +126,16 @@ tables:
 tapstate validate --workdir tapstate-work
 ```
 
-Offline validation checks resource structure and catalog-backed fields. It does not test the Atlas network allowlist, credentials, DNS seed discovery, or Oplog access.
+<ValidationStatusGuide />
+
+Offline validation checks resource structure and documented fields. It does not test the Atlas network allowlist, credentials, DNS seed discovery, or Oplog access.
 
 ## Limitations
 
 - The database name must be present in the URI path.
 - The runtime network origin must be allowed by Atlas Network Access.
 - Oplog retention depends on the Atlas tier and configuration; size it beyond the longest recovery window.
-- Advanced full-document filling and sharding controls from upstream products are not exposed by the current TapState catalog.
+- Advanced full-document filling and sharding controls are not part of this TapState connection contract.
 
 ## Reference
 
@@ -152,7 +151,7 @@ Offline validation checks resource structure and catalog-backed fields. It does 
 | `password` | No | — | Database password. |
 | `additionalString` | No | — | Additional connection parameters. |
 | `schemaLimit` | No | `1024` | Maximum number of sampled documents used by the connector's schema inference path. |
-| `ssl` | No | `false` | Enable the catalog-backed SSL path when URI options are insufficient. |
+| `ssl` | No | `false` | Enable the documented SSL path when URI options are insufficient. |
 | `sslKey` | With `ssl` | — | Client key material. |
 | `sslPass` | No | — | Password for the client key. |
 | `sslValidate` | No | — | Validate the server certificate. |

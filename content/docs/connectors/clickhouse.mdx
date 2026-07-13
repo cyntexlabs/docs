@@ -13,7 +13,7 @@ ai:
   aliases: [clickhouse, clickhouse snapshot, clickhouse source, clickhouse target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use ClickHouse for point-in-time reads or as an analytical destination.
 
@@ -22,15 +22,15 @@ Use ClickHouse for point-in-time reads or as an analytical destination.
   maturity="GA"
   maturityLabel="General availability"
   worksAs="Source, Target"
-  capabilities="Snapshot, Schema discovery, Data write"
+  capabilities="Snapshot, Schema discovery, Data write, Target DDL apply"
   compatibility="ClickHouse 20.x–24.x"
 />
 
-<ConnectorCapabilities source="Snapshot read" target="Data write" />
-
-<Aside type="note" title="Local validation boundary">
-  The bundled catalog validates the Snapshot mode and documented field shapes. It does not connect to ClickHouse, validate credentials, or verify a target write.
-</Aside>
+<ConnectorCapabilities
+  source="Full load (Snapshot)"
+  target="Data write"
+  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
+/>
 
 ## Before you begin
 
@@ -76,6 +76,37 @@ tables:
 
 For a target-only connection, omit `mode` and `tables`.
 
+```yaml title="tapstate-work/source/analytics_clickhouse_target.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: analytics_clickhouse_target
+connector: clickhouse
+config:
+  host: analytics-clickhouse.internal
+  port: "8123"
+  database: analytics
+  user: ${CLICKHOUSE_WRITER_USER}
+  password: ${CLICKHOUSE_WRITER_PASSWORD}
+```
+
+```yaml title="tapstate-work/pipeline/events_to_clickhouse.tapstate.yml"
+version: tapstate/v1
+kind: pipeline
+id: events_to_clickhouse
+source: analytics_clickhouse
+serve:
+  from: /.*/
+  sync:
+    - id: write_to_clickhouse
+      source: analytics_clickhouse_target
+      write_mode: upsert
+      ddl: fail
+```
+
+Pre-create ClickHouse tables when their engine, sort key, partitioning, or retention must be controlled. Keep `ddl: fail` until table creation and evolution have been tested against the chosen engine.
+
+The target connector implements add column, rename column, alter column attributes, and drop column. Use `ddl: apply` only after those operations have passed staging against the exact ClickHouse version and table engine.
+
 ## Validate the configuration
 
 ```bash
@@ -84,11 +115,11 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-This checks the local resource, Snapshot mode, and catalog-known field types—not network access, ClickHouse privileges, or query results.
+This checks the local resource, Snapshot mode, and known field types. It does not test network access, ClickHouse privileges, or query results.
 
 ## Limitations
 
-- The catalog declares Snapshot only; it does not declare a CDC or DDL contract.
+- This guide covers point-in-time reads. Treat CDC and source DDL delivery as staging-test cases rather than assuming either behavior.
 - ClickHouse HTTP is commonly served on port `8123`; confirm the endpoint and any encryption settings with your deployment rather than assuming a TLS field.
 - The connector implementation creates `ReplacingMergeTree` with the primary key as the sort key when the source has a primary key; otherwise it creates `MergeTree` without a sort key. Pre-create tables when that default does not fit the query or retention design.
 - Binary source values are Base64-encoded into ClickHouse strings by the connector implementation because the documented ClickHouse type baseline has no binary type.

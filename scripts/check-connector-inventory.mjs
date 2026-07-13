@@ -40,7 +40,8 @@ const published = entriesFor('connectorDirectory');
 const deferred = entriesFor('deferredCatalogConnectors');
 const covered = entriesFor('coveredCatalogConnectors');
 const nonCatalog = entriesFor('nonCatalogPublishedConnectors');
-const classified = [...published, ...deferred, ...covered];
+const publishedCatalog = published.filter((id) => catalogIds.includes(id));
+const classified = [...publishedCatalog, ...deferred, ...covered];
 
 const errors = [
   ...duplicateValues(catalogIds).map((id) => `duplicate catalog ID: ${id}`),
@@ -56,4 +57,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`Connector inventory complete: ${catalogIds.length} catalog IDs (${published.length} published, ${covered.length} covered, ${deferred.length} deferred); ${nonCatalog.length} published server-side guides outside the catalog.`);
+console.log(`Connector inventory complete: ${catalogIds.length} catalog IDs (${publishedCatalog.length} published, ${covered.length} covered, ${deferred.length} deferred); ${nonCatalog.length} published server-side guides outside the catalog; ${published.length} public guides total.`);

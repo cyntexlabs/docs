@@ -13,9 +13,9 @@ ai:
   aliases: [apache hudi, hudi, hudi target, hudi hive, hudi kerberos]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Apache Hudi as a catalog-declared destination backed by the configured Hadoop and Hive environment.
+Use Apache Hudi as a destination backed by the configured Hadoop and Hive environment.
 
 <ConnectorProfile
   category="Warehouses & analytics"
@@ -28,15 +28,17 @@ Use Apache Hudi as a catalog-declared destination backed by the configured Hadoo
 
 <ConnectorCapabilities source="No documented source mode" target="Data write" />
 
-<Aside type="note" title="Local validation boundary">
-  The catalog validates this configuration shape. It does not load Hadoop XML, authenticate with Kerberos, reach Hive, create a Hudi table, or write files.
-</Aside>
-
 ## Before you begin
 
 ### Target
 
-Obtain the cluster address, destination database, Hadoop and Hive site configuration, and a least-privilege account. If Kerberos is enabled, obtain the keytab, Kerberos configuration, and principal from the platform administrator.
+Install a Hadoop client compatible with the cluster on the machine that runs TapState, then check its version:
+
+```bash
+hadoop -version
+```
+
+Obtain the cluster address, destination database, Hadoop and Hive site configuration, and a least-privilege account. If Kerberos is enabled, obtain the keytab, Kerberos configuration, and Hive principal from the platform administrator. The principal is environment-specific; do not copy an example principal from another cluster.
 
 ## Create a connection
 
@@ -55,6 +57,7 @@ config:
   hdfsSiteXML: ${HDFS_SITE_XML}
   hiveSiteXML: ${HIVE_SITE_XML}
   ssl: true
+  extParams: "sasl.qop=auth-conf;auth=KERBEROS"
 ```
 
 When `krb5: true`, also provide `krb5Keytab`, `krb5Conf`, and `principal`.
@@ -67,11 +70,13 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
+Validation checks resource shape and known field types. It does not load Hadoop XML, authenticate with Kerberos, reach Hive, create a Hudi table, or write files.
+
 ## Limitations
 
-- The catalog declares a target only, with no source mode, CDC, DDL, or table-layout contract.
+- This guide covers a target connection only. Confirm source modes, CDC, DDL, and table-layout behavior with the deployed connector contract before relying on them.
 - Site XML and Kerberos material are sensitive deployment inputs; do not commit them to a workspace.
-- The reused connector is Hudi 0.11.0. Verify metastore integration and exact table behavior in staging.
+- The documented connector baseline is Hudi 0.11.0. Verify metastore integration and exact table behavior in staging.
 
 ## Reference
 

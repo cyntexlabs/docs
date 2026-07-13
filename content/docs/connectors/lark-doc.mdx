@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Lark Doc as a catalog-declared API source for document content.
+Use Lark Doc as a supported API source for document content.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -29,7 +29,7 @@ Use Lark Doc as a catalog-declared API source for document content.
 <ConnectorCapabilities source="API read" target="No documented target role" />
 
 <Aside type="note" title="Runtime access is outside local validation">
-  The catalog declares an API source with application credentials. It does not declare a document selector, a target, or a credential test; those behaviors must be confirmed in the deployed connector contract.
+  TapState supports an API source with application credentials. It does not declare a document selector, a target, or a credential test; those behaviors must be confirmed in the deployed connector contract.
 </Aside>
 
 ## Before you begin
@@ -41,7 +41,7 @@ Use Lark Doc as a catalog-declared API source for document content.
 3. Grant the least document, drive, or wiki permissions that the intended read requires.
 4. Review the platform's API frequency limits before scheduling downstream reads.
 
-The reused connector also recommends publishing the app and assigning any required document or wiki administrator role. Confirm the exact permission model with the tenant administrator before a production run.
+The connector also recommends publishing the app and assigning any required document or wiki administrator role. Confirm the exact permission model with the tenant administrator before a production run.
 
 ## Create a connection
 
@@ -64,11 +64,11 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, API mode, and catalog-known field names. It does not authenticate to Lark/Feishu, test app publication or permissions, enumerate documents, or retrieve content.
+Local validation checks the resource envelope, API mode, and recognized field names. It does not authenticate to Lark/Feishu, test app publication or permissions, enumerate documents, or retrieve content.
 
 ## Limitations
 
-- The catalog declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- TapState supports an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
 - Document visibility, tenant policy, rate limits, and API responses are enforced by Lark/Feishu at runtime.
 - Do not commit App Secret values in a `.tapstate.yml` file.
 

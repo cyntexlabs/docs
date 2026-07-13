@@ -1,6 +1,6 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import Link from 'next/link';
-import { BadgeCheck, CircleAlert, CircleCheck, Database, FileText, RadioTower, Store, TableProperties, Wrench } from 'lucide-react';
+import { ArrowRight, BadgeCheck, CircleAlert, CircleCheck, Database, FileText, RadioTower, Store, TableProperties, Wrench } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { MDXComponents } from 'mdx/types';
 import {
@@ -77,6 +77,15 @@ type ConnectorProfileProps = {
   worksAs: string;
   capabilities: string;
   compatibility: string;
+};
+
+const connectorCategoryAnchors: Record<string, ConnectorCategoryId> = {
+  Databases: 'databases',
+  'Warehouses & analytics': 'warehouses-analytics',
+  'Streaming & messaging': 'streaming-messaging',
+  Files: 'files',
+  'SaaS, business & commerce APIs': 'saas-business-commerce-apis',
+  'Custom & development': 'custom-development',
 };
 
 function connectorMaturityTone(maturity: string) {
@@ -179,9 +188,13 @@ export function ConnectorProfile({
       <h2 className="sr-only">Connector profile</h2>
       <dl className="divide-y divide-fd-border">
         <ConnectorProfileRow label="Category">
-          <span className="inline-flex rounded-md border border-fd-border bg-fd-muted/55 px-2 py-0.5 text-xs font-medium leading-5 text-fd-foreground">
-            {category}
-          </span>
+          <Link
+            href={`/docs/connectors#connector-category-${connectorCategoryAnchors[category] ?? 'databases'}`}
+            className="group inline-flex items-center gap-1.5 rounded-md border border-fd-border bg-fd-muted/55 px-2 py-0.5 text-xs font-medium leading-5 text-fd-foreground no-underline transition-colors hover:border-fd-primary/40 hover:text-fd-primary"
+          >
+            <span>{category}</span>
+            <ArrowRight aria-hidden="true" className="size-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2} />
+          </Link>
         </ConnectorProfileRow>
         <ConnectorProfileRow label="Maturity">
           <span className="flex flex-wrap items-center gap-2.5">
@@ -250,33 +263,33 @@ export function ConnectorCapabilities({
   );
 }
 
-/** Code-backed guidance for interpreting CLI validation without simulating a live connection test. */
+/** Illustrative offline-validation outcomes; this does not simulate a live connection test. */
 export function ValidationStatusGuide() {
   return (
     <div className="not-prose my-5 grid gap-3 sm:grid-cols-2">
       <section className="rounded-xl border border-emerald-200 bg-emerald-50/65 p-4 dark:border-emerald-900 dark:bg-emerald-950/25">
         <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-800 dark:text-emerald-200">
           <CircleCheck aria-hidden="true" className="size-4" strokeWidth={2.25} />
-          Valid
+          Example: validation passed
         </div>
         <code className="block rounded-md border border-emerald-200/80 bg-white/70 px-2.5 py-2 text-xs text-emerald-950 dark:border-emerald-900 dark:bg-black/15 dark:text-emerald-100">
           valid: 3 resources in tapstate-work
         </code>
         <p className="mb-0 mt-2 text-sm text-emerald-950/80 dark:text-emerald-100/80">
-          Exit code 0. The workspace passed structure, reference, and known mode/config checks.
+          Exit code 0 means the workspace passed structure, reference, and known mode and configuration checks. The resource count varies by workspace.
         </p>
       </section>
       <section className="rounded-xl border border-amber-200 bg-amber-50/65 p-4 dark:border-amber-900 dark:bg-amber-950/25">
         <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-900 dark:text-amber-200">
           <CircleAlert aria-hidden="true" className="size-4" strokeWidth={2.25} />
-          Needs attention
+          Example: changes required
         </div>
         <code className="block whitespace-pre-wrap rounded-md border border-amber-200/80 bg-white/70 px-2.5 py-2 text-xs leading-5 text-amber-950 dark:border-amber-900 dark:bg-black/15 dark:text-amber-100">
           {`invalid: orders_source.tapstate.yml:12:1  dsl.unknown-field
 Unknown field 'unexpected' at unexpected.`}
         </code>
         <p className="mb-0 mt-2 text-sm text-amber-950/80 dark:text-amber-100/80">
-          Exit code 1. The CLI also prints a suggested fix; apply it and validate again.
+          Exit code 1 means at least one local rule failed. The filename, location, error code, message, and suggested fix reflect the affected resource.
         </p>
       </section>
     </div>
@@ -336,12 +349,12 @@ function DirectoryMaturity({ maturity }: { maturity: ConnectorMaturity }) {
   );
 }
 
-/** A compact, filter-free support directory. The canonical data lives in connector-directory.ts. */
+/** A compact, filter-free connector index. The canonical data lives in connector-directory.ts. */
 export function SupportedConnectorMatrix() {
   const maturityCounts = connectorMaturityCounts();
 
   return (
-    <section aria-label="Supported data sources" className="not-prose my-8">
+    <section aria-label="Supported connectors" className="not-prose my-8">
       <div className="mb-8 flex flex-wrap items-center gap-2 text-sm text-fd-muted-foreground">
         <span className="font-medium text-fd-foreground">{maturityCounts.ga + maturityCounts.preview + maturityCounts.deprecated} documented connectors</span>
         <span aria-hidden="true">·</span>
@@ -382,18 +395,25 @@ export function SupportedConnectorMatrix() {
                     {connectors.map((connector) => (
                       <tr key={connector.slug} className="transition-colors hover:bg-fd-accent/40">
                         <th className="px-0 py-2.5 font-medium text-fd-foreground">
-                          <Link href={`/docs/connectors/${connector.slug}`} className="no-underline hover:text-fd-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
-                            {connector.title}
+                          <Link href={`/docs/connectors/${connector.slug}`} className="group inline-flex items-center gap-1.5 text-fd-primary underline decoration-fd-primary/25 underline-offset-4 transition-colors hover:decoration-fd-primary focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
+                            <span>{connector.title}</span>
+                            <ArrowRight aria-hidden="true" className="size-3.5 transition-transform group-hover:translate-x-0.5" strokeWidth={2} />
                           </Link>
                         </th>
                         <td className="px-3 py-2.5"><DirectoryMaturity maturity={connector.maturity} /></td>
-                        <td className="px-3 py-2.5 text-fd-muted-foreground">{connector.useAs.map((role) => role[0].toUpperCase() + role.slice(1)).join(' + ')}</td>
+                        <td className="px-3 py-2.5 text-fd-muted-foreground">
+                          {connector.useAs.length > 0
+                            ? connector.useAs.map((role) => role[0].toUpperCase() + role.slice(1)).join(' + ')
+                            : 'Not declared'}
+                        </td>
                         <td className="px-3 py-2.5 text-fd-muted-foreground">
                           {connector.modes.length > 0
                             ? connector.modes.join(' · ')
                             : connector.useAs.includes('source')
                               ? 'Not declared'
-                              : '—'}
+                              : connector.useAs.includes('target')
+                                ? '—'
+                                : 'Not declared'}
                         </td>
                       </tr>
                     ))}

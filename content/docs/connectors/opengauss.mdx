@@ -22,17 +22,18 @@ Use openGauss to copy the rows that exist now, or as a destination for data writ
   maturity="Preview"
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
-  capabilities="Snapshot, Schema discovery, Data write"
+  capabilities="Snapshot, Schema discovery, Data write, Target DDL apply"
   compatibility="openGauss 3.0+"
 />
 
 <ConnectorCapabilities
   source="Snapshot read"
   target="Data write"
+  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 <Aside type="note" title="Local validation boundary">
-  The bundled catalog validates the `snapshot` mode and the fields documented below. It does not establish CDC support, test credentials, or connect to an openGauss server.
+  The local configuration schema validates the `snapshot` mode and the fields documented below. It does not establish CDC support, test credentials, or connect to an openGauss server.
 </Aside>
 
 ## Before you begin
@@ -78,7 +79,7 @@ tapstate new --non-interactive \
   --workdir tapstate-work
 ```
 
-The resulting source connection uses catalog-backed field names:
+The resulting source connection uses documented field names:
 
 ```yaml title="tapstate-work/source/orders_opengauss.tapstate.yml"
 version: tapstate/v1
@@ -125,13 +126,13 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-The command validates the local resource structure, `snapshot` mode, and known catalog field shapes. It does not validate a network route, database credentials, permissions, or a live write.
+The command validates the local resource structure, `snapshot` mode, and known connection field shapes. It does not validate a network route, database credentials, permissions, or a live write.
 
 ## Limitations
 
-- The current catalog declares Snapshot, not CDC. Do not configure `mode: cdc` for openGauss from this page.
-- The `logPluginName` setting is catalog-backed, but its presence does not prove a supported CDC path.
-- Connection encryption and advanced runtime options are deployment-specific; this page does not infer them from upstream UI documentation.
+- The current connection contract declares Snapshot, not CDC. Do not configure `mode: cdc` for openGauss from this page.
+- The `logPluginName` setting is documented, but its presence does not prove a supported CDC path.
+- Connection encryption and advanced runtime options are deployment-specific. Use only the settings supplied by your TapState deployment.
 
 ## Reference
 
@@ -144,5 +145,5 @@ The command validates the local resource structure, `snapshot` mode, and known c
 | `user` | No | — | Database user. Prefer an environment variable. |
 | `password` | No | — | Database password. Prefer an environment variable. |
 | `extParams` | No | — | Connector-specific connection parameters. |
-| `logPluginName` | Yes | `pgoutput` | Catalog enum: `pgoutput`, `decoderbufs`, `wal2json`, `wal2json_rds`, `wal2json_streaming`, and `wal2json_rds_streaming`. This Snapshot-only guide does not establish a CDC path. |
+| `logPluginName` | Yes | `pgoutput` | Values: `pgoutput`, `decoderbufs`, `wal2json`, `wal2json_rds`, `wal2json_streaming`, and `wal2json_rds_streaming`. This Snapshot-only guide does not establish a CDC path. |
 | `timezone` | No | empty | UTC offset used by the connector. |

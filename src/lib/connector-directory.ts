@@ -18,6 +18,20 @@ export type ConnectorDirectoryItem = {
   modes: string[];
 };
 
+export type UpstreamConnectorPageDisposition = {
+  source: string;
+  reason: string;
+};
+
+export type CoveredUpstreamConnectorPage = UpstreamConnectorPageDisposition & {
+  guide: string;
+};
+
+export type MigratedUpstreamConnectorPage = {
+  source: string;
+  guide: string;
+};
+
 export const connectorCategories: Array<{
   id: ConnectorCategoryId;
   label: string;
@@ -82,8 +96,6 @@ export const connectorDirectory: ConnectorDirectoryItem[] = [
   { slug: 'feishu-bitable', id: 'feishu-bitable', title: 'Lark Bitable', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'lark-approval', id: 'lark-approval', title: 'Lark Approval', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'lark-doc', id: 'lark-doc', title: 'Lark Doc', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
-  { slug: 'lark-im', id: 'lark-im', title: 'Lark IM', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['target'], modes: [] },
-  { slug: 'lark-task', id: 'lark-task', title: 'Lark Task', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['target'], modes: [] },
   { slug: 'alibaba-1688', id: 'ali1688', title: 'Alibaba 1688', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'github', id: 'GitHub', title: 'GitHub', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['api'] },
   { slug: 'quickapi', id: 'quickapi', title: 'QuickAPI', category: 'saas-business-commerce-apis', maturity: 'preview', useAs: ['source'], modes: ['snapshot'] },
@@ -97,7 +109,6 @@ export const connectorDirectory: ConnectorDirectoryItem[] = [
 
   { slug: 'custom', id: 'custom', title: 'Custom Connection', category: 'custom-development', maturity: 'preview', useAs: ['source', 'target'], modes: ['snapshot', 'cdc'] },
   { slug: 'dummy', id: 'dummy', title: 'Dummy', category: 'custom-development', maturity: 'preview', useAs: ['source', 'target'], modes: ['snapshot', 'cdc'] },
-  { slug: 'hazelcast', id: 'hazelcast', title: 'Hazelcast', category: 'custom-development', maturity: 'preview', useAs: ['source'], modes: [] },
 ];
 
 /**
@@ -126,13 +137,147 @@ export const deferredCatalogConnectors: Array<{ id: string; reason: string }> = 
   { id: 'bes-channels', reason: 'BES Channels needs a messaging-specific product contract.' },
   { id: 'coding', reason: 'Coding needs OAuth and webhook behavior verified against the deployment.' },
   { id: 'kafka_avro', reason: 'Kafka Avro needs a separate schema-registry compatibility decision.' },
+  { id: 'lark-im', reason: 'The catalog does not declare a source or target role or an operating mode.' },
+  { id: 'lark-task', reason: 'The catalog does not declare a source or target role or an operating mode.' },
   { id: 'shein', reason: 'Shein needs a current marketplace API contract.' },
   { id: 'temu', reason: 'Temu needs a current marketplace API contract.' },
   { id: 'file-stream', reason: 'File Stream needs a runtime file-transport contract.' },
+  { id: 'hazelcast', reason: 'The catalog declares neither a read mode nor target-write capability, so no pipeline role can be published.' },
 ];
 
 /** Legacy IDs represented by a current published guide rather than a duplicate page. */
 export const coveredCatalogConnectors: Array<{ id: string; guide: string; reason: string }> = [];
+
+/**
+ * Independent connector pages migrated from the docs-en 4.21.0 baseline. Keep the
+ * source path explicit so the upstream migration can be checked as a closed set.
+ * The TapState guide remains the canonical reader-facing page after adaptation.
+ */
+export const migratedUpstreamConnectorPages: MigratedUpstreamConnectorPage[] = [
+  { source: 'cloud-databases/amazon-rds-mysql.md', guide: 'aws-rds-mysql' },
+  { source: 'cloud-databases/azure-cosmos-db.md', guide: 'azure-cosmosdb' },
+  { source: 'cloud-databases/mongodb-atlas.md', guide: 'mongodb-atlas' },
+  { source: 'cloud-databases/polardb-mysql.md', guide: 'polar-db-mysql' },
+  { source: 'cloud-databases/polardb-postgresql.md', guide: 'polar-db-postgresql' },
+  { source: 'crm-and-sales-analytics/hubspot.md', guide: 'hubspot' },
+  { source: 'crm-and-sales-analytics/metabase.md', guide: 'metabase' },
+  { source: 'crm-and-sales-analytics/salesforce.md', guide: 'salesforce' },
+  { source: 'crm-and-sales-analytics/zoho-crm.md', guide: 'zoho-crm' },
+  { source: 'e-commerce/alibaba-1688.md', guide: 'alibaba-1688' },
+  { source: 'files/csv.md', guide: 'csv' },
+  { source: 'files/excel.md', guide: 'excel' },
+  { source: 'files/json.md', guide: 'json' },
+  { source: 'files/xml.md', guide: 'xml' },
+  { source: 'mq-and-middleware/activemq.md', guide: 'activemq' },
+  { source: 'mq-and-middleware/kafka-enhanced.md', guide: 'kafka' },
+  { source: 'mq-and-middleware/kafka.md', guide: 'kafka-legacy' },
+  { source: 'mq-and-middleware/rabbitmq.md', guide: 'rabbitmq' },
+  { source: 'mq-and-middleware/rocketmq.md', guide: 'rocketmq' },
+  { source: 'on-prem-databases/elasticsearch.md', guide: 'elasticsearch' },
+  { source: 'on-prem-databases/mariadb.md', guide: 'mariadb' },
+  { source: 'on-prem-databases/mongodb-below34.md', guide: 'mongodb3' },
+  { source: 'on-prem-databases/mongodb.md', guide: 'mongodb' },
+  { source: 'on-prem-databases/mysql-pxc.md', guide: 'mysql-pxc' },
+  { source: 'on-prem-databases/mysql.md', guide: 'mysql' },
+  { source: 'on-prem-databases/oceanbase.md', guide: 'oceanbase' },
+  { source: 'on-prem-databases/opengauss.md', guide: 'opengauss' },
+  { source: 'on-prem-databases/oracle.md', guide: 'oracle' },
+  { source: 'on-prem-databases/postgresql.md', guide: 'postgresql' },
+  { source: 'on-prem-databases/redis.md', guide: 'redis' },
+  { source: 'on-prem-databases/sqlserver.md', guide: 'sqlserver' },
+  { source: 'on-prem-databases/tdengine.md', guide: 'tdengine' },
+  { source: 'on-prem-databases/tidb.md', guide: 'tidb' },
+  { source: 'others/custom-connection.md', guide: 'custom' },
+  { source: 'others/dummy.md', guide: 'dummy' },
+  { source: 'others/http-receiver.md', guide: 'http-receiver' },
+  { source: 'saas-and-api/feishu-bitable.md', guide: 'feishu-bitable' },
+  { source: 'saas-and-api/github.md', guide: 'github' },
+  { source: 'saas-and-api/lark-approval.md', guide: 'lark-approval' },
+  { source: 'saas-and-api/lark-doc.md', guide: 'lark-doc' },
+  { source: 'saas-and-api/quick-api.md', guide: 'quickapi' },
+  { source: 'saas-and-api/vika.md', guide: 'vika' },
+  { source: 'saas-and-api/zoho-desk.md', guide: 'zoho-desk' },
+  { source: 'warehouses-and-lake/big-query.md', guide: 'bigquery' },
+  { source: 'warehouses-and-lake/clickhouse.md', guide: 'clickhouse' },
+  { source: 'warehouses-and-lake/databend.md', guide: 'databend' },
+  { source: 'warehouses-and-lake/doris.md', guide: 'doris' },
+  { source: 'warehouses-and-lake/greenplum.md', guide: 'greenplum' },
+  { source: 'warehouses-and-lake/hudi.md', guide: 'hudi' },
+  { source: 'warehouses-and-lake/paimon.md', guide: 'paimon' },
+  { source: 'warehouses-and-lake/selectdb.md', guide: 'selectdb' },
+  { source: 'warehouses-and-lake/snowflake.md', guide: 'snowflake' },
+  { source: 'warehouses-and-lake/starrocks.md', guide: 'starrocks' },
+];
+
+/**
+ * Independent connector pages in the docs-en 4.21.0 migration baseline that do not need a
+ * second TapState page. These are documentation mappings only: they do not expand the roles,
+ * modes, or deployment support declared by the published guide.
+ */
+export const coveredUpstreamConnectorPages: CoveredUpstreamConnectorPage[] = [
+  {
+    source: 'on-prem-databases/mongodb-atlas.md',
+    guide: 'mongodb-atlas',
+    reason: 'The cloud-databases and on-prem-databases entries describe the same MongoDB Atlas connection and are consolidated into one guide.',
+  },
+  {
+    source: 'others/mock-source.md',
+    guide: 'dummy',
+    reason: 'The Dummy guide is the current bidirectional test-data contract and covers its source behavior.',
+  },
+  {
+    source: 'others/mock-target.md',
+    guide: 'dummy',
+    reason: 'The Dummy guide is the current bidirectional test-data contract and covers its target behavior.',
+  },
+];
+
+/**
+ * Independent connector pages in the docs-en 4.21.0 migration baseline that are intentionally
+ * not published. A source page is deferred when the current catalog/server contract cannot
+ * substantiate a customer-facing TapState guide, or when platform-specific preparation remains
+ * unverified. Keep the reason concrete so a later catalog refresh can close the decision.
+ */
+export const deferredUpstreamConnectorPages: UpstreamConnectorPageDisposition[] = [
+  { source: 'cloud-databases/aliyun-adb-mysql.md', reason: 'No published TapState contract verifies the Alibaba Cloud warehouse fields, network path, and source/target behavior.' },
+  { source: 'cloud-databases/aliyun-adb-postgresql.md', reason: 'No published TapState contract verifies the Alibaba Cloud warehouse fields, network path, and source/target behavior.' },
+  { source: 'cloud-databases/aliyun-mongodb.md', reason: 'The managed MongoDB deployment needs verified Alibaba Cloud network, authentication, and CDC preparation.' },
+  { source: 'cloud-databases/aliyun-rds-for-mariadb.md', reason: 'The managed MariaDB deployment needs verified Alibaba Cloud network, privilege, and Binlog preparation.' },
+  { source: 'cloud-databases/aliyun-rds-for-mongodb.md', reason: 'The managed MongoDB deployment needs verified Alibaba Cloud network, authentication, and CDC preparation.' },
+  { source: 'cloud-databases/aliyun-rds-for-mysql.md', reason: 'The managed MySQL deployment needs verified Alibaba Cloud network, privilege, and Binlog preparation.' },
+  { source: 'cloud-databases/aliyun-rds-for-pg.md', reason: 'The managed PostgreSQL deployment needs verified Alibaba Cloud network, privilege, and WAL preparation.' },
+  { source: 'cloud-databases/aliyun-rds-for-sql-server.md', reason: 'No current catalog or server contract identifies this managed SQL Server deployment separately.' },
+  { source: 'cloud-databases/huawei-cloud-gaussdb.md', reason: 'GaussDB has platform-specific connection and CDC behavior that is not established by the current contract.' },
+  { source: 'cloud-databases/tencentdb-for-mariadb.md', reason: 'The managed MariaDB deployment needs verified Tencent Cloud network, privilege, and Binlog preparation.' },
+  { source: 'cloud-databases/tencentdb-for-mongodb.md', reason: 'The managed MongoDB deployment needs verified Tencent Cloud network, authentication, and CDC preparation.' },
+  { source: 'cloud-databases/tencentdb-for-mysql.md', reason: 'No current catalog contract identifies this deployment; cloud-specific network and Binlog preparation remains unverified.' },
+  { source: 'cloud-databases/tencentdb-for-pg.md', reason: 'The managed PostgreSQL deployment needs verified Tencent Cloud network, privilege, and WAL preparation.' },
+  { source: 'cloud-databases/tencentdb-for-sql-server.md', reason: 'No current catalog or server contract identifies this managed SQL Server deployment separately.' },
+  { source: 'e-commerce/shein.md', reason: 'A current marketplace API, authentication, and runtime behavior contract is not available.' },
+  { source: 'mq-and-middleware/ai-chat.md', reason: 'A current AI API and runtime behavior contract is not available.' },
+  { source: 'mq-and-middleware/bes-channels.md', reason: 'A current messaging role, mode, and connection contract is not available.' },
+  { source: 'mq-and-middleware/hazelcast-cloud.md', reason: 'The upstream page describes a target, but the current catalog declares neither a read mode nor target-write capability.' },
+  { source: 'on-prem-databases/dameng.md', reason: 'The current catalog does not provide a verified Dameng connector contract.' },
+  { source: 'on-prem-databases/db2-for-i.md', reason: 'The current catalog does not provide a verified IBM i connection, privilege, and change-data contract.' },
+  { source: 'on-prem-databases/db2.md', reason: 'The current catalog does not provide a verified Db2 connection, privilege, and change-data contract.' },
+  { source: 'on-prem-databases/gbase-8a.md', reason: 'The current catalog does not provide a verified GBase 8a connector contract.' },
+  { source: 'on-prem-databases/gbase-8s.md', reason: 'The current catalog does not provide a verified GBase 8s connector contract.' },
+  { source: 'on-prem-databases/hive1.md', reason: 'The current catalog does not provide a verified Hive 1 connection and read contract.' },
+  { source: 'on-prem-databases/hive3.md', reason: 'The current catalog does not provide a verified Hive 3 connection and read contract.' },
+  { source: 'on-prem-databases/informix.md', reason: 'The current catalog does not provide a verified Informix connector contract.' },
+  { source: 'on-prem-databases/kingbase-es-r3.md', reason: 'The current catalog does not provide a verified KingbaseES R3 connector contract.' },
+  { source: 'on-prem-databases/kingbase-es-r6.md', reason: 'The current catalog does not provide a verified KingbaseES R6 connector contract.' },
+  { source: 'on-prem-databases/mrs-hive3.md', reason: 'The current catalog does not provide a verified Huawei MRS network, authentication, and Hive read contract.' },
+  { source: 'on-prem-databases/oceanbase-oracle.md', reason: 'The published OceanBase guide covers MySQL mode; Oracle mode requires a distinct verified contract.' },
+  { source: 'on-prem-databases/sybase.md', reason: 'The current catalog does not provide a verified Sybase connector contract.' },
+  { source: 'on-prem-databases/vastbase.md', reason: 'PostgreSQL/openGauss compatibility alone is insufficient without a verified Vastbase contract.' },
+  { source: 'saas-and-api/coding.md', reason: 'A current OAuth, webhook, and runtime behavior contract is not available.' },
+  { source: 'saas-and-api/lark-im.md', reason: 'The catalog does not declare a source or target role or an operating mode.' },
+  { source: 'saas-and-api/lark-task.md', reason: 'The catalog does not declare a source or target role or an operating mode.' },
+  { source: 'warehouses-and-lake/gaussdb.md', reason: 'GaussDB(DWS) needs a verified warehouse role, table model, and distribution contract.' },
+  { source: 'warehouses-and-lake/tablestore.md', reason: 'A current Alibaba Cloud table model, IAM, role, and mode contract is not available.' },
+  { source: 'warehouses-and-lake/yashandb.md', reason: 'A current YashanDB target and platform behavior contract is not available.' },
+];
 
 /** Published server-side connector guides that are not represented by the bundled catalog snapshot. */
 export const nonCatalogPublishedConnectors: Array<{ id: string; reason: string }> = [
@@ -159,12 +304,16 @@ export function renderSupportedConnectorMatrixForLLM() {
     .map((category) => {
       const rows = getConnectorsByCategory(category.id)
         .map((connector) => {
-          const roles = connector.useAs.map((role) => role[0].toUpperCase() + role.slice(1)).join(' + ');
+          const roles = connector.useAs.length > 0
+            ? connector.useAs.map((role) => role[0].toUpperCase() + role.slice(1)).join(' + ')
+            : 'Not declared';
           const modes = connector.modes.length > 0
             ? connector.modes.join(', ')
             : connector.useAs.includes('source')
               ? 'Not declared'
-              : 'Target only';
+              : connector.useAs.includes('target')
+                ? 'Target only'
+                : 'Not declared';
           return `| [${connector.title}](/docs/connectors/${connector.slug}) | ${connector.maturity.toUpperCase()} | ${roles} | ${modes} |`;
         })
         .join('\n');

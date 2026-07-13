@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Apache ActiveMQ to read or write queue messages through the catalog-declared stream connector.
+Use Apache ActiveMQ to read or write queue messages through the supported stream connector.
 
 <ConnectorProfile
   category="Streaming & messaging"
@@ -29,14 +29,14 @@ Use Apache ActiveMQ to read or write queue messages through the catalog-declared
 <ConnectorCapabilities source="Stream read" target="Stream write" />
 
 <Aside type="note" title="Local validation boundary">
-  The catalog validates Stream mode and the listed connection fields. It does not open a broker connection, verify credentials, list queues, consume a message, or publish one.
+  Local validation checks Stream mode and the listed connection fields. It does not open a broker connection, verify credentials, list queues, consume a message, or publish one.
 </Aside>
 
 ## Before you begin
 
 ### Source
 
-Create a broker account restricted to consuming from the intended queues. The reused connector accepts JSON-object messages and queue mode; test message shape and acknowledgement behavior with the deployed runtime.
+Create a broker account restricted to consuming from the intended queues. The connector accepts JSON-object messages and queue mode; test message shape and acknowledgement behavior with the deployed runtime.
 
 ### Target
 
@@ -69,7 +69,7 @@ tapstate validate --workdir tapstate-work
 
 ## Limitations
 
-- The catalog does not define delivery guarantee, acknowledgement, transactions, topic support, CDC, or DDL behavior.
+- TapState does not define delivery guarantee, acknowledgement, transactions, topic support, CDC, or DDL behavior.
 - The documented compatibility is not a deployed TapState runtime test; stage Classic and Artemis broker URLs separately.
 
 ## Reference
@@ -82,4 +82,4 @@ tapstate validate --workdir tapstate-work
 
 ### Message data compatibility
 
-The reused connector baseline accepts `OBJECT`, `ARRAY`, `NUMBER`, `INTEGER`, `BOOLEAN`, `STRING` values shorter than 200 characters, and `TEXT`. Verify the actual message envelope and character encoding with a staging queue.
+The documented connector baseline accepts `OBJECT`, `ARRAY`, `NUMBER`, `INTEGER`, `BOOLEAN`, `STRING` values shorter than 200 characters, and `TEXT`. Verify the actual message envelope and character encoding with a staging queue.

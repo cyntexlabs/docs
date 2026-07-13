@@ -18,8 +18,11 @@ const coreSections = {
   validateConfiguration: /^## Validate the configuration/m,
   limitations: /^## Limitations/m,
   reference: /^## Reference/m,
-  validationBoundary: /(?:Local validation boundary|validation checks|Local validation|does not (?:test|connect|prove))/i,
+  validationBoundary: /(?:Local validation boundary|validation checks|Local validation|does not (?:test|connect|prove|verify))/i,
+  validationExamples: /<ValidationStatusGuide\s*\/>/,
 };
+
+const internalMigrationLanguage = /(?:catalog-declared|code-backed|bundled catalog|current catalog|upstream (?:guide|page|connector|platform|baseline))/i;
 
 function frontmatterValue(page, key) {
   return page.match(new RegExp(`^\\s*${key}:\\s*([^\\s]+)\\s*$`, 'm'))?.[1];
@@ -44,24 +47,61 @@ for (const name of pageNames) {
     continue;
   }
 
+  const roles = frontmatterList(page, 'useAs');
+  const declaredModes = frontmatterList(page, 'modes');
+  const missing = Object.entries(coreSections)
+    .filter(([section, pattern]) => section !== 'validationExamples' && !pattern.test(page))
+    .map(([section]) => section);
+
+  if (/^kind:\s*target\s*$/m.test(page)) {
+    missing.push('invalid kind: target example (target-capable connections use kind: source without mode)');
+  }
+  if (internalMigrationLanguage.test(page)) {
+    missing.push('reader-facing migration provenance');
+  }
+  if (roles.includes('source') && !/^### Source\b/m.test(page)) missing.push('source section');
+  if (roles.includes('target') && !/^### Target\b/m.test(page)) missing.push('target section');
+
   let catalog;
   try {
     catalog = JSON.parse(await readFile(path.join(catalogDir, `${id}.json`), 'utf8'));
   } catch {
     serverContract += 1;
+    if (missing.length > 0) failures.push(`${name}: ${missing.join(', ')}`);
     continue;
   }
 
   catalogBacked += 1;
-  const missing = Object.entries(coreSections)
-    .filter(([, pattern]) => !pattern.test(page))
-    .map(([name]) => name);
-  const roles = frontmatterList(page, 'useAs');
+  if (!coreSections.validationExamples.test(page)) missing.push('validationExamples');
+  const catalogModes = catalog.modes ?? [];
 
-  if (roles.includes('source') && !/^### Source\b/m.test(page)) missing.push('source section');
-  if (roles.includes('target') && !/^### Target\b/m.test(page)) missing.push('target section');
+  const unexpectedModes = declaredModes.filter((mode) => !catalogModes.includes(mode));
+  const missingModes = catalogModes.filter((mode) => !declaredModes.includes(mode));
+  if (unexpectedModes.length > 0 || missingModes.length > 0) {
+    missing.push(`frontmatter modes differ from product catalog (missing: ${missingModes.join(', ') || 'none'}; unexpected: ${unexpectedModes.join(', ') || 'none'})`);
+  }
+  if (catalogModes.length > 0 && !roles.includes('source')) {
+    missing.push('source role required by published read modes');
+  }
+  if (Boolean(catalog.sink?.capable) !== roles.includes('target')) {
+    missing.push(`target role differs from product catalog (${catalog.sink?.capable ? 'target required' : 'target not declared'})`);
+  }
+
+  const undocumentedFields = (catalog.config ?? [])
+    .map((field) => field.name)
+    .filter((field) => !page.includes(`\`${field}\``) && !page.includes(`${field}:`));
+  if (undocumentedFields.length > 0) {
+    missing.push(`connection fields not documented: ${undocumentedFields.join(', ')}`);
+  }
+
   if ((catalog.modes ?? []).includes('cdc') && (!/<SourceModeTabs\b/.test(page) || !/value="snapshot-cdc"/.test(page))) {
     missing.push('snapshot + CDC mode path');
+  }
+  if ((catalog.modes ?? []).includes('cdc')) {
+    const cdcTab = page.match(/<SourceModeTab\s+value="snapshot-cdc"[^>]*>([\s\S]*?)<\/SourceModeTab>/)?.[1] ?? '';
+    if (/(?:start with (?:the )?snapshot|as shown in (?:the )?snapshot|snapshot grants above)/i.test(cdcTab)) {
+      missing.push('CDC tab depends on the Snapshot tab');
+    }
   }
 
   if (missing.length > 0) failures.push(`${name}: ${missing.join(', ')}`);

@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Metabase as a catalog-declared API source for analytics content.
+Use Metabase as a supported API source for analytics content.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -29,7 +29,7 @@ Use Metabase as a catalog-declared API source for analytics content.
 <ConnectorCapabilities source="API read" target="No documented target role" />
 
 <Aside type="note" title="Exact inherited field name">
-  The catalog field is spelled `matebaseDomainName`. Preserve that spelling in a resource even though it differs from the product name.
+  The connection field is spelled `matebaseDomainName`. Preserve that spelling in a resource even though it differs from the product name.
 </Aside>
 
 ## Before you begin
@@ -40,7 +40,7 @@ Use Metabase as a catalog-declared API source for analytics content.
 2. Create a least-privilege Metabase account for the intended analytics content.
 3. Record the full HTTP or HTTPS base URL, including a non-default port when applicable.
 
-The reused connector identifies a username, password, and HTTP host. It does not establish a TapState UI connection test or a selector for questions, dashboards, or collections.
+The connector identifies a username, password, and HTTP host. It does not establish a TapState UI connection test or a selector for questions, dashboards, or collections.
 
 ## Create a connection
 
@@ -64,12 +64,12 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, API mode, and catalog-known fields. It does not reach Metabase, authenticate the user, list collections, or read analytics content.
+Local validation checks the resource envelope, API mode, and recognized fields. It does not reach Metabase, authenticate the user, list collections, or read analytics content.
 
 ## Limitations
 
-- The catalog declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
-- The catalog does not expose a TapState TLS option. Use the URL and your deployment's network policy; do not assume an unlisted connector setting.
+- TapState supports an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- TapState does not expose a TapState TLS option. Use the URL and your deployment's network policy; do not assume an unlisted connector setting.
 - Metabase permissions and API limits are evaluated by the service at runtime.
 
 ## Reference

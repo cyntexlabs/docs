@@ -44,8 +44,6 @@
     "feishu-bitable",
     "lark-approval",
     "lark-doc",
-    "lark-im",
-    "lark-task",
     "alibaba-1688",
     "github",
     "quickapi",
@@ -57,7 +55,6 @@
     "http-receiver",
     "custom",
     "dummy",
-    "hazelcast",
     "vika"
   ]
 }

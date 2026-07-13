@@ -1,18 +1,18 @@
 ---
-title: Connector directory
-description: Compare and configure TapState connectors by category, maturity, role, and read mode
+title: Supported connectors
+description: Find the TapState connector that can read from or write to your system
 sidebar:
   order: 1
 ai:
   kind: guide
-  id: connector-directory
+  id: supported-connectors
   maturity: ga
   aliases: [connector directory, supported connectors, connector matrix, connector compatibility, supported databases, supported data sources]
 ---
 
 import { Aside, SupportedConnectorMatrix } from '@/components/mdx';
 
-Choose a connector before designing a pipeline. This directory records the public documentation contract; it is not a promise that a local configuration check has reached a live system.
+Choose the system you want TapState to read from or write to. Select a connector name to open its setup guide, including prerequisites, connection fields, supported read modes, and limitations.
 
 <SupportedConnectorMatrix />
 
@@ -22,14 +22,14 @@ Choose a connector before designing a pipeline. This directory records the publi
 - **Preview** means the connector is ready to evaluate, but its configuration or behavior may still change before GA. Validate production workloads with the connector contract supplied by your TapState deployment.
 - **Deprecated** means the connector remains documented for existing deployments, but new work should use its named replacement.
 
-TapState uses GA and Preview for current connectors. The upstream inventory's former **Beta** group maps to **Preview**, a clearer customer-facing term. **Deprecated** is retained only when a current catalog explicitly marks a legacy connector that customers may still need to maintain. We do not show **Alpha** until a connector has a documented, limited-access contract.
+TapState uses **GA** and **Preview** for active connectors. **Deprecated** appears only for a legacy connector that existing deployments may still need to maintain.
 
 ## How to read roles and modes
 
 - **Source** reads from the listed system. The read mode tells you whether that happens as a one-time Snapshot, Snapshot + CDC, stream, or API read.
-- **Target** means the current catalog declares data writing. Check the connector guide before relying on table creation, schema evolution, or a particular write behavior.
-- **Not declared** means the catalog has a source connection contract but does not declare a readable mode. A dash means the guide is target-only. Neither value implies an undocumented source mode.
+- **Target** means the connector can write data. Check its guide before relying on table creation, schema evolution, or a particular write behavior.
+- A dash under **Read mode** means the connector is target-only.
 
 <Aside type="note" title="Validation boundary">
-  `tapstate validate` checks the resource envelope plus catalog-known connector IDs, modes, and field shapes. It does not prove network reachability, credentials, permissions, API scope, data access, or a live write. Individual guides state the preparation and runtime checks required for that system.
+  `tapstate validate` checks the resource envelope plus recognized connector IDs, modes, and field shapes. It does not prove network reachability, credentials, permissions, API scope, data access, or a live write. Individual guides state the preparation and runtime checks required for that system.
 </Aside>

@@ -30,7 +30,7 @@ Use Custom Connection when the integration is defined by scripts rather than a v
 <ConnectorCapabilities source="Snapshot and CDC scripts" target="Script-defined data write" />
 
 <Aside type="caution" title="No script execution or debugger is available locally">
-  The catalog validates field types and the declared modes. It does not execute JavaScript, test network calls from a script, inspect a returned record, or provide the upstream platform's script debugger.
+  Local validation checks field types and source modes. It does not execute JavaScript, test network calls, inspect a returned record, or provide an interactive script debugger.
 </Aside>
 
 ## Before you begin
@@ -49,14 +49,14 @@ Set `syncType: initial_sync` and keep script inputs, secrets, retries, and error
 
 Use **Snapshot + CDC** when you need an initial script-defined read followed by incremental work. Provide both `historyScript` and `cdcScript`, use `syncType: initial_sync+cdc`, and design an idempotent checkpoint or cursor strategy in the script contract.
 
-The catalog cannot verify event ordering, polling cadence, cursor durability, or script output shape.
+Local validation cannot verify event ordering, polling cadence, cursor durability, or script output shape.
 
 </SourceModeTab>
 </SourceModeTabs>
 
 ### Target
 
-Use a `targetScript` only after defining its input shape and failure behavior. Give the script the smallest credentials and network access it needs. The catalog declares target capability but does not describe a conflict policy, transaction boundary, or DDL behavior.
+Use a `targetScript` only after defining its input shape and failure behavior. Give the script the smallest credentials and network access it needs. TapState supports target capability but does not describe a conflict policy, transaction boundary, or DDL behavior.
 
 ## Create a connection
 
@@ -93,8 +93,8 @@ Local validation checks the resource, mode, known field types, and enum values. 
 
 ## Limitations
 
-- The upstream platform's script debugging, HTTP helpers, database helpers, heartbeat, and connection test are not represented as TapState capabilities here.
-- The catalog does not define script sandboxing, timeout, retry, pagination, record schema, or error semantics.
+- Interactive script debugging, helper APIs, heartbeat behavior, and live connection testing are not part of this documented TapState contract.
+- TapState does not define script sandboxing, timeout, retry, pagination, record schema, or error semantics.
 - Keep scripts and secret values under review. Do not commit credentials into workspace files.
 
 ## Reference
@@ -110,4 +110,4 @@ Local validation checks the resource, mode, known field types, and enum values. 
 | `targetScript` | No | — | Script for a target connection. |
 | `customBeforeOpr`, `customBeforeScript` | `customBeforeOpr` yes | `false` | Optional pre-operation hook and script. |
 | `customAfterOpr`, `customAfterScript` | `customAfterOpr` yes | `false` | Optional post-operation hook and script. |
-| `batchProcess` | No | `false` | Catalog boolean for batch-oriented script handling. |
+| `batchProcess` | No | `false` | Boolean for batch-oriented script handling. |

@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use QuickAPI to describe a one-time source read from a prepared Postman collection. The catalog exposes the collection text and optional token-expiry fields; it declares Snapshot only.
+Use QuickAPI for a one-time source read from a prepared Postman collection. The connection accepts the collection text and optional token-expiry fields, and supports Snapshot only.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -28,8 +28,8 @@ Use QuickAPI to describe a one-time source read from a prepared Postman collecti
 
 <ConnectorCapabilities source="Snapshot read" target="No documented target role" />
 
-<Aside type="note" title="What is code-backed">
-  The reused connector code parses `TAP_TABLE`, pagination tags, `TAP_GET_TOKEN`, token-expiry rules, and token mappings. Local `tapstate validate` still checks only field shapes; it does not execute the collection or prove that a deployed runtime includes the connector package.
+<Aside type="note" title="What local validation checks">
+  QuickAPI parses `TAP_TABLE`, pagination tags, `TAP_GET_TOKEN`, token-expiry rules, and token mappings at runtime. Local `tapstate validate` checks only field shapes; it does not execute the collection or prove that a deployed runtime includes the connector package.
 </Aside>
 
 ## Before you begin
@@ -92,9 +92,9 @@ Local validation checks the resource, Snapshot mode, and field shapes. It does n
 
 ## Limitations
 
-- The catalog declares Snapshot only; it does not declare CDC, API mode, target writes, or DDL behavior.
+- TapState supports Snapshot only; it does not declare CDC, API mode, target writes, or DDL behavior.
 - Incorrect response paths or pagination tags can silently omit or repeat rows. Compare page boundaries and record counts with the source API in staging.
-- Token refresh is connector-code-backed, but it depends on the exact expiry expression and response mapping supplied by the user.
+- Token refresh depends on the exact expiry expression and response mapping supplied in the connection.
 - API rate limits, retries, pagination consistency, and schema drift are controlled by the remote API and are not checked by local validation.
 - Do not commit collections containing secrets or token values.
 
@@ -103,8 +103,8 @@ Local validation checks the resource, Snapshot mode, and field shapes. It does n
 | Field | Required | Use |
 |---|---|---|
 | `jsonTxt` | Yes | Exported Postman collection JSON. |
-| `expireStatus` | No | Upstream token-expiry response rule. |
-| `tokenParams` | No | Upstream mapping between refreshed token output and collection variables. |
-| `schemaTxt` | No | Optional schema text exposed by the catalog. |
+| `expireStatus` | No | Token-expiry response rule. |
+| `tokenParams` | No | Mapping between refreshed token output and collection variables. |
+| `schemaTxt` | No | Optional schema text. |
 
 `expireStatus` accepts response predicates such as `body.errorCode=INVALID_OAUTH`, `header.httpCode=401`, or `code=401`. Multiple conditions can use `&&`; separate lines represent alternatives. `tokenParams` maps a collection variable to the token field returned by the refresh request, for example `accessToken=access_token`.

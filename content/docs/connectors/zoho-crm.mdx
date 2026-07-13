@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Zoho CRM as a catalog-declared API source.
+Use Zoho CRM as a supported API source.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -29,7 +29,7 @@ Use Zoho CRM as a catalog-declared API source.
 <ConnectorCapabilities source="API read" target="No documented target role" />
 
 <Aside type="note" title="Authorization boundary">
-  The catalog requires one field, `code`. The upstream interactive authorization guide is not evidence of an equivalent TapState UI or CLI flow.
+  The connection requires `code`. Obtain it through the authorization flow supplied by your TapState deployment; local validation does not perform the exchange.
 </Aside>
 
 ## Before you begin
@@ -50,7 +50,7 @@ config:
 mode: api
 ```
 
-The current catalog does not disclose token refresh, selected modules, or incremental behavior; confirm those with a deployed runtime.
+The current connection contract does not disclose token refresh, selected modules, or incremental behavior; confirm those with a deployed runtime.
 
 ## Validate the configuration
 
@@ -65,10 +65,10 @@ Local validation does not authorize Zoho, test permissions, enumerate modules, o
 ## Limitations
 
 - API source only; no target, Snapshot, CDC, DDL, or rate-limit contract is declared.
-- The resource schema does not establish access to every upstream-listed CRM module.
+- The resource schema does not guarantee access to every Zoho CRM module; application scopes and account permissions still apply.
 
 ## Reference
 
 | Field | Required | Use |
 |---|---|---|
-| `code` | Yes | Catalog-defined authorization value. Keep it out of committed files. |
+| `code` | Yes | Documented authorization value. Keep it out of committed files. |

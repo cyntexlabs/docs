@@ -49,19 +49,33 @@ Snapshot does not require Binlog or replication privileges.
 
 Use **Snapshot + CDC** to copy existing rows and then follow changes from the MySQL binary log.
 
-Start with the Snapshot grants, then add replication discovery privileges:
+**1. Create a dedicated CDC reader**
 
 ```sql
+CREATE USER 'tapstate_reader'@'%' IDENTIFIED BY 'replace-with-a-secret';
+```
+
+Restrict `%` to the TapState runtime network origin whenever possible.
+
+**2. Grant snapshot and replication access**
+
+```sql
+GRANT SELECT, SHOW VIEW, CREATE ROUTINE, LOCK TABLES
+  ON `orders`.* TO 'tapstate_reader'@'%';
 GRANT RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT
   ON *.* TO 'tapstate_reader'@'%';
 FLUSH PRIVILEGES;
 ```
+
+**3. Enable and retain Binlog**
 
 Enable Binlog through the RDS parameter group, use row-based logging, and retain logs longer than the largest planned interruption. Verify the active settings before starting CDC:
 
 ```sql
 SHOW VARIABLES WHERE Variable_name IN ('log_bin', 'binlog_format', 'binlog_row_image');
 ```
+
+**4. Confirm authentication compatibility**
 
 For MySQL 8, create the account with an authentication method accepted by the RDS instance and the deployed runtime. Do not change an existing production account's authentication method without testing it first.
 

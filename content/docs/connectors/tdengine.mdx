@@ -23,14 +23,18 @@ Use TDengine to copy existing time-series data or keep a target current from the
   maturity="Preview"
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
-  capabilities="Snapshot, CDC, Data write"
+  capabilities="Snapshot, CDC, Data write, Target DDL apply"
   compatibility="TDengine 3.x"
 />
 
-<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
+<ConnectorCapabilities
+  source="Snapshot and CDC"
+  target="Data write"
+  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
+/>
 
 <Aside type="note" title="Local validation boundary">
-  The catalog declares Snapshot and CDC and validates their configuration shape. It does not connect to TDengine, install a client driver, subscribe to changes, or verify a target write.
+  TapState supports Snapshot and CDC and validates their configuration shape. It does not connect to TDengine, install a client driver, subscribe to changes, or verify a target write.
 </Aside>
 
 ## Before you begin
@@ -40,12 +44,12 @@ Use TDengine to copy existing time-series data or keep a target current from the
 <SourceModeTabs>
 <SourceModeTab value="snapshot">
 
-Use **Snapshot** to copy current data once. The reused connector uses TDengine's REST endpoint on port `6041`; allow the future runtime to reach that endpoint and create a read account for the selected database.
+Use **Snapshot** to copy current data once. The connector uses TDengine's REST endpoint on port `6041`; allow the future runtime to reach that endpoint and create a read account for the selected database.
 
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** when you also need later records. The reused connector describes TDengine new-data subscriptions, port `6030`, and a TDengine client driver. The catalog exposes `originPort` with default `6030`; confirm the deployed runtime's driver and subscription requirements before relying on this path.
+Use **Snapshot + CDC** when you also need later records. The connector describes TDengine new-data subscriptions, port `6030`, and a TDengine client driver. The connection exposes `originPort` with default `6030`; confirm the deployed runtime's driver and subscription requirements before relying on this path.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -84,13 +88,13 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, mode, and catalog-known fields. It does not test REST access, the native subscription port, a driver installation, permissions, or record delivery.
+Local validation checks the resource envelope, mode, and recognized fields. It does not test REST access, the native subscription port, a driver installation, permissions, or record delivery.
 
 ## Limitations
 
-- The catalog declares Snapshot and CDC but no DDL contract; this guide does not claim DDL capture or application.
+- TapState supports Snapshot and CDC but does not document source DDL capture. The target connector implements add column, rename column, alter column attributes, and drop column through the pipeline DDL policy.
 - The TDengine 3.x, REST-port, and subscription-driver statements are an documented compatibility, not a TapState runtime test.
-- The reused connector notes that TDengine cannot change the width of some column types. Test table and type behavior with representative data before production writes.
+- The connector notes that TDengine cannot change the width of some column types. Test table and type behavior with representative data before production writes.
 
 ## Reference
 
@@ -102,7 +106,7 @@ Local validation checks the resource envelope, mode, and catalog-known fields. I
 | `user` | Yes | — | Database account. |
 | `password` | No | — | Account password; supply through an environment variable. |
 | `loadTableOptions` | No | normal, super, and child tables | Table families to load. |
-| `supportWebSocket` | No | `false` | Catalog boolean setting; confirm runtime behavior before changing it. |
-| `originPort` | No | `6030` | Upstream subscription baseline port. |
+| `supportWebSocket` | No | `false` | Boolean setting; confirm runtime behavior before changing it. |
+| `originPort` | No | `6030` | Native subscription port. |
 | `extParams` | No | — | Connector-specific parameters. |
 | `timezone` | No | empty | UTC offset used by the connector. |

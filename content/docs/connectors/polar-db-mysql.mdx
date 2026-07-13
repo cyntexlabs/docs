@@ -46,11 +46,23 @@ FLUSH PRIVILEGES;
 
 Use **Snapshot + CDC** to copy existing rows and continue from MySQL Binlog changes.
 
+**1. Create a dedicated CDC reader**
+
+```sql
+CREATE USER 'tapstate_reader'@'%' IDENTIFIED BY 'replace_with_a_secret';
+```
+
+Restrict `%` to the TapState runtime network origin whenever possible.
+
+**2. Grant snapshot and replication access**
+
 ```sql
 GRANT SELECT, SHOW VIEW ON `orders`.* TO 'tapstate_reader'@'%';
 GRANT REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'tapstate_reader'@'%';
 FLUSH PRIVILEGES;
 ```
+
+**3. Enable and retain Binary Logging**
 
 Enable Binary Logging for the cluster and retain logs long enough to cover the longest planned interruption. A seven-day retention window is a useful starting point, but size it for the actual change rate and recovery objective.
 

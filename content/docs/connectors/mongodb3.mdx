@@ -13,7 +13,7 @@ ai:
   aliases: [mongodb 3.4, mongodb below 3.4, mongodb 3.2, mongodb oplog, mongodb legacy cdc]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use this connector for MongoDB 3.2 and 3.4. Use the standard MongoDB guide for newer deployments.
@@ -22,18 +22,18 @@ Use this connector for MongoDB 3.2 and 3.4. Use the standard MongoDB guide for n
 
 <ConnectorCapabilities source="Snapshot and CDC through the Oplog" target="Data write" />
 
-<Aside type="note" title="Local validation boundary">
-  Local validation checks source mode and configuration shape. It does not connect to MongoDB, inspect the Oplog, validate TLS material, or write a document.
-</Aside>
-
 ## Before you begin
 
 ### Source
+
+Choose the outcome you need. Each tab is a complete preparation path; you do not need to combine steps from both tabs.
 
 <SourceModeTabs label="Choose the MongoDB source read mode">
 <SourceModeTab value="snapshot">
 
 Use **Snapshot** to copy selected collections once. Create a least-privilege reader:
+
+**1. Create a dedicated reader**
 
 ```js
 use admin
@@ -47,12 +47,20 @@ db.createUser({
 })
 ```
 
+**2. Prepare a sharded cluster**
+
 For a sharded cluster, pause the Balancer during the initial copy and clean up orphaned documents before the run.
 
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
 Use **Snapshot + CDC** to copy existing documents and then read Oplog changes. The source must be a replica set or sharded cluster; convert a standalone server to a single-member replica set before using CDC.
+
+**1. Prepare the topology and Oplog**
+
+Confirm that every shard is a replica set and keep enough Oplog history to cover the longest expected interruption. A 24-hour window is a practical minimum to validate against the actual write rate.
+
+**2. Create a dedicated CDC reader**
 
 ```js
 use admin
@@ -68,7 +76,11 @@ db.createUser({
 })
 ```
 
-Keep enough Oplog history to cover the longest expected interruption; a 24-hour window is a practical minimum to validate against the actual write rate. In a sharded cluster, create equivalent users on shard primaries.
+In a sharded cluster, create equivalent users on shard primaries because shard servers cannot retrieve these user permissions from the config database.
+
+**3. Prepare a sharded-cluster snapshot**
+
+Pause the Balancer during the initial copy and clean up orphaned documents before the run. Resume balancing only after the initial copy has completed and the pipeline is following Oplog changes.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -117,6 +129,8 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
+Local validation checks the source mode and recognized connection fields. It does not connect to MongoDB, inspect the Oplog, validate TLS material, or write a document.
+
 Verify a small snapshot, an insert, an update, and a delete in staging. Confirm that the Oplog window still contains the stored position after a controlled pause.
 
 ## Limitations
@@ -124,9 +138,25 @@ Verify a small snapshot, an insert, an update, and a delete in staging. Confirm 
 - This guide covers only MongoDB 3.2 and 3.4. Use the current MongoDB connector for later versions.
 - CDC requires an Oplog. If it rotates past the stored position, recovery requires a new snapshot.
 - Shard balancing and orphaned documents can affect snapshot consistency.
+- Legacy Oplog update events may contain only modified fields. When a pipeline depends on a non-`_id` key, a changed sub-document, or an embedded-array `PULL`, verify that the deployed runtime reconstructs the complete document before routing or writing it.
+- Delete events normally contain only `_id`. A target update condition that does not include `_id` needs an explicitly tested delete-handling design.
 - TLS files, certificate validation, and server policy must be tested against the deployment; local validation only checks the documented field shapes.
 
 ## Reference
+
+### Data compatibility
+
+| Family | Supported baseline |
+|---|---|
+| Text and code | `String`, `JavaScript`, `Symbol` |
+| Numeric | `Double`, `Int32`, `Int64`, `Decimal128` |
+| Structured | `Document`, `Array` |
+| Binary and identity | `Binary`, `ObjectId` |
+| Boolean | `Boolean` |
+| Date and time | `Date`, `Timestamp` |
+| Special | `MinKey`, `MaxKey`, `Null` |
+
+### Connection settings
 
 | Field | Required | Default | Use |
 |---|---:|---|---|

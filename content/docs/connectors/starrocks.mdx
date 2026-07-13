@@ -15,28 +15,32 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use StarRocks for catalog-declared Snapshot reads or as a destination for analytical data.
+Use StarRocks for supported Snapshot reads or as a destination for analytical data.
 
 <ConnectorProfile
   category="Warehouses & analytics"
   maturity="Preview"
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
-  capabilities="Snapshot, Data write"
+  capabilities="Snapshot, Data write, Target DDL apply"
   compatibility="StarRocks 3.x"
 />
 
-<ConnectorCapabilities source="Snapshot read" target="Data write" />
+<ConnectorCapabilities
+  source="Snapshot read"
+  target="Data write"
+  schema="Apply add, alter, and drop-column events through pipeline policy"
+/>
 
 <Aside type="note" title="Source use needs staging validation">
-  The catalog declares Snapshot source and target roles. The upstream guide focuses on target use. Treat a live source read as a staging-test requirement.
+  TapState supports Snapshot source and target roles. Verify a live source read and target write separately in staging.
 </Aside>
 
 ## Before you begin
 
 ### Source
 
-The catalog declares Snapshot reads, while the upstream guide documents target-only use. If your deployment supplies the source contract, grant read access to the selected tables and verify discovery and snapshot completion in staging.
+For Snapshot reads, grant read access to the selected tables and verify discovery and completion in staging.
 
 ### Target
 
@@ -80,14 +84,14 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, Snapshot mode, and catalog-defined field shapes. It does not authenticate to StarRocks, discover source tables, access FE or BE endpoints, or load a target row.
+Local validation checks the resource envelope, Snapshot mode, and recognized field shapes. It does not authenticate to StarRocks, discover source tables, access FE or BE endpoints, or load a target row.
 
 ## Limitations
 
-- The catalog declares Snapshot only; it does not declare CDC or DDL behavior.
-- Target writes use Stream Load in the reused connector baseline. Detail/Duplicate-style tables are append-oriented; update and delete behavior depends on the table model.
-- Frequent updates and deletes can be expensive. Validate write semantics against the exact table type instead of relying on the catalog's generic upsert/append labels.
-- Upstream batch-size recommendations were not measured in TapState and are not published as product defaults.
+- TapState supports Snapshot and does not publish CDC for StarRocks. The target connector implements add column, alter column attributes, and drop column; column rename is not registered.
+- Target writes use Stream Load in the documented connector baseline. Detail/Duplicate-style tables are append-oriented; update and delete behavior depends on the table model.
+- Frequent updates and deletes can be expensive. Validate write semantics against the exact table type instead of relying only on generic `upsert` and `append` labels.
+- Batch-size recommendations have not been measured for TapState and are not published as product defaults.
 - Confirm HTTPS behavior, certificate handling, target table design, and type mapping in staging.
 
 ## Reference
@@ -97,7 +101,7 @@ Local validation checks the resource envelope, Snapshot mode, and catalog-define
 | `host`, `port` | Yes | `9030` for port | Frontend SQL endpoint. |
 | `starrocksHttp` | Yes | — | Frontend HTTP endpoint. |
 | `database` | Yes | — | Database name. |
-| `useHTTPS` | No | `false` | Catalog HTTPS boolean. |
+| `useHTTPS` | No | `false` | Enable the documented HTTPS path. |
 | `user`, `password` | No | — | Account and secret. |
 | `backendNum`, `catalog`, `extParams`, `timezone` | No | — | Optional connector fields. |
 

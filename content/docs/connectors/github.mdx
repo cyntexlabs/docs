@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use GitHub as a catalog-declared API source for repository data.
+Use GitHub as a supported API source for repository data.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -29,7 +29,7 @@ Use GitHub as a catalog-declared API source for repository data.
 <ConnectorCapabilities source="API read" target="No documented target role" />
 
 <Aside type="note" title="Authorization boundary">
-  The catalog's connector ID is case-sensitive: `GitHub`. It requires a field named `code`, but the current TapState product surface does not publish an interactive OAuth exchange. Do not treat local validation as authorization.
+  The connector ID is case-sensitive: `GitHub`. The resource requires `code`, but local validation does not exchange or verify that authorization value.
 </Aside>
 
 ## Before you begin
@@ -50,7 +50,7 @@ config:
 mode: api
 ```
 
-`code` is the complete catalog contract. Its exchange, refresh, and scope behavior must be confirmed with the deployed runtime before production use.
+`code` is the complete connection contract. Its exchange, refresh, and scope behavior must be confirmed with the deployed runtime before production use.
 
 ## Validate the configuration
 
@@ -64,11 +64,11 @@ The local check validates resource shape and API mode. It does not open a browse
 
 ## Limitations
 
-- The catalog declares an API source only; target writes, Snapshot, CDC, DDL, and rate-limit behavior are not declared.
-- The reused connector describes an interactive authorization flow, which is not presented here as a TapState UI or CLI capability.
+- TapState supports an API source only; target writes, Snapshot, CDC, DDL, and rate-limit behavior are not declared.
+- The connector describes an interactive authorization flow, which is not presented here as a TapState UI or CLI capability.
 
 ## Reference
 
 | Field | Required | Use |
 |---|---|---|
-| `code` | Yes | Catalog-defined authorization value. Store it in a secret-aware environment variable. |
+| `code` | Yes | Documented authorization value. Store it in a secret-aware environment variable. |

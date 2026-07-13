@@ -13,7 +13,7 @@ ai:
   aliases: [apache doris, doris, doris snapshot, doris target, doris stream load]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Apache Doris for point-in-time reads or as an analytical destination.
 
@@ -22,15 +22,15 @@ Use Apache Doris for point-in-time reads or as an analytical destination.
   maturity="GA"
   maturityLabel="General availability"
   worksAs="Source, Target"
-  capabilities="Snapshot, Data write"
+  capabilities="Snapshot, Data write, Target DDL apply"
   compatibility="Apache Doris 1.2–3.0"
 />
 
-<ConnectorCapabilities source="Snapshot read" target="Data write" />
-
-<Aside type="note" title="Local validation boundary">
-  The catalog validates Snapshot mode, SQL/HTTP endpoint fields, and known types. It does not connect to a Frontend node, authenticate, or prove a write.
-</Aside>
+<ConnectorCapabilities
+  source="Full load (Snapshot)"
+  target="Data write"
+  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
+/>
 
 ## Before you begin
 
@@ -79,6 +79,39 @@ tables:
 
 For target-only use, omit `mode` and `tables`.
 
+```yaml title="tapstate-work/source/analytics_doris_target.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: analytics_doris_target
+connector: doris
+config:
+  host: analytics-fe.doris.internal
+  port: "9030"
+  dorisHttp: http://analytics-fe.doris.internal:8030
+  database: analytics
+  user: ${DORIS_WRITER_USER}
+  password: ${DORIS_WRITER_PASSWORD}
+  useHTTPS: false
+```
+
+```yaml title="tapstate-work/pipeline/events_to_doris.tapstate.yml"
+version: tapstate/v1
+kind: pipeline
+id: events_to_doris
+source: analytics_doris
+serve:
+  from: /.*/
+  sync:
+    - id: write_to_doris
+      source: analytics_doris_target
+      write_mode: upsert
+      ddl: fail
+```
+
+Choose the Doris key model before using `upsert`. Keep `ddl: fail` until table creation and schema changes have been tested with the destination's key model, distribution, and partitioning.
+
+The target connector implements add column, rename column, alter column attributes, and drop column. Change the pipeline `ddl` policy to `apply` only after those operations have passed staging against the exact Doris version and table model.
+
 ## Validate the configuration
 
 ```bash
@@ -87,13 +120,15 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
+Validation checks the resource shape, Snapshot mode, and known field types. It does not connect to a Frontend node, authenticate, or prove a write.
+
 ## Limitations
 
-- The catalog declares Snapshot only; it does not declare CDC or DDL behavior.
-- `useHTTPS` is a boolean in the catalog, but certificate fields and verification behavior are not documented. Confirm the security model with the deployed runtime.
+- This guide covers point-in-time reads. Treat CDC and source DDL delivery as staging-test cases rather than assuming either behavior.
+- `useHTTPS` enables the connector's HTTPS setting. Confirm certificate and verification behavior with the deployed runtime before relying on a private CA or mutual TLS.
 - The connector writes through Doris Stream Load. Frequent updates and deletes can be expensive and should be tested against the chosen key model.
-- Duplicate Key and Aggregate Key tables do not provide the same update/delete semantics as a Unique Key table. Do not assume upsert behavior from the catalog's generic write label alone.
-- Large ingestion batches consume Frontend/Backend memory and I/O. Size batches from measurements in your own environment rather than carrying over upstream benchmark values.
+- Duplicate Key and Aggregate Key tables do not provide the same update/delete semantics as a Unique Key table. Do not assume upsert behavior without a staging write test.
+- Large ingestion batches consume Frontend/Backend memory and I/O. Size batches from measurements in your own environment.
 - Test target table keys, distribution, partitions, data types, and restart behavior in staging.
 
 ## Reference
@@ -103,7 +138,7 @@ tapstate validate --workdir tapstate-work
 | `host`, `port` | Yes | `9030` for port | Frontend SQL endpoint. |
 | `dorisHttp` | Yes | — | Frontend HTTP endpoint. |
 | `database` | Yes | — | Database name. |
-| `useHTTPS` | No | `false` | Catalog HTTPS boolean. |
+| `useHTTPS` | No | `false` | Enable HTTPS for the documented HTTP endpoint. |
 | `user`, `password` | No | — | Database account and secret. |
 | `backendNum`, `catalog`, `extParams`, `timezone` | No | — | Optional connector tuning and context fields. |
 

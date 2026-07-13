@@ -112,11 +112,23 @@ function cleanMdxForLLM(markdown: string) {
     .replace(/<SourceModeTabs(?:\s[^>]*)?>([\s\S]*?)<\/SourceModeTabs>/g, (_match, body: string) => {
       return body.replace(/^ {4}/gm, '');
     })
-    .replace(/<SourceModeTab\s+value="([^"]+)">\n?/g, (_match, value: string) => {
-      const label = value === 'snapshot' ? 'Snapshot preparation' : 'Snapshot + CDC preparation';
-      return `\n\n#### ${label}\n\n`;
+    .replace(/<SourceModeTab\s+value="([^"]+)"(?:\s+label="([^"]+)")?(?:\s+description="[^"]+")?>\n?/g, (_match, value: string, label?: string) => {
+      const fallback = value === 'snapshot' ? 'Full load (Snapshot) preparation' : 'Full load + CDC preparation';
+      const labelWithContext = label ? `${label} preparation` : fallback;
+      return `\n\n#### ${labelWithContext}\n\n`;
     })
     .replace(/<\/SourceModeTab>\n?/g, '\n\n')
+    .replace(/<PreparationSteps>\n?([\s\S]*?)<\/PreparationSteps>/g, (_match, body: string) => {
+      let step = 0;
+      return body.replace(
+        /<PreparationStep\s+title="([^"]+)">\n?([\s\S]*?)<\/PreparationStep>\n?/g,
+        (_stepMatch, title: string, content: string) => {
+          step += 1;
+          const stepContent = content.replace(/^ {2}/gm, '').trim();
+          return `##### Step ${step}: ${title}\n\n${stepContent}\n\n`;
+        },
+      );
+    })
     .replace(/<div[^>]*>\n?/g, '')
     .replace(/<\/div>\n?/g, '')
     .replace(/<CardGrid>\n?/g, '')
@@ -138,8 +150,8 @@ function cleanMdxForLLM(markdown: string) {
     })
     .replace(/<ValidationStatusGuide\s*\/>/g, `### Interpret the result
 
-- **Valid:** \`valid: 3 resources in tapstate-work\`. Exit code 0; workspace structure, references, and known mode/config rules passed.
-- **Needs attention:** \`invalid: orders_source.tapstate.yml:12:1 dsl.unknown-field\`. Exit code 1; the CLI prints the message and a suggested fix before you validate again.`)
+- **Example — validation passed:** \`valid: 3 resources in tapstate-work\`. Exit code 0 means workspace structure, references, and known mode and configuration rules passed. The resource count varies by workspace.
+- **Example — changes required:** \`invalid: orders_source.tapstate.yml:12:1 dsl.unknown-field\`. Exit code 1 means at least one local rule failed. The filename, location, error code, message, and suggested fix identify the affected resource.`)
     .replace(/<SupportedConnectorMatrix\s*\/>/g, renderSupportedConnectorMatrixForLLM())
     .replace(/<ConnectorProfile\s+([\s\S]*?)\/>/g, (_match, attrs: string) => {
       return renderConnectorProfileForLLM(attrs);

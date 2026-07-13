@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Vika as a catalog-declared data-writing target. The current catalog does not declare a source read mode, so this page does not carry over the upstream source-oriented wording.
+Use Vika as a data-writing target. This connection does not provide a source read mode.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -29,7 +29,7 @@ Use Vika as a catalog-declared data-writing target. The current catalog does not
 <ConnectorCapabilities source="No documented source mode" target="Data write" />
 
 <Aside type="note" title="Rate limits are service-side">
-  The upstream Vika guide notes table-level API rate limits and usage limits. Keep requests within the limits of the selected Vika plan; local validation does not authenticate, measure rates, or test a write.
+  Keep requests within the table and API limits of the selected Vika plan. Local validation does not authenticate, measure rates, or test a write.
 </Aside>
 
 ## Before you begin
@@ -40,7 +40,7 @@ Use Vika as a catalog-declared data-writing target. The current catalog does not
 2. Create a credential with the minimum write scope and keep it outside source control.
 3. Confirm the selected Vika plan's table, row, and API-rate limits with the account administrator.
 
-The catalog declares `upsert` and `append` write semantics, but it does not define field mapping, conflict selection, rate-limit handling, or schema evolution behavior.
+TapState supports `upsert` and `append` write semantics, but it does not define field mapping, conflict selection, rate-limit handling, or schema evolution behavior.
 
 ## Create a connection
 
@@ -55,7 +55,7 @@ config:
   credential: ${VIKA_CREDENTIAL}
 ```
 
-Target connections have no source `mode` or `tables` section. `hostUrl` defaults to `https://api.vika.cn` in the catalog.
+Target connections have no source `mode` or `tables` section. `hostUrl` defaults to `https://api.vika.cn`.
 
 ## Validate the configuration
 
@@ -65,11 +65,11 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope and catalog-known fields. It does not authenticate to Vika, list spaces or tables, enforce a rate limit, map fields, or write a record.
+Local validation checks the resource envelope and recognized fields. It does not authenticate to Vika, list spaces or tables, enforce a rate limit, map fields, or write a record.
 
 ## Limitations
 
-- The catalog declares target capability only. It does not declare source reads, Snapshot, CDC, API mode, or DDL handling.
+- TapState supports target capability only. It does not declare source reads, Snapshot, CDC, API mode, or DDL handling.
 - Verify Vika API limits, table permissions, schema mapping, and conflict behavior against the deployed runtime before production use.
 - Keep `credential` in an environment variable or a secret manager.
 

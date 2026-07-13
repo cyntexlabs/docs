@@ -22,21 +22,25 @@ Use Greenplum for point-in-time table reads or as a target for analytical data.
   maturity="Preview"
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
-  capabilities="Snapshot, Data write"
+  capabilities="Snapshot, Data write, Target DDL apply"
   compatibility="Greenplum"
 />
 
-<ConnectorCapabilities source="Snapshot read" target="Data write" />
+<ConnectorCapabilities
+  source="Snapshot read"
+  target="Data write"
+  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
+/>
 
 <Aside type="note" title="Local validation boundary">
-  The catalog validates Snapshot mode and field shapes. It does not test PostgreSQL-compatible network access, credentials, privileges, plugins, or target writes.
+  Local validation checks Snapshot mode and field shapes. It does not test PostgreSQL-compatible network access, credentials, privileges, plugins, or target writes.
 </Aside>
 
 ## Before you begin
 
 ### Source
 
-Create a reader account limited to the selected schema. The upstream guide exposes a `logPluginName` setting for incremental work, but the current catalog declares Snapshot only; do not configure an incremental path based on that field alone.
+Create a reader account limited to the selected schema. Although the connection includes `logPluginName`, TapState currently publishes Snapshot only for Greenplum; do not configure an incremental path based on that field alone.
 
 ### Target
 
@@ -74,8 +78,9 @@ tapstate validate --workdir tapstate-work
 
 ## Limitations
 
-- `logPluginName` is required by the catalog but does not establish CDC support; the catalog declares Snapshot only.
-- The catalog does not declare DDL behavior, topology/failover semantics, or TLS fields.
+- `logPluginName` is required by the connection schema but does not establish CDC support; TapState supports Snapshot only.
+- Target-side add column, rename column, alter column attributes, and drop column are implemented by the connector. Stage each operation before changing a pipeline from `ddl: fail` to `ddl: apply`.
+- This guide does not define topology/failover semantics or TLS fields.
 
 ## Reference
 
@@ -83,5 +88,5 @@ tapstate validate --workdir tapstate-work
 |---|---|---|---|
 | `host`, `port`, `database`, `schema` | Yes | — | Greenplum endpoint and selected schema. |
 | `user`, `password` | No | — | Connection account and secret. |
-| `logPluginName` | Yes | `pgoutput` | Catalog enum: `pgoutput`, `decoderbufs`, `wal2json`, `wal2json_rds`, `wal2json_streaming`, and `wal2json_rds_streaming`. This Snapshot-only guide does not establish a CDC path. |
+| `logPluginName` | Yes | `pgoutput` | Values: `pgoutput`, `decoderbufs`, `wal2json`, `wal2json_rds`, `wal2json_streaming`, and `wal2json_rds_streaming`. This Snapshot-only guide does not establish a CDC path. |
 | `extParams`, `timezone` | No | empty timezone | Extra parameters and UTC offset. |

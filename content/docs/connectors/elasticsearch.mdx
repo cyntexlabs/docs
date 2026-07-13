@@ -29,7 +29,7 @@ Use Elasticsearch as a destination for searchable pipeline data.
 <ConnectorCapabilities source="No documented source mode" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
-  The bundled catalog declares an Elasticsearch target and validates the documented connection fields. It does not connect to a cluster, verify certificates, or index a document.
+  The local configuration schema declares an Elasticsearch target and validates the documented connection fields. It does not connect to a cluster, verify certificates, or index a document.
 </Aside>
 
 ## Before you begin
@@ -55,7 +55,7 @@ config:
   sslCA: ${ELASTICSEARCH_CA_PEM}
 ```
 
-The catalog requires `sslCA`; supply the CA material through a secret-aware variable and confirm the runtime's expected PEM/path representation before deployment.
+The connection requires `sslCA`; supply the CA material through a secret-aware variable and confirm the runtime's expected PEM/path representation before deployment.
 
 ## Validate the configuration
 
@@ -69,18 +69,18 @@ This checks local field shape only. It does not test DNS, TLS negotiation, certi
 
 ## Limitations
 
-- The catalog declares a target only; it does not declare source reads, Snapshot, CDC, or DDL behavior.
-- The reused connector covers Elasticsearch 7.6. Version compatibility and mappings need staging verification.
-- The catalog exposes certificate-related fields but not a complete security model. Do not assume defaults for HTTPS, certificate paths, or hostname verification.
+- TapState supports a target only; it does not declare source reads, Snapshot, CDC, or DDL behavior.
+- The connector covers Elasticsearch 7.6. Version compatibility and mappings need staging verification.
+- The connection exposes certificate-related fields but not a complete security model. Do not assume defaults for HTTPS, certificate paths, or hostname verification.
 
 ## Reference
 
 | Field | Required | Use |
 |---|---|---|
 | `host` | Yes | Elasticsearch host. |
-| `port` | Yes | Elasticsearch service port; catalog type is string. |
+| `port` | Yes | Elasticsearch service port; field type is string. |
 | `user` | No | Account name. |
 | `password` | No | Account password; use an environment variable. |
-| `sslValidate` | No | Catalog boolean for SSL validation. |
-| `validateCA` | No | Catalog boolean for CA validation. |
-| `sslCA` | Yes | CA material required by the current catalog. |
+| `sslValidate` | No | Boolean for SSL validation. |
+| `validateCA` | No | Boolean for CA validation. |
+| `sslCA` | Yes | CA material required by the current connection contract. |

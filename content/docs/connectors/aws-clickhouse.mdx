@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use ClickHouse Cloud on AWS for point-in-time reads or as an analytical destination through its dedicated catalog contract.
+Use ClickHouse Cloud on AWS for point-in-time reads or as an analytical destination through its dedicated connection contract.
 
 <ConnectorProfile
   category="Warehouses & analytics"
@@ -29,7 +29,7 @@ Use ClickHouse Cloud on AWS for point-in-time reads or as an analytical destinat
 <ConnectorCapabilities source="Snapshot read" target="Data write" />
 
 <Aside type="note" title="Dedicated cloud contract">
-  This is separate from the generic ClickHouse connector because the catalog declares a distinct ID and default port `8443`. It does not imply a TapState TLS control or a live connection test.
+  This is separate from the generic ClickHouse connector because TapState supports a distinct ID and default port `8443`. It does not imply a TapState TLS control or a live connection test.
 </Aside>
 
 ## Before you begin
@@ -71,12 +71,12 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the Snapshot mode and catalog-known field shapes. It does not reach the cloud endpoint, authenticate, inspect grants, or verify a target write.
+Local validation checks the Snapshot mode and recognized field shapes. It does not reach the cloud endpoint, authenticate, inspect grants, or verify a target write.
 
 ## Limitations
 
-- The catalog declares Snapshot only; it does not declare CDC or DDL handling.
-- The catalog has no explicit TapState transport-encryption field. Do not infer one from the cloud endpoint or port.
+- TapState supports Snapshot only; it does not declare CDC or DDL handling.
+- This connection contract has no explicit transport-encryption field. Do not infer one from the cloud endpoint or port.
 - Test table engines, sort keys, data-type mapping, and destination behavior with representative data before production writes.
 
 ## Reference
@@ -84,7 +84,7 @@ Local validation checks the Snapshot mode and catalog-known field shapes. It doe
 | Field | Required | Default | Use |
 |---|---|---|---|
 | `host` | Yes | — | ClickHouse Cloud endpoint host. |
-| `port` | Yes | `8443` | Catalog-defined service port; type is string. |
+| `port` | Yes | `8443` | Documented service port; type is string. |
 | `database` | Yes | — | Database name. |
 | `user` | Yes | — | Cloud database account. |
 | `password` | No | — | Password; inject through an environment variable. |

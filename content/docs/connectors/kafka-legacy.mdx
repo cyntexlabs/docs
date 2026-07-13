@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use this connector only to maintain an existing resource with the catalog ID `kafka`. For a new Kafka connection, use [Kafka](/docs/connectors/kafka), whose catalog ID is `kafka_enhanced`.
+Use this connector only to maintain an existing resource with connector ID `kafka`. For new work, use [Kafka](/docs/connectors/kafka) with connector ID `kafka_enhanced`.
 
 <ConnectorProfile
   category="Streaming & messaging"
@@ -23,17 +23,17 @@ Use this connector only to maintain an existing resource with the catalog ID `ka
   maturityLabel="Retained for existing deployments; use Kafka Enhanced for new work"
   worksAs="Source, Target"
   capabilities="Stream read, Stream write, JSON-object messages"
-  compatibility="Kafka 2.3.x upstream baseline"
+  compatibility="Kafka 2.3.x"
 />
 
 <ConnectorCapabilities source="Stream read of JSON-object messages" target="Stream write" />
 
 <Aside type="caution" title="Choose the replacement for new pipelines">
-  The current catalog explicitly marks this connector as deprecated. Kafka Enhanced has a separate ID and a broader record, serializer, and Schema Registry contract. Do not change an existing resource's connector ID without staging the migration and validating downstream consumers.
+  The current connection contract explicitly marks this connector as deprecated. Kafka Enhanced has a separate ID and a broader record, serializer, and Schema Registry contract. Do not change an existing resource's connector ID without staging the migration and validating downstream consumers.
 </Aside>
 
 <Aside type="note" title="Local validation boundary">
-  Local validation checks the `stream` mode and catalog-defined field shapes. It does not reach brokers, authenticate, list topics, consume records, or publish a message.
+  Local validation checks the `stream` mode and recognized field shapes. It does not reach brokers, authenticate, list topics, consume records, or publish a message.
 </Aside>
 
 ## Before you begin
@@ -99,7 +99,7 @@ Before production, read and write one JSON object through a staging topic. Check
 
 ## Limitations
 
-- The upstream baseline supports Kafka 2.3.x and JSON-object message strings only. Use Kafka Enhanced when consumers require other native record or serialization shapes.
+- This legacy connector supports Kafka 2.3.x and JSON-object message strings only. Use Kafka Enhanced when consumers require other native record or serialization shapes.
 - Stream recovery can deliver the same record again. Use stable identifiers and idempotent downstream processing when duplicates are unacceptable.
 - `kafkaIgnorePushError` can permit progress after a write error, with a risk of lost records. Do not enable it without an explicit loss-handling decision.
 - Topic existence, partitions, ACLs, retention, broker security, and delivery behavior require live validation against the Kafka deployment.
@@ -113,7 +113,7 @@ Before production, read and write one JSON object through a staging topic. Check
 | `krb5` | No | `false` | Enable Kerberos fields. |
 | `krb5Keytab`, `krb5Conf`, `krb5Principal`, `krb5ServiceName` | With Kerberos | — | Keytab, configuration, principal, and service name. |
 | `mqUsername`, `mqPassword` | No | — | Broker credentials when Kerberos is disabled. |
-| `schemaRegister` | No | `false` | Enable the catalog's Schema Registry fields. |
+| `schemaRegister` | No | `false` | Enable the Schema Registry fields. |
 | `schemaRegisterUrl` | With Schema Registry | — | Schema Registry URL. |
 | `basicAuth` | No | `false` | Enable Schema Registry basic authentication. |
 | `authCredentialsSource`, `authUserName`, `authPassword` | With registry basic auth | — | Registry credential source and credentials. |

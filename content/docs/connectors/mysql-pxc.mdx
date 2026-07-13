@@ -30,7 +30,7 @@ Use MySQL Percona XtraDB Cluster (PXC) to copy existing rows or start with a cop
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
-  The catalog validates Snapshot and CDC resource shapes. It does not inspect the cluster's binlog settings, node topology, privileges, or target write path.
+  Local validation checks Snapshot and CDC resource shapes. It does not inspect the cluster's binlog settings, node topology, privileges, or target write path.
 </Aside>
 
 ## Before you begin
@@ -53,7 +53,9 @@ Snapshot does not require replication privileges or binary logging.
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** when the downstream system must start current and then receive new inserts, updates, and deletes. Create a reader with replication access:
+Use **Snapshot + CDC** when the downstream system must start current and then receive new inserts, updates, and deletes.
+
+**1. Create a reader with replication access**
 
 ```sql
 CREATE USER 'tapstate_reader'@'%' IDENTIFIED BY 'replace_with_a_secret';
@@ -61,6 +63,8 @@ GRANT SELECT ON `orders`.* TO 'tapstate_reader'@'%';
 GRANT REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'tapstate_reader'@'%';
 FLUSH PRIVILEGES;
 ```
+
+**2. Enable row-based binary logging**
 
 Enable row-based binary logging with a unique `server_id` and retain logs longer than the longest credible interruption:
 
@@ -72,7 +76,9 @@ binlog_format     = ROW
 binlog_row_image  = FULL
 ```
 
-Restart during an approved maintenance window, then confirm `binlog_format` is `ROW` and `binlog_row_image` is `FULL`.
+**3. Restart and verify the active settings**
+
+Restart during an approved maintenance window, then confirm `binlog_format` is `ROW` and `binlog_row_image` is `FULL` on the node used for CDC.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -107,7 +113,7 @@ tables:
   - orders
 ```
 
-Use `mode: snapshot` for a one-time copy. For a target connection, omit `mode` and `tables` and supply the writer credentials. `addtionalString` is the catalog's inherited spelling.
+Use `mode: snapshot` for a one-time copy. For a target connection, omit `mode` and `tables` and supply the writer credentials. `addtionalString` is the required inherited spelling.
 
 ## Validate the configuration
 
@@ -117,12 +123,12 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource, declared mode, and catalog-known fields. It does not test cluster routing, credentials, privileges, binlog retention, or data movement.
+Local validation checks the resource, declared mode, and recognized fields. It does not test cluster routing, credentials, privileges, binlog retention, or data movement.
 
 ## Limitations
 
-- The catalog declares Snapshot and CDC, but no DDL behavior; this guide does not claim DDL capture or application.
-- The reused connector warns that changes caused by database-level cascade actions may not be represented in the binary log. Test those relationships end to end and use target-side logic where required.
+- TapState supports Snapshot and CDC, but no DDL behavior; this guide does not claim DDL capture or application.
+- The connector warns that changes caused by database-level cascade actions may not be represented in the binary log. Test those relationships end to end and use target-side logic where required.
 - Validate failover, node routing, and PXC version behavior with representative workloads before production use.
 
 ## Reference
@@ -130,7 +136,7 @@ Local validation checks the resource, declared mode, and catalog-known fields. I
 | Field | Required | Default | Use |
 |---|---|---|---|
 | `host` | Yes | — | Reachable PXC endpoint or cluster router. |
-| `port` | Yes | — | MySQL service port; catalog type is string. |
+| `port` | Yes | — | MySQL service port; field type is string. |
 | `database` | Yes | — | Database name. |
 | `username` | Yes | — | Reader or writer account. |
 | `password` | No | — | Account password; supply through an environment variable. |

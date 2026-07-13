@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use HubSpot as a catalog-declared API source for CRM data.
+Use HubSpot as a supported API source for CRM data.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -29,7 +29,7 @@ Use HubSpot as a catalog-declared API source for CRM data.
 <ConnectorCapabilities source="API read" target="No documented target role" />
 
 <Aside type="note" title="Authorization boundary">
-  The catalog requires `code`. The upstream guide uses an interactive authorization flow, but a corresponding TapState UI or CLI exchange is not yet evidenced; this page does not invent one.
+  The connection requires `code`. Obtain it through the authorization flow supplied by your TapState deployment; local validation does not exchange or refresh it.
 </Aside>
 
 ## Before you begin
@@ -50,7 +50,7 @@ config:
 mode: api
 ```
 
-The catalog does not expose a token-refresh field, selected-object field, or account selector. Confirm those runtime behaviors before production use.
+TapState does not expose a token-refresh field, selected-object field, or account selector. Confirm those runtime behaviors before production use.
 
 ## Validate the configuration
 
@@ -65,10 +65,10 @@ Local validation does not authorize HubSpot, verify scopes, enumerate CRM object
 ## Limitations
 
 - API source only; no target, Snapshot, CDC, DDL, or API-rate contract is declared.
-- The code-backed resource schema is intentionally smaller than the upstream UI guide; do not infer missing configuration fields.
+- Use only the documented resource fields. Do not add OAuth or account settings that are not accepted by the connection schema.
 
 ## Reference
 
 | Field | Required | Use |
 |---|---|---|
-| `code` | Yes | Catalog-defined authorization value; use a secret-aware environment variable. |
+| `code` | Yes | Documented authorization value; use a secret-aware environment variable. |

@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Zoho Desk as a catalog-declared Snapshot source for service data.
+Use Zoho Desk as a supported Snapshot source for service data.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -28,8 +28,8 @@ Use Zoho Desk as a catalog-declared Snapshot source for service data.
 
 <ConnectorCapabilities source="Snapshot read" target="No documented target role" />
 
-<Aside type="note" title="Webhook is not a catalog-declared mode">
-  The upstream guide describes WebHook updates, but the current catalog declares `snapshot` only. This page does not represent webhook incremental delivery as an available TapState mode.
+<Aside type="note" title="Webhook is not a supported mode">
+  TapState currently publishes this connector as Snapshot only. Although the connection contains webhook-related fields, this page does not represent webhook incremental delivery as an available source mode.
 </Aside>
 
 ## Before you begin
@@ -38,7 +38,7 @@ Use Zoho Desk as a catalog-declared Snapshot source for service data.
 
 1. In Zoho Desk, open the API settings and record the organization ID.
 2. In the Zoho API Console, create a **Self Client** and store its client ID and client secret.
-3. Generate an authorization code for the required Desk scopes. The reused connector uses:
+3. Generate an authorization code for the required Desk scopes. The connector uses:
 
 ```text
 Desk.tickets.ALL,Desk.search.READ,Desk.contacts.READ,
@@ -50,7 +50,7 @@ Desk.articles.CREATE,Desk.articles.UPDATE,Desk.articles.DELETE
 
 Reduce this scope list if your selected modules need less access. Authorization codes expire; generate one immediately before the deployed connection flow exchanges it. Keep every credential in a secret manager.
 
-The upstream connector exposes these table-like modules: `Tickets`, `Departments`, `Products`, `OrganizationFields`, and `Contracts`.
+The connector exposes these table-like modules: `Tickets`, `Departments`, `Products`, `OrganizationFields`, and `Contracts`.
 
 ## Create a connection
 
@@ -69,7 +69,7 @@ config:
 mode: snapshot
 ```
 
-`streamReadType` is a catalog field with a `WebHook` default; it does not override the catalog's Snapshot-only mode declaration.
+`streamReadType` is a connection field with a `WebHook` default; it does not override the published Snapshot-only source mode.
 
 ## Validate the configuration
 
@@ -83,17 +83,17 @@ Local validation does not authenticate to Zoho Desk, exchange credentials, gener
 
 ## Limitations
 
-- The current catalog declares Snapshot only; it does not declare CDC, target writes, DDL, or webhook delivery semantics.
-- The upstream connector supports webhook delivery, but a webhook requires a unique externally reachable callback URL and lifecycle management that the current TapState catalog does not describe. Do not promise real-time delivery from this Snapshot-only resource.
+- The current connection contract declares Snapshot only; it does not declare CDC, target writes, DDL, or webhook delivery semantics.
+- Webhook delivery requires a unique externally reachable callback URL and lifecycle management that this TapState contract does not define. Do not rely on real-time delivery from this Snapshot-only resource.
 - Reusing one Zoho client ID and secret across many connections can hit Zoho token limits.
-- In the upstream webhook model, deleted records arrive as update events with `IsDel = TRUE`; a later full read does not recreate those deletion events.
-- The catalog exposes `getTokenMsg`, `getRefreshMsg`, and `hookText` but does not document their runtime representation; leave them unset unless the deployed contract specifies values.
+- In the connector's webhook model, deleted records arrive as update events with `IsDel = TRUE`; a later full read does not recreate those deletion events.
+- The connection exposes `getTokenMsg`, `getRefreshMsg`, and `hookText` but does not document their runtime representation; leave them unset unless the deployed contract specifies values.
 
 ## Reference
 
 | Field | Required | Default | Use |
 |---|---|---|---|
 | `orgId`, `clientID`, `clientSecret`, `generateCode` | Yes | — | Zoho Desk organization and authorization material. |
-| `connectionMode` | No | `DocumentMode` | Catalog connection-mode enum. |
-| `streamReadType` | No | `WebHook` | Catalog field; not a TapState CDC declaration. |
+| `connectionMode` | No | `DocumentMode` | Connection-mode value. |
+| `streamReadType` | No | `WebHook` | Webhook-related value; it is not a published TapState CDC mode. |
 | `getTokenMsg`, `getRefreshMsg`, `hookText` | No | — | Runtime-specific optional fields. |

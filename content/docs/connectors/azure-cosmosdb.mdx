@@ -29,7 +29,7 @@ Use Azure Cosmos DB to copy the records that exist now from a NoSQL account and 
 <ConnectorCapabilities source="Snapshot read" target="No documented target role" />
 
 <Aside type="note" title="Local validation boundary">
-  The catalog declares a Snapshot source and validates the four documented fields. It does not sign in to Azure, check account permissions, list containers, or read records.
+  TapState supports a Snapshot source and validates the four documented fields. It does not sign in to Azure, check account permissions, list containers, or read records.
 </Aside>
 
 ## Before you begin
@@ -38,9 +38,9 @@ Use Azure Cosmos DB to copy the records that exist now from a NoSQL account and 
 
 1. Select an Azure Cosmos DB account that uses the NoSQL API and the database to read.
 2. Copy the account host and a key with the smallest practical read permission.
-3. Choose the consistency level that matches the account policy. The catalog default is `Session`.
+3. Choose the consistency level that matches the account policy. The documented default is `Session`.
 
-Keep the account key in a secret manager. The upstream guide establishes the NoSQL API baseline; it does not establish a TapState connection test or an additional authentication field.
+Keep the account key in a secret manager. This connector uses the Azure Cosmos DB for NoSQL API and does not publish another authentication field or a live connection-test command.
 
 ## Create a connection
 
@@ -67,13 +67,13 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, Snapshot mode, and catalog-known field shapes. It does not test DNS, network access, account keys, Azure RBAC, container selection, or query results.
+Local validation checks the resource envelope, Snapshot mode, and recognized field shapes. It does not test DNS, network access, account keys, Azure RBAC, container selection, or query results.
 
 ## Limitations
 
-- The catalog declares Snapshot only; it does not declare CDC, target writes, or DDL handling.
+- TapState supports Snapshot only; it does not declare CDC, target writes, or DDL handling.
 - Treat consistency, partitioning, capacity settings, and API rate limits as deployment concerns. Confirm them against the selected Cosmos account before running a production pipeline.
-- The catalog does not expose a TapState TLS setting. Do not infer one from Azure endpoint conventions.
+- TapState does not expose a TapState TLS setting. Do not infer one from Azure endpoint conventions.
 
 ## Reference
 

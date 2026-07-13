@@ -15,7 +15,7 @@ ai:
 
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Salesforce as a catalog-declared API source for CRM data.
+Use Salesforce as a supported API source for CRM data.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -29,7 +29,7 @@ Use Salesforce as a catalog-declared API source for CRM data.
 <ConnectorCapabilities source="API read" target="No documented target role" />
 
 <Aside type="note" title="Authorization boundary">
-  The local resource needs `code`. The upstream page shows an interactive authorization flow, but the current TapState catalog does not expose its browser exchange or refresh handling.
+  The resource requires `code`. Obtain it through the authorization flow supplied by your TapState deployment; local validation does not perform the browser exchange or refresh it.
 </Aside>
 
 ## Before you begin
@@ -64,11 +64,11 @@ Local validation checks the API mode and `code` field shape only. It does not au
 
 ## Limitations
 
-- The catalog declares API source only; it does not declare target writes, Snapshot, CDC, DDL, or rate-limit behavior.
+- TapState supports API source only; it does not declare target writes, Snapshot, CDC, DDL, or rate-limit behavior.
 - Authorization steps from the legacy product UI do not establish a TapState UI or CLI flow.
 
 ## Reference
 
 | Field | Required | Use |
 |---|---|---|
-| `code` | Yes | Catalog-defined authorization value. Keep it outside committed files. |
+| `code` | Yes | Documented authorization value. Keep it outside committed files. |

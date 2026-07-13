@@ -30,7 +30,7 @@ Use JSON files from local or supported remote storage as a source for structured
 <ConnectorCapabilities source="Snapshot and CDC" target="No documented target role" />
 
 <Aside type="note" title="Local validation boundary">
-  The catalog validates the selected mode and known field shapes. It does not open or parse a JSON file, authenticate to storage, or observe file changes.
+  Local validation checks the selected mode and known field shapes. It does not open or parse a JSON file, authenticate to storage, or observe file changes.
 </Aside>
 
 ## Before you begin
@@ -45,7 +45,7 @@ Use **Snapshot** to read the files that match the configured path now. Make them
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** only after testing file-change behavior in the deployed runtime. The catalog does not define a watcher, file-replacement policy, deletion event, or JSON parse-error policy, so test each case with representative files.
+Use **Snapshot + CDC** only after testing file-change behavior in the deployed runtime. TapState does not define a watcher, file-replacement policy, deletion event, or JSON parse-error policy, so test each case with representative files.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -81,8 +81,8 @@ tapstate validate --workdir tapstate-work
 
 ## Limitations
 
-- The catalog declares a source only; it does not declare JSON target writes or DDL behavior.
-- The catalog does not specify a JSON record convention, file-change mechanism, deletion behavior, or parsing-error policy.
+- TapState supports a source only; it does not declare JSON target writes or DDL behavior.
+- TapState does not specify a JSON record convention, file-change mechanism, deletion behavior, or parsing-error policy.
 - Store credentials outside committed workspace files.
 
 ## Reference

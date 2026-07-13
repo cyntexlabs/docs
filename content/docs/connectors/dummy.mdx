@@ -52,7 +52,7 @@ Use **Snapshot + CDC** to generate initial rows followed by periodic changes. Ch
 
 ### Target
 
-Use the catalog-declared target path only for development. Set write intervals and logging deliberately, then verify target semantics with a real destination before a production rollout.
+Use the supported target path only for development. Set write intervals and logging deliberately, then verify target semantics with a real destination before a production rollout.
 
 ## Create a connection
 
@@ -95,13 +95,13 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the catalog-known fields and values. It does not start generation, measure cadence, inspect generated rows, or execute a live target write.
+Local validation checks the recognized fields and values. It does not start generation, measure cadence, inspect generated rows, or execute a live target write.
 
 ## Limitations
 
 - Dummy is for development and test fixtures; it is not evidence of production connector readiness.
-- The catalog does not define the complete generated-field vocabulary or error behavior. Keep test schemas small and explicit.
-- Target write semantics remain a runtime concern even though the catalog declares target capability.
+- TapState does not define the complete generated-field vocabulary or error behavior. Keep test schemas small and explicit.
+- Target write semantics remain a runtime concern even though TapState supports target capability.
 
 ## Reference
 
@@ -111,7 +111,7 @@ Local validation checks the catalog-known fields and values. It does not start g
 | `incremental_interval` | Yes | `1000` | Interval between generated incremental events. |
 | `incremental_interval_totals` | Yes | `1` | Generated events per interval. |
 | `incremental_types` | No | `[1]` | Supported generated change-type values: `1`, `2`, `3`. |
-| `write_interval`, `write_interval_totals` | Yes | `1000`, `0` | Catalog-defined target timing fields. |
+| `write_interval`, `write_interval_totals` | Yes | `1000`, `0` | Documented target timing fields. |
 | `write_log` | Yes | `false` | Enable connector-side write logging. |
 | `table_name` | Yes | `dummy_test` | Generated table name. |
 | `table_fields` | Yes | built-in sample | Array of generated field definitions. |

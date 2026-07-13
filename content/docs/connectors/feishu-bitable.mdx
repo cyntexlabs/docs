@@ -31,8 +31,8 @@ Use Lark Bitable, also known as Feishu Bitable, to read records from one Bitable
   target="No documented target role"
 />
 
-<Aside type="note" title="Catalog takes precedence over the upstream UI guide">
-  The bundled catalog declares an API source and no target-write capability. This page intentionally does not carry over the upstream claim that Bitable can be a target.
+<Aside type="note" title="Source-only connection">
+  This TapState connection reads from Bitable through the API. It does not provide a target-write path.
 </Aside>
 
 ## Before you begin
@@ -61,7 +61,7 @@ tapstate new --non-interactive \
   --workdir tapstate-work
 ```
 
-The resource uses the catalog's exact field spellings:
+The resource uses these exact field spellings:
 
 ```yaml title="tapstate-work/source/customer_requests.tapstate.yml"
 version: tapstate/v1
@@ -76,7 +76,7 @@ config:
 mode: api
 ```
 
-All four fields are required by the catalog. Keep secrets in environment variables even though the current catalog does not mark `app_secret` as a secret field.
+All four fields are required by the connection schema. Keep secrets in environment variables even though the current connection contract does not mark `app_secret` as a secret field.
 
 ## Validate the configuration
 
@@ -86,11 +86,11 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, API mode, and catalog-known field types. It does not authenticate to Lark/Feishu, check application scopes, enumerate Bitable tables, or read records.
+Local validation checks the resource envelope, API mode, and recognized field types. It does not authenticate to Lark/Feishu, check application scopes, enumerate Bitable tables, or read records.
 
 ## Limitations
 
-- The current catalog declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- The current connection contract declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
 - App permissions, tenant policy, and API rate limits are enforced by Lark/Feishu at runtime.
 - Do not put App Secret values in a committed `.tapstate.yml` file.
 

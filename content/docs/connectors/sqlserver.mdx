@@ -16,35 +16,39 @@ ai:
 import { Aside, ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
-Use SQL Server with TapState for snapshots, CDC, DDL capture, target writes, and DDL apply.
+Use SQL Server with TapState for an initial full load, table CDC, DDL capture, and destination writes.
 
 <ConnectorProfile
   category="Databases"
   maturity="GA"
   maturityLabel="General availability"
   worksAs="Source, Target"
-  capabilities="Snapshot, CDC, DDL capture, DDL apply"
+  capabilities="Snapshot, CDC, DDL capture, Data write"
   compatibility="SQL Server 2008–2022"
 />
 
 <ConnectorCapabilities
-  source="Snapshot and CDC"
+  source="Full load (Snapshot), CDC, and DDL capture"
   target="Data write"
-  schema="DDL capture and apply"
+  schema="DDL capture; apply through pipeline policy"
 />
 
-<Aside type="note" title="Local validation boundary">
-  The bundled offline catalog does not contain SQL Server. `tapstate validate` accepts the resource structure, but defers SQL Server-specific fields and modes to the server-side connector contract. This does not indicate that SQL Server is unsupported by a TapState deployment.
+<Aside type="note" title="Deployment contract">
+  SQL Server is registered by the TapState service rather than the bundled offline connector catalog. **GA** is the lifecycle of that server-side connector contract; the field names and target behavior come from your deployed TapState service. The local CLI can validate the resource envelope, but it cannot confirm those SQL Server-specific details.
 </Aside>
 
 ## Before you begin
 
 ### Source
 
-<SourceModeTabs label="Choose the SQL Server source read mode">
-<SourceModeTab value="snapshot">
+Choose the outcome you need. Each tab is a complete preparation path; you do not need to combine steps from both tabs.
 
-Use **Snapshot** to copy the rows that exist now.
+<SourceModeTabs label="Choose the SQL Server source read mode">
+<SourceModeTab value="snapshot" label="Full load (Snapshot)" description="Copy existing rows once">
+
+Use **Full load** (`Snapshot`) to copy the rows that exist now. It does not require SQL Server Agent or database/table CDC.
+
+**1. Create a dedicated reader**
 
 Create a login and map it to a user in the source database:
 
@@ -62,24 +66,41 @@ GRANT SELECT ON SCHEMA::dbo TO tapstate;
 GO
 ```
 
+**2. Restrict table access when needed**
+
 Use object-level `SELECT` grants instead of a schema grant when the account should read only a subset of tables.
 
-Snapshot does not require SQL Server Agent or database/table CDC.
-
 </SourceModeTab>
-<SourceModeTab value="snapshot-cdc">
+<SourceModeTab value="snapshot-cdc" label="Full load + CDC" description="Copy existing rows, then follow table CDC changes">
 
-Use **Snapshot + CDC** to copy existing rows and then follow SQL Server CDC changes.
+Use **Full load + CDC** to copy existing rows and then follow SQL Server CDC changes.
 
-Start with the Snapshot account and grant read access to the CDC schema:
+**1. Create a dedicated CDC reader**
+
+Create a login, map it to the source database, and grant read access to both the source schema and the CDC schema:
 
 ```sql
+CREATE LOGIN tapstate
+  WITH PASSWORD = 'replace-with-a-secret',
+       DEFAULT_DATABASE = database_name;
+GO
+
 USE database_name;
+GO
+CREATE USER tapstate FOR LOGIN tapstate WITH DEFAULT_SCHEMA = dbo;
+GRANT CONNECT TO tapstate;
+GRANT SELECT ON SCHEMA::dbo TO tapstate;
 GRANT SELECT ON SCHEMA::cdc TO tapstate;
 GO
 ```
 
-Make sure SQL Server Agent is running. On Linux, install and enable the Agent service for the SQL Server version in use.
+Use object-level `SELECT` grants when the account should read only a subset of source tables.
+
+**2. Start SQL Server Agent and check log capacity**
+
+Make sure SQL Server Agent is running. On Linux, install and enable the Agent service for the SQL Server version in use. Check the transaction log growth limit, available disk space, and the expected number of capture instances before enabling CDC.
+
+**3. Enable database and table CDC**
 
 Enable CDC on the database, then on each selected table:
 
@@ -100,6 +121,13 @@ GO
 
 For a table without a primary key, set `@supports_net_changes = 0`. If `@role_name` is not `NULL`, add the TapState user to that database role.
 
+```sql
+ALTER ROLE cdc_reader ADD MEMBER tapstate;
+GO
+```
+
+**4. Verify the capture instance**
+
 Confirm that CDC is enabled and discover the generated capture instance:
 
 ```sql
@@ -110,7 +138,13 @@ WHERE name = N'database_name';
 EXEC sys.sp_cdc_help_change_data_capture
   @source_schema = N'dbo',
   @source_name = N'orders';
+
+EXEC sys.sp_cdc_help_jobs;
 ```
+
+Confirm that both the capture and cleanup jobs are present and running. A missing or stopped capture job means table CDC can be enabled without producing new change rows.
+
+**5. Set the cleanup window**
 
 Set cleanup retention longer than the longest planned outage. The value is in minutes; this example keeps two days:
 
@@ -120,14 +154,31 @@ EXEC sys.sp_cdc_change_job
   @retention = 2880;
 ```
 
-Check the transaction log growth limit and available disk space before enabling a large number of tables. SQL Server CDC polling cost grows with the number of capture instances.
+SQL Server CDC polling cost grows with the number of capture instances. Split very large table sets when one polling cycle cannot meet the required latency.
 
 </SourceModeTab>
 </SourceModeTabs>
 
 ### Target
 
-Create a login and database user as shown for the source, then grant target privileges:
+**1. Create a dedicated writer**
+
+Create a login and map it to a user in the target database:
+
+```sql
+CREATE LOGIN tapstate
+  WITH PASSWORD = 'replace-with-a-secret',
+       DEFAULT_DATABASE = database_name;
+GO
+
+USE database_name;
+GO
+CREATE USER tapstate FOR LOGIN tapstate WITH DEFAULT_SCHEMA = dbo;
+GRANT CONNECT TO tapstate;
+GO
+```
+
+**2. Grant the approved write operations**
 
 ```sql
 USE database_name;
@@ -142,11 +193,11 @@ Remove `CREATE TABLE` or `ALTER` when TapState must write only to pre-created ta
 
 ## Create a connection
 
-Create the SQL Server connection through the connection flow supplied by your TapState deployment. The public offline catalog does not contain a SQL Server field schema, so this page does not publish a speculative `.tapstate.yml` example.
+Create the SQL Server connection through the connection flow supplied by your TapState deployment. This guide does not invent a `.tapstate.yml` field schema where the deployment has not documented one.
 
 ## Validate the configuration
 
-The bundled offline CLI can validate the resource envelope, but not SQL Server field names, credentials, listener reachability, SQL Server Agent, CDC enablement, or retention.
+`tapstate validate` checks the resource envelope only for this connector. It does not verify SQL Server field names, credentials, listener reachability, SQL Server Agent, CDC enablement, or retention.
 
 Before production, verify in a staging table that:
 
@@ -158,14 +209,14 @@ Before production, verify in a staging table that:
 ## Limitations
 
 - CDC must be enabled and retained for every participating table. If cleanup removes the saved position, recovery requires a new snapshot.
-- Tables with CDC enabled cannot use `TRUNCATE TABLE`, and renaming columns with `sp_rename` is not supported by the reused connector baseline.
+- Tables with CDC enabled cannot use `TRUNCATE TABLE`, and renaming columns with `sp_rename` is not supported by the documented connector baseline.
 - After a schema change, SQL Server does not automatically rebuild the capture instance. Disable and re-enable table CDC during a controlled window before resuming dependent DML.
 - DDL and DML close together can create a gap because some implicitly committed DDL is not represented in `cdc.ddl_history`.
-- Large values are limited by the SQL Server CDC capture configuration; the reused connector calls out a 64 KB default and recommends column-level CDC when large fields are involved.
+- SQL Server CDC processes up to 64 KB for an inserted or updated large field by default in the documented baseline. Capture only the required columns when large fields are involved, and verify the effective limit with representative values in staging.
 - A task that polls hundreds of capture tables can accumulate latency and load. Split very large table sets and measure the polling interval in staging.
 - `timestamp`/`rowversion` is not supported when SQL Server is the target.
 - SQL Server 2005 does not provide native CDC and is outside this connector baseline.
-- The offline catalog does not expose TLS fields. Configure forced encryption on SQL Server when required, then use only the fields supplied by your TapState deployment.
+- Configure forced encryption on SQL Server when required, then use the connection settings supplied by your TapState deployment.
 
 ### Recreate CDC after a table change
 

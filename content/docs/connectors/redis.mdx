@@ -16,7 +16,7 @@ ai:
 import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
-Use Redis for catalog-declared Snapshot or CDC reads, or as a destination for pipeline data. Validate the intended key model and source semantics in a staging environment before production use.
+Use Redis for supported Snapshot or CDC reads, or as a destination for pipeline data. Validate the intended key model and source semantics in a staging environment before production use.
 
 <ConnectorProfile
   category="Databases"
@@ -41,7 +41,7 @@ Use **Snapshot** to read the intended key namespace once. Confirm the value enco
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** only after staging source behavior with the deployed runtime. The catalog declares `cdc`, but does not expose a Redis source-selection or CDC-position setting, so this guide does not claim Redis Streams, keyspace notifications, or a replication-log mechanism.
+Use **Snapshot + CDC** only after staging source behavior with the deployed runtime. TapState supports `cdc`, but does not expose a Redis source-selection or CDC-position setting, so this guide does not claim Redis Streams, keyspace notifications, or a replication-log mechanism.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -69,7 +69,7 @@ config:
 mode: snapshot
 ```
 
-Use `mode: cdc` only after staging it. For Sentinel, set `deploymentMode: sentinel` and provide `sentinelAddress`; for cluster mode, validate the exact endpoint layout with the deployed runtime. The catalog marks `sentinelName` as required even though it exposes all three deployment modes, so retain the field and confirm its expected value with your runtime contract.
+Use `mode: cdc` only after staging it. For Sentinel, set `deploymentMode: sentinel` and provide `sentinelAddress`; for cluster mode, validate the exact endpoint layout with the deployed runtime. The connection schema marks `sentinelName` as required even though it exposes all three deployment modes, so retain the field and confirm its expected value with your runtime contract.
 
 For a target-only connection, omit `mode`.
 
@@ -85,9 +85,9 @@ Local validation checks field shape and the selected mode. It does not authentic
 
 ## Limitations
 
-- The catalog declares Snapshot and CDC but does not disclose the source key model or CDC mechanism; do not assume Redis Streams, keyspace notifications, or replication-log behavior.
-- The upstream guide documents a target baseline for Redis 2.8–6.0. Test modern Redis versions and managed offerings before production use.
-- The catalog does not declare DDL behavior or transport-encryption fields.
+- TapState supports Snapshot and CDC but does not disclose the source key model or CDC mechanism; do not assume Redis Streams, keyspace notifications, or replication-log behavior.
+- The documented target baseline is Redis 2.8–6.0. Test newer versions and managed offerings before production use.
+- TapState does not declare DDL behavior or transport-encryption fields.
 
 ## Reference
 
@@ -95,8 +95,8 @@ Local validation checks field shape and the selected mode. It does not authentic
 |---|---|---|---|
 | `deploymentMode` | No | `standalone` | `standalone`, `sentinel`, or `cluster`. |
 | `host` | Yes | — | Redis host. |
-| `port` | Yes | `6379` | Redis port; catalog type is string. |
-| `sentinelName` | Yes | — | Sentinel master name, as required by the current catalog. |
+| `port` | Yes | `6379` | Redis port; field type is string. |
+| `sentinelName` | Yes | — | Sentinel master name, as required by the current connection contract. |
 | `sentinelAddress` | No | — | Sentinel endpoint array. |
 | `database` | Yes | `0` | Redis logical database. |
 | `username` | No | — | Redis ACL user. |

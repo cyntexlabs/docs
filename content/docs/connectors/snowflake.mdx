@@ -22,14 +22,18 @@ Use Snowflake to read existing tables or to deliver pipeline data into a selecte
   maturity="Preview"
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
-  capabilities="Snapshot, Schema discovery, Data write"
+  capabilities="Snapshot, Schema discovery, Data write, Target DDL apply"
   compatibility="Snowflake accounts supported by JDBC"
 />
 
-<ConnectorCapabilities source="Snapshot read" target="Data write" />
+<ConnectorCapabilities
+  source="Snapshot read"
+  target="Data write"
+  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
+/>
 
 <Aside type="note" title="Local validation boundary">
-  The bundled catalog validates Snapshot mode and the selected authentication-field shapes. It does not authenticate to Snowflake, test a warehouse, or prove target-write behavior.
+  The local configuration schema validates Snapshot mode and the selected authentication-field shapes. It does not authenticate to Snowflake, test a warehouse, or prove target-write behavior.
 </Aside>
 
 ## Before you begin
@@ -112,9 +116,9 @@ Local validation checks mode, field types, and authentication-method enum values
 
 ## Limitations
 
-- The catalog declares Snapshot, not a Snowflake Streams, Change Tracking, or log-based CDC mode.
+- TapState supports Snapshot, not a Snowflake Streams, Change Tracking, or log-based CDC mode.
 - Only physical tables should be assumed for source selection until a deployment proves additional object support.
-- `DECFLOAT`, `UUID`, `TIMESTAMP_LTZ`, `VARIANT`, `GEOGRAPHY`, and `GEOMETRY` are query-side types in the reused connector baseline. Do not rely on automatic target-table creation for them.
+- `DECFLOAT`, `UUID`, `TIMESTAMP_LTZ`, `VARIANT`, `GEOGRAPHY`, and `GEOMETRY` are query-side types in the documented connector baseline. Do not rely on automatic target-table creation for them.
 - Do not put passwords, PATs, or private keys in committed resource files.
 
 ## Reference

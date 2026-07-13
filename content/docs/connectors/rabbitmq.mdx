@@ -13,7 +13,7 @@ ai:
   aliases: [rabbitmq, rabbitmq stream, rabbitmq queue, amqp, rabbitmq source, rabbitmq target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use RabbitMQ to read or write streaming queue messages.
 
@@ -28,15 +28,11 @@ Use RabbitMQ to read or write streaming queue messages.
 
 <ConnectorCapabilities source="Stream read" target="Stream write" />
 
-<Aside type="note" title="Local validation boundary">
-  The bundled catalog validates Stream mode and the listed field shapes. It does not connect to AMQP, call the management API, enumerate queues, or publish/consume a message.
-</Aside>
-
 ## Before you begin
 
 ### Source
 
-Create a dedicated user with AMQP read access to the intended virtual host and management-API access if the deployed connector requires queue metadata. The reused connector uses these commands for the default virtual host:
+Create a dedicated user with AMQP read access to the intended virtual host and management-API access for queue metadata. The following commands use the default virtual host:
 
 ```bash
 rabbitmqctl add_user tapstate_reader replace_with_a_secret
@@ -68,7 +64,7 @@ config:
 mode: stream
 ```
 
-For a target connection, omit `mode`. The catalog default for `apiPort` is `8090`, which differs from the upstream UI guide's example; retain the catalog contract and stage the deployed endpoint before production use.
+For a target connection, omit `mode`. The default `apiPort` in this connection contract is `8090`; change it to the RabbitMQ management port used by your deployment, commonly `15672`.
 
 ## Validate the configuration
 
@@ -82,9 +78,15 @@ Local validation cannot prove that a queue exists, that the account has virtual-
 
 ## Limitations
 
-- The reused connector supports JSON object message bodies and direct routing through the default exchange. Treat custom exchanges, routing keys, and more complex message routing as unverified in TapState.
-- The catalog does not declare Snapshot, CDC, DDL, acknowledgement, or delivery-guarantee semantics.
+- RabbitMQ messages must contain JSON object bodies. Arrays and scalar JSON values are supported as field values inside that object, not as the top-level message body.
+- TapState supports direct routing through the default exchange. Custom exchanges, routing keys, and more complex routing are not part of this connector contract.
+- This connector does not define Snapshot, CDC, DDL, acknowledgement, or delivery-guarantee semantics.
 - Do not put broker credentials in a committed `.tapstate.yml` file.
+
+## Troubleshooting
+
+- `ACCESS_REFUSED - Login was refused using authentication mechanism PLAIN` usually means the username or password is incorrect, or the account lacks permission on the selected virtual host. Recheck `rabbitmqctl set_permissions` for that virtual host.
+- `401 Unauthorized` or `HttpClientErrorException: 401` means the management API rejected the account or the API port is incorrect. Grant the narrow `management` tag with `rabbitmqctl set_user_tags tapstate_reader management`, then test the configured management endpoint directly.
 
 ## Reference
 
@@ -92,12 +94,12 @@ Local validation cannot prove that a queue exists, that the account has virtual-
 |---|---|---|---|
 | `mqQueueString` | No | — | Comma-separated queue selection, if supported by the deployment. |
 | `mqHost` | Yes | — | RabbitMQ host. |
-| `mqPort` | Yes | — | AMQP port; catalog type is string. |
-| `apiPort` | Yes | `8090` | Management/API port in the current catalog. |
+| `mqPort` | Yes | — | AMQP port, represented as a string. |
+| `apiPort` | Yes | `8090` | Management/API port. Set it to the port exposed by your RabbitMQ deployment. |
 | `mqUsername` | No | — | RabbitMQ user. |
 | `mqPassword` | No | — | Password; use an environment variable. |
 | `virtualHost` | No | — | RabbitMQ virtual host. |
 
 ### Message data compatibility
 
-The reused connector baseline accepts `OBJECT`, `ARRAY`, `NUMBER`, `INTEGER`, `BOOLEAN`, `STRING` values shorter than 200 characters, and `TEXT`. It documents queue delivery through the default exchange; other routing models need separate runtime evidence.
+Message fields can contain `OBJECT`, `ARRAY`, `NUMBER`, `INTEGER`, `BOOLEAN`, `STRING` values shorter than 200 characters, and `TEXT`. Queue delivery uses the default exchange.

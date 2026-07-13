@@ -29,7 +29,7 @@ Use BigQuery as a destination for pipeline data with a Google Cloud service acco
 <ConnectorCapabilities source="No documented source mode" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
-  The bundled catalog declares BigQuery as a target connection. It validates the two documented field shapes only; it does not authenticate to Google Cloud or create a dataset or table.
+  The local configuration schema declares BigQuery as a target connection. It validates the two documented field shapes only; it does not authenticate to Google Cloud or create a dataset or table.
 </Aside>
 
 ## Before you begin
@@ -38,7 +38,7 @@ Use BigQuery as a destination for pipeline data with a Google Cloud service acco
 
 1. Ensure the TapState runtime can reach Google Cloud APIs.
 2. Create a dedicated Google Cloud service account and JSON key. Keep the key in a secret manager and rotate it according to your security policy.
-3. Grant a custom role scoped to the intended project or dataset. The reused connector uses these permissions:
+3. Grant a custom role scoped to the intended project or dataset. The connector uses these permissions:
 
 ```text
 bigquery.datasets.create
@@ -64,7 +64,7 @@ bigquery.tables.updateData
 
 Remove administrative permissions if your pipeline writes only to pre-created tables and does not manage datasets, routines, or table metadata.
 
-4. Create the destination dataset and tables, or approve the permissions required for your deployment to manage them. The reused connector uses a multi-region dataset; verify the required location with the pipeline's other Google Cloud resources to avoid cross-location failures.
+4. Create the destination dataset and tables, or approve the permissions required for your deployment to manage them. The connector uses a multi-region dataset; verify the required location with the pipeline's other Google Cloud resources to avoid cross-location failures.
 
 ## Create a connection
 
@@ -92,7 +92,7 @@ Local validation checks the resource envelope and known field shapes. It does no
 
 ## Limitations
 
-- The current catalog does not declare a source mode, CDC, or DDL behavior for BigQuery.
+- The current connection contract does not declare a source mode, CDC, or DDL behavior for BigQuery.
 - Dataset location and service-account permissions are enforced by Google Cloud at runtime.
 - A service-account key is a long-lived credential. Store it outside Git, restrict its IAM scope, and rotate or replace it with a deployment-supported workload identity when available.
 - Stage representative target writes to validate data types and table policy before production use.

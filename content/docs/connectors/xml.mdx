@@ -30,7 +30,7 @@ Use XML files from local or supported remote storage as a source for structured 
 <ConnectorCapabilities source="Snapshot and CDC" target="No documented target role" />
 
 <Aside type="note" title="Local validation boundary">
-  The catalog validates the selected mode and configuration field shapes. It does not read XML, authenticate to storage, watch files, or validate XML schema.
+  Local validation checks the selected mode and configuration field shapes. It does not read XML, authenticate to storage, watch files, or validate XML schema.
 </Aside>
 
 ## Before you begin
@@ -45,7 +45,7 @@ Use **Snapshot** to read the matching XML files once. Make files available to th
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** only after verifying changed-file handling in the deployed runtime. The catalog does not define polling, watcher, delete, XML-schema, or record-mapping behavior, so validate those cases with representative files.
+Use **Snapshot + CDC** only after verifying changed-file handling in the deployed runtime. TapState does not define polling, watcher, delete, XML-schema, or record-mapping behavior, so validate those cases with representative files.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -80,7 +80,7 @@ tapstate validate --workdir tapstate-work
 
 ## Limitations
 
-- The catalog declares a source only; target writes and DDL behavior are not declared.
+- TapState supports a source only; target writes and DDL behavior are not declared.
 - It does not specify XML schema validation, record mapping, file polling, or deletion behavior.
 - Keep transport credentials out of committed workspace files.
 
