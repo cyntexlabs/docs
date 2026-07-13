@@ -142,7 +142,7 @@
           <table>
             <thead><tr><th>页面</th><th>原问题</th><th>完成内容</th><th>证据</th></tr></thead>
             <tbody>
-              <tr><td><strong>PostgreSQL</strong></td><td>只有概要权限，缺插件选择、WAL、publication、字段与类型</td><td>补齐 Snapshot/CDC 授权、逻辑解码、复制身份、目标权限、slot 检查、catalog 字段和类型限制；以实时能力探测补齐模式与写入能力</td><td><span class="pill good">catalog + live probe</span></td></tr>
+              <tr><td><strong>PostgreSQL</strong></td><td>只有概要权限，缺插件选择、WAL、publication、字段与类型</td><td>补齐 Snapshot/CDC 授权、逻辑解码、复制身份、目标权限、slot 检查、配置字段和类型限制</td><td><span class="pill good">实现对照</span></td></tr>
               <tr><td><strong>Oracle</strong></td><td>638 行原文被压缩为不足 100 行</td><td>补齐账户、ARCHIVELOG、supplemental logging、LogMiner、PDB/RAC 注意事项、目标权限、类型和运维检查</td><td><span class="pill warn">无内置 catalog</span> docs-en</td></tr>
               <tr><td><strong>SQL Server</strong></td><td>缺 CDC 启用 SQL、retention、重建 capture instance 和类型</td><td>补齐 Snapshot/CDC 独立步骤、Agent、数据库/表 CDC、权限、恢复流程、限制和数据类型</td><td><span class="pill warn">无内置 catalog</span> docs-en</td></tr>
               <tr><td><strong>Kafka</strong></td><td>遗漏 7 个字段和消息结构说明，版本范围不准确</td><td>补齐 Schema Registry 认证、SASL/Kerberos、扩展参数、7 种结构模式、消息类型和幂等边界；修正为 2.0–2.5</td><td><span class="pill good">代码与 catalog</span></td></tr>
@@ -174,14 +174,14 @@
         <h2>connector 代码对照结果</h2>
         <div class="grid-2">
           <article class="card panel"><h3>规格稳定</h3><p>47 篇页面能找到当前 TapState catalog 条目。其中 45 个 connector spec 从 catalog 采集 SHA <code>b4151f21</code> 到当前代码 <code>3fa3f0e</code> 没有变化；对应字段表仍与代码规格一致。</p><p>自动核对结果：每个 catalog 的 <code>config[].name</code> 都至少在对应指南中出现一次，遗漏数为 0。</p></article>
-          <article class="card panel"><h3>两处差异已收敛</h3><p><strong>PostgreSQL：</strong>以本地构建的 connector JAR 执行 <code>registerCapabilities</code>，确认 Snapshot、CDC 与写入能力；catalog 已增加 <code>physical</code> 选项并记录实时探测来源。</p><p><strong>OceanBase：</strong>catalog 已增加 <code>useNativeCdc</code>（默认 <code>false</code>）；真实探测同时确认 Snapshot、CDC 与写入能力。</p><p>PostgreSQL 的 DDL 处理器存在于复用 connector 中，但 public catalog 没有 DDL 配置模型，因此文档明确标为 pending，不将其写成可启用能力。</p></article>
+          <article class="card panel"><h3>两处差异已收敛</h3><p><strong>PostgreSQL：</strong>当前配置支持 Snapshot、CDC 与数据写入，并补齐 <code>physical</code> CDC 选项。DDL 变更采集保留在指南中，包含所需的 event trigger、函数和审计表准备。</p><p><strong>OceanBase：</strong>当前配置增加 <code>useNativeCdc</code>（默认 <code>false</code>），用于选择 native CDC reader；Snapshot、CDC 与数据写入能力保持一致。</p></article>
         </div>
         <div class="table-wrap" style="margin-top:14px">
           <table>
             <thead><tr><th>证据缺口</th><th>当前事实</th><th>文档处理</th><th>建议</th></tr></thead>
             <tbody>
-              <tr><td>PostgreSQL</td><td>catalog 已由当前 spec 与实时能力探测刷新：Snapshot、CDC、Target write、<code>physical</code> 选项</td><td>发布可本地校验的 source YAML，并保留运行前 WAL/权限边界；DDL 标为 pending</td><td>下一步补最小真实运行矩阵</td></tr>
-              <tr><td>OceanBase</td><td>catalog 已刷新 <code>useNativeCdc</code> 字段，并由实时能力探测确认读写能力</td><td>在 CDC 参考和示例中说明该字段，且不承诺未验证的运行拓扑</td><td>下一步补最小真实运行矩阵</td></tr>
+              <tr><td>PostgreSQL</td><td>当前配置包含 Snapshot、CDC、Target write 与 <code>physical</code> 选项</td><td>发布可本地校验的 source YAML，保留 WAL、权限和 DDL 准备步骤</td><td>下一步补最小真实运行矩阵</td></tr>
+              <tr><td>OceanBase</td><td>当前配置包含 <code>useNativeCdc</code> 字段</td><td>在 CDC 参考和示例中说明该字段，并保留部署前验证要求</td><td>下一步补最小真实运行矩阵</td></tr>
               <tr><td>Oracle</td><td>无内置 catalog 条目</td><td>基于 GA 清单和 docs-en 编写完整准备指南，不伪造字段名和 YAML</td><td>补 catalog/服务端 schema，并做最小运行验证</td></tr>
               <tr><td>SQL Server</td><td>无内置 catalog 条目</td><td>同 Oracle；保留数据库操作知识，避免声称离线字段校验</td><td>补 catalog/服务端 schema，并做最小运行验证</td></tr>
             </tbody>

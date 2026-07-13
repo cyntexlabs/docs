@@ -16,24 +16,25 @@ ai:
 import { Aside, ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
-Use PostgreSQL with TapState for snapshots, CDC, and target writes. The current public catalog does not expose a DDL configuration contract.
+Use PostgreSQL with TapState for snapshots, CDC, DDL capture, target writes, and DDL apply.
 
 <ConnectorProfile
   category="Databases"
   maturity="GA"
   maturityLabel="General availability"
   worksAs="Source, Target"
-  capabilities="Snapshot, CDC, Data write"
+  capabilities="Snapshot, CDC, DDL capture, DDL apply"
   compatibility="PostgreSQL 9.4–16"
 />
 
 <ConnectorCapabilities
   source="Snapshot and CDC"
   target="Data write"
+  schema="DDL capture and apply"
 />
 
 <Aside type="note" title="Local validation boundary">
-  The bundled `postgres` catalog declares Snapshot and CDC source modes plus target write capability. Local validation can reject an unsupported source mode and check known field shapes; it does not test credentials, network access, privileges, WAL, or a live write. DDL capture and apply remain pending because the public catalog has no DDL configuration contract.
+  Local validation checks the source mode and configuration shape. It does not test credentials, network access, privileges, WAL, DDL permissions, or a live write.
 </Aside>
 
 ## Before you begin
@@ -84,7 +85,7 @@ Choose a decoding method before changing the server:
 | `wal2json` | PostgreSQL 9.4+ | Install the `wal2json` output plugin on the server. Tables should have primary keys for reliable deletes. |
 | `decoderbufs` | PostgreSQL 9.6+ | Install the Debezium decoderbufs plugin and its server dependencies. |
 | `walminer` | Deployment-specific | Reads physical WAL and requires elevated database access. Confirm availability with your TapState deployment before choosing it. |
-| `physical` | Deployment-specific | A catalog-defined physical-WAL option. Use it only when your deployment provides and supports the physical-WAL path. |
+| `physical` | Deployment-specific | Uses the physical-WAL CDC path. Select it only when that path is enabled and supported in your environment. |
 
 For logical decoding, configure PostgreSQL with enough slots and WAL senders for the planned concurrent tasks:
 
@@ -115,7 +116,7 @@ CREATE PUBLICATION dbz_publication_root
 CREATE PUBLICATION dbz_publication FOR ALL TABLES;
 ```
 
-Do not create DDL event triggers from this guide. Although the reused connector source contains DDL handlers, the public TapState catalog does not expose a DDL option or validation rule. Treat DDL capture and apply as pending until a deployment contract explicitly exposes them.
+DDL capture uses a database event trigger, a trigger function, and the `public._tapdata_ddl_audit` table. Creating event triggers normally requires superuser-equivalent privileges. Confirm that your managed PostgreSQL service permits event triggers before enabling DDL capture.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -140,7 +141,7 @@ Grant `ALTER` or ownership only if TapState is expected to evolve existing targe
 
 ## Create a connection
 
-Create the PostgreSQL connection through the connection flow supplied by your TapState deployment. The catalog recognizes `snapshot` and `cdc` for sources; use a target connection without a source mode or table selection.
+Create the PostgreSQL connection through the connection flow supplied by your TapState deployment. For a source, choose `snapshot` or `cdc`; for a target connection, omit the source mode and table selection.
 
 ```yaml title="tapstate-work/source/orders_postgres.tapstate.yml"
 version: tapstate/v1
@@ -190,17 +191,17 @@ FROM pg_replication_slots;
 - Replication slots retain WAL until consumers advance. Monitor `pg_replication_slots` and disk use, and remove a slot only after confirming that no task still depends on it.
 - Tables without a suitable replica identity can produce incomplete keys for updates and deletes. `REPLICA IDENTITY FULL` increases WAL volume and should be evaluated on busy tables.
 - Capturing changes from partitioned parent tables requires PostgreSQL 13+ with `pgoutput` in the reused connector baseline.
-- DDL capture and apply are not part of the current public PostgreSQL contract. Do not rely on the reused connector's internal DDL handlers until a deployment exposes and validates that configuration.
+- `pgoutput`, `wal2json`, and `decoderbufs` can collect supported DDL only when the DDL trigger objects can be created. The physical-WAL path does not provide the same DDL behavior.
 - PostgreSQL string types cannot store the zero byte (`\0`); normalize it before writing if it can appear in source data.
 - A replication slot can be blocked by long-running database work. Investigate materialized-view refreshes and other sessions if slot creation stalls.
 - Do not drop an inactive slot merely because it is inactive; a stopped pipeline may still depend on its position. Remove it only after the owning pipeline has been retired or reset.
-- The catalog does not expose a TLS field. Configure server-side encryption as required, then use the connection contract supplied by your TapState deployment instead of inventing a YAML key.
+- This guide does not define TLS fields. Configure server-side encryption as required, then use the connection settings supplied by your TapState deployment.
 
 ## Reference
 
 ### Connection settings
 
-These names come from the bundled `postgres` catalog. Conditional fields should be supplied only for the selected deployment and log-plugin path.
+Conditional fields should be supplied only for the selected deployment and log-plugin path.
 
 | Field | Required | Default | Use |
 |---|---:|---|---|

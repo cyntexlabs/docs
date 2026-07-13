@@ -30,7 +30,7 @@ Use the current OceanBase connector for MySQL-compatible OceanBase deployments. 
 <ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
 <Aside type="note" title="Mode boundary">
-  The catalog implementation is the MySQL-compatible OceanBase connector. It does not establish an Oracle-compatible mode, DDL behavior, a connection test, or a TapState UI for the advanced settings in the upstream guide.
+  This guide covers MySQL-compatible OceanBase only. It does not cover Oracle-compatible mode, DDL behavior, connection testing, or advanced settings from the upstream guide.
 </Aside>
 
 ## Before you begin
@@ -54,9 +54,9 @@ The upstream MySQL-compatible baseline does not require a log service for a one-
 
 Use **Snapshot + CDC** when the target must start current and then receive later data changes. In addition to the reader access, deploy the OceanBase Binlog Service described by the reused connector. It uses OBProxy for client access and `obbinlog` for incremental log conversion.
 
-Record the Root Server list, raw-log server host and port, plus CDC credentials required by your deployment. The catalog exposes these values as `rootServerList`, `rawLogServerHost`, `rawLogServerPort`, `cdcUser`, and `cdcPassword`; validate the service endpoint with the deployed runtime before relying on incremental delivery.
+Record the Root Server list, raw-log server host and port, plus CDC credentials required by your deployment. Configure them as `rootServerList`, `rawLogServerHost`, `rawLogServerPort`, `cdcUser`, and `cdcPassword`, then validate the service endpoint with the deployed runtime before relying on incremental delivery.
 
-The catalog also exposes `useNativeCdc` (default `false`). When enabled, the connector selects its native CDC reader. Set it only when the deployed TapState runtime and OceanBase topology have been validated for that path.
+`useNativeCdc` defaults to `false`. When enabled, the connector uses its native CDC reader. Set it only when the deployed TapState runtime and OceanBase topology have been validated for that path.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -98,7 +98,7 @@ tables:
   - orders
 ```
 
-Use `mode: snapshot` for a one-time copy. For a target connection, omit `mode` and `tables`, and use the writer credentials. CDC-specific values are optional catalog fields; set them only for the deployed service topology that needs them.
+Use `mode: snapshot` for a one-time copy. For a target connection, omit `mode` and `tables`, and use the writer credentials. CDC-specific values are optional; set them only for the deployed service topology that needs them.
 
 ## Validate the configuration
 
@@ -108,12 +108,12 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource, declared mode, and catalog-known field shapes. It does not reach OBProxy, check a tenant allowlist, verify Binlog Service deployment, authenticate CDC credentials, or write destination data.
+Local validation checks the resource, selected mode, and configuration shape. It does not reach OBProxy, check a tenant allowlist, verify Binlog Service deployment, authenticate CDC credentials, or write destination data.
 
 ## Limitations
 
-- This page covers the MySQL-compatible catalog implementation only. The upstream Oracle-compatible OceanBase guide needs a separate current connector contract before publication.
-- The catalog declares Snapshot and CDC but no DDL contract. This guide does not claim DDL capture or application.
+- This page covers MySQL-compatible OceanBase only. Oracle-compatible OceanBase needs its own guide.
+- This guide does not cover DDL capture or application.
 - Treat tenant access, cluster topology, Binlog Service setup, and type compatibility as deployment-specific. Test them with representative data before production use.
 
 ## Reference
@@ -121,14 +121,14 @@ Local validation checks the resource, declared mode, and catalog-known field sha
 | Field | Required | Default | Use |
 |---|---|---|---|
 | `host` | Yes | — | OceanBase endpoint, commonly an OBProxy host. |
-| `port` | Yes | `2881` | OceanBase service port; catalog type is string. |
+| `port` | Yes | `2881` | OceanBase service port; provide it as a string. |
 | `tenant` | No | — | OceanBase logical tenant. |
 | `database` | Yes | — | Database name. |
 | `user`, `password` | `user` yes | — | Tenant account and optional password; inject the password through an environment variable. |
 | `extParams` | No | — | Connector-specific connection parameters. |
-| `rootServerList` | No | — | Catalog-defined OceanBase Root Server list for a CDC deployment. |
-| `rawLogServerHost`, `rawLogServerPort` | No | `50051` port | Raw log service endpoint exposed by the catalog. |
-| `cdcUser`, `cdcPassword` | No | `root@sys` user | Catalog-defined CDC service credentials. |
+| `rootServerList` | No | — | OceanBase Root Server list for a CDC deployment. |
+| `rawLogServerHost`, `rawLogServerPort` | No | `50051` port | Raw log service endpoint. |
+| `cdcUser`, `cdcPassword` | No | `root@sys` user | CDC service credentials. |
 | `useNativeCdc` | No | `false` | Selects the connector's native CDC reader when the deployed runtime supports it. |
 | `timezone` | No | empty | UTC offset used by the connector. |
 
