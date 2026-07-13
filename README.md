@@ -72,7 +72,8 @@ src/
 ├── components/     Shared MDX and documentation UI components
 └── lib/            Fumadocs source loading and Markdown conversion
 
-public/assets/       Logos and architecture assets
+research/brand/     Non-runtime brand research, concepts, and source assets
+public/assets/       Page-served assets (currently the architecture diagram)
 ```
 
 ## Generated routes
