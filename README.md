@@ -42,6 +42,13 @@ npm run build
 
 `npm run types:check` regenerates the Fumadocs collections and Next.js route types before running TypeScript. `npm run build` creates the static site in `out/`.
 
+When the TapState product repository is available, verify that every bundled catalog connector is published, covered by a current guide, or explicitly deferred:
+
+```bash
+TAPSTATE_CATALOG_DIR=/path/to/tapstate/core/core-catalog/src/main/resources/catalog \
+  npm run connectors:check
+```
+
 Preview the production export locally:
 
 ```bash
