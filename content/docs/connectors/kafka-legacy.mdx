@@ -1,0 +1,125 @@
+---
+title: Kafka (legacy)
+description: Maintain an existing TapState connection that uses the deprecated Kafka connector
+sidebar:
+  order: 70
+ai:
+  kind: connector
+  id: kafka
+  category: streaming-messaging
+  maturity: deprecated
+  useAs: [source, target]
+  modes: [stream]
+  aliases: [legacy kafka, deprecated kafka, kafka 2.3, kafka json object, kafka source, kafka target]
+---
+
+import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+
+Use this connector only to maintain an existing resource with the catalog ID `kafka`. For a new Kafka connection, use [Kafka](/docs/connectors/kafka), whose catalog ID is `kafka_enhanced`.
+
+<ConnectorProfile
+  category="Streaming & messaging"
+  maturity="Deprecated"
+  maturityLabel="Retained for existing deployments; use Kafka Enhanced for new work"
+  worksAs="Source, Target"
+  capabilities="Stream read, Stream write, JSON-object messages"
+  compatibility="Kafka 2.3.x upstream baseline"
+/>
+
+<ConnectorCapabilities source="Stream read of JSON-object messages" target="Stream write" />
+
+<Aside type="caution" title="Choose the replacement for new pipelines">
+  The current catalog explicitly marks this connector as deprecated. Kafka Enhanced has a separate ID and a broader record, serializer, and Schema Registry contract. Do not change an existing resource's connector ID without staging the migration and validating downstream consumers.
+</Aside>
+
+<Aside type="note" title="Local validation boundary">
+  Local validation checks the `stream` mode and catalog-defined field shapes. It does not reach brokers, authenticate, list topics, consume records, or publish a message.
+</Aside>
+
+## Before you begin
+
+### Source
+
+- Allow the runtime network to reach every broker in `nameSrvAddr`.
+- Grant a dedicated account read and describe access to the selected topics.
+- Supply a topic name or expression in `mqTopicString`. Validate any regular expression against the real topic set before production.
+- This legacy connector accepts JSON-object message strings. Decide whether malformed records should stop the read or be skipped with `kafkaIgnoreInvalidRecord`.
+
+Kafka is a stream, not a Snapshot or CDC source. The connection does not define the initial offset policy; confirm the start position and recovery behavior with the deployed runtime.
+
+### Target
+
+Pre-create production topics with the required partition count, replication factor, retention policy, and write ACLs. For example:
+
+```bash
+bin/kafka-topics.sh --create \
+  --bootstrap-server localhost:9092 \
+  --replication-factor 3 \
+  --partitions 3 \
+  --topic orders.events
+```
+
+Grant the writer account write and describe access only to the intended topics. Choose `kafkaAcks` and `kafkaCompressionType` to match the broker policy and delivery requirements.
+
+## Create a connection
+
+```yaml title="tapstate-work/source/legacy_kafka.tapstate.yml"
+version: tapstate/v1
+kind: source
+id: legacy_kafka
+connector: kafka
+config:
+  nameSrvAddr: "broker1.internal:9092,broker2.internal:9092"
+  mqTopicString: orders.events
+  krb5: false
+  mqUsername: ${KAFKA_USER}
+  mqPassword: ${KAFKA_PASSWORD}
+  kafkaSaslMechanism: PLAIN
+  securityProtocol: SASL_PLAINTEXT
+  kafkaIgnoreInvalidRecord: false
+  kafkaAcks: "-1"
+  kafkaCompressionType: lz4
+  kafkaIgnorePushError: false
+mode: stream
+tables:
+  - orders.events
+```
+
+For a target-only connection, omit `mode` and `tables`. Enable `krb5` only when the deployed runtime can provide the required keytab and Kerberos configuration fields.
+
+## Validate the configuration
+
+```bash
+tapstate validate --workdir tapstate-work
+```
+
+<ValidationStatusGuide />
+
+Before production, read and write one JSON object through a staging topic. Check the record with an independent consumer and verify how a malformed value, a broker restart, and a consumer restart are handled.
+
+## Limitations
+
+- The upstream baseline supports Kafka 2.3.x and JSON-object message strings only. Use Kafka Enhanced when consumers require other native record or serialization shapes.
+- Stream recovery can deliver the same record again. Use stable identifiers and idempotent downstream processing when duplicates are unacceptable.
+- `kafkaIgnorePushError` can permit progress after a write error, with a risk of lost records. Do not enable it without an explicit loss-handling decision.
+- Topic existence, partitions, ACLs, retention, broker security, and delivery behavior require live validation against the Kafka deployment.
+
+## Reference
+
+| Field | Required | Default | Use |
+|---|---:|---|---|
+| `nameSrvAddr` | Yes | — | Comma-separated Kafka broker addresses. |
+| `mqTopicString` | No | — | Topic name or expression. |
+| `krb5` | No | `false` | Enable Kerberos fields. |
+| `krb5Keytab`, `krb5Conf`, `krb5Principal`, `krb5ServiceName` | With Kerberos | — | Keytab, configuration, principal, and service name. |
+| `mqUsername`, `mqPassword` | No | — | Broker credentials when Kerberos is disabled. |
+| `schemaRegister` | No | `false` | Enable the catalog's Schema Registry fields. |
+| `schemaRegisterUrl` | With Schema Registry | — | Schema Registry URL. |
+| `basicAuth` | No | `false` | Enable Schema Registry basic authentication. |
+| `authCredentialsSource`, `authUserName`, `authPassword` | With registry basic auth | — | Registry credential source and credentials. |
+| `kafkaSaslMechanism` | No | `PLAIN` | `PLAIN`, `SHA256`, or `SHA512` when Kerberos is disabled. |
+| `securityProtocol` | No | `SASL_PLAINTEXT` | `SASL_PLAINTEXT` or `SASL_SSL`. |
+| `kafkaIgnoreInvalidRecord` | No | `false` | Skip non-JSON-object source records. |
+| `kafkaAcks` | No | `-1` | Producer acknowledgement: `0`, `1`, `-1`, or `all`. |
+| `kafkaCompressionType` | No | `lz4` | `uncompressed`, `gzip`, `snappy`, `lz4`, or `zstd`. |
+| `kafkaIgnorePushError` | No | `false` | Continue after a push error; assess data-loss risk first. |

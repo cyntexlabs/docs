@@ -13,9 +13,16 @@ const source = await readFile(directoryFile, 'utf8');
 
 function entriesFor(exportName) {
   const start = source.indexOf(`export const ${exportName}`);
-  const end = source.indexOf('\n];', start);
-  if (start === -1 || end === -1) throw new Error(`Could not read ${exportName} from connector-directory.ts.`);
-  return [...source.slice(start, end).matchAll(/\bid:\s*'([^']+)'/g)].map((match) => match[1]);
+  if (start === -1) throw new Error(`Could not read ${exportName} from connector-directory.ts.`);
+
+  const assignment = source.indexOf('= [', start);
+  const arrayStart = assignment + 2;
+  if (assignment === -1) throw new Error(`Could not read ${exportName} from connector-directory.ts.`);
+  if (source.slice(arrayStart, arrayStart + 2) === '[]') return [];
+
+  const end = source.indexOf('\n];', arrayStart);
+  if (end === -1) throw new Error(`Could not read ${exportName} from connector-directory.ts.`);
+  return [...source.slice(arrayStart, end).matchAll(/\bid:\s*'([^']+)'/g)].map((match) => match[1]);
 }
 
 function duplicateValues(values) {

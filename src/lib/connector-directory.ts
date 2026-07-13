@@ -6,7 +6,7 @@ export type ConnectorCategoryId =
   | 'saas-business-commerce-apis'
   | 'custom-development';
 
-export type ConnectorMaturity = 'ga' | 'preview';
+export type ConnectorMaturity = 'ga' | 'preview' | 'deprecated';
 
 export type ConnectorDirectoryItem = {
   slug: string;
@@ -69,6 +69,7 @@ export const connectorDirectory: ConnectorDirectoryItem[] = [
   { slug: 'starrocks', id: 'starrocks', title: 'StarRocks', category: 'warehouses-analytics', maturity: 'preview', useAs: ['source', 'target'], modes: ['snapshot'] },
 
   { slug: 'kafka', id: 'kafka_enhanced', title: 'Kafka', category: 'streaming-messaging', maturity: 'ga', useAs: ['source', 'target'], modes: ['stream'] },
+  { slug: 'kafka-legacy', id: 'kafka', title: 'Kafka (legacy)', category: 'streaming-messaging', maturity: 'deprecated', useAs: ['source', 'target'], modes: ['stream'] },
   { slug: 'activemq', id: 'activemq', title: 'Apache ActiveMQ', category: 'streaming-messaging', maturity: 'preview', useAs: ['source', 'target'], modes: ['stream'] },
   { slug: 'rabbitmq', id: 'rabbitmq', title: 'RabbitMQ', category: 'streaming-messaging', maturity: 'preview', useAs: ['source', 'target'], modes: ['stream'] },
   { slug: 'rocketmq', id: 'rocketmq', title: 'Apache RocketMQ', category: 'streaming-messaging', maturity: 'preview', useAs: ['source', 'target'], modes: ['stream'] },
@@ -131,9 +132,7 @@ export const deferredCatalogConnectors: Array<{ id: string; reason: string }> = 
 ];
 
 /** Legacy IDs represented by a current published guide rather than a duplicate page. */
-export const coveredCatalogConnectors: Array<{ id: string; guide: string; reason: string }> = [
-  { id: 'kafka', guide: 'kafka', reason: 'Legacy Kafka entry is superseded by the Confluent-compatible Kafka guide.' },
-];
+export const coveredCatalogConnectors: Array<{ id: string; guide: string; reason: string }> = [];
 
 /** Published server-side connector guides that are not represented by the bundled catalog snapshot. */
 export const nonCatalogPublishedConnectors: Array<{ id: string; reason: string }> = [
@@ -151,7 +150,7 @@ export function connectorMaturityCounts() {
       counts[connector.maturity] += 1;
       return counts;
     },
-    { ga: 0, preview: 0 },
+    { ga: 0, preview: 0, deprecated: 0 },
   );
 }
 

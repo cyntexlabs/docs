@@ -8,6 +8,7 @@ import {
   connectorMaturityCounts,
   getConnectorsByCategory,
   type ConnectorCategoryId,
+  type ConnectorMaturity,
 } from '@/lib/connector-directory';
 
 type AsideType = 'note' | 'tip' | 'caution' | 'danger';
@@ -312,17 +313,25 @@ const categoryPresentation: Record<
   },
 };
 
-function DirectoryMaturity({ maturity }: { maturity: 'ga' | 'preview' }) {
-  const isGa = maturity === 'ga';
-  return (
-    <span
-      className={
-        isGa
-          ? 'inline-flex rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/45 dark:text-emerald-300'
-          : 'inline-flex rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-900 dark:border-amber-800 dark:bg-amber-950/45 dark:text-amber-200'
+function DirectoryMaturity({ maturity }: { maturity: ConnectorMaturity }) {
+  const presentation = maturity === 'ga'
+    ? {
+        label: 'GA',
+        className: 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/45 dark:text-emerald-300',
       }
-    >
-      {isGa ? 'GA' : 'Preview'}
+    : maturity === 'deprecated'
+      ? {
+          label: 'Deprecated',
+          className: 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-800 dark:bg-rose-950/45 dark:text-rose-300',
+        }
+      : {
+          label: 'Preview',
+          className: 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/45 dark:text-amber-200',
+        };
+
+  return (
+    <span className={`inline-flex rounded-md border px-2 py-0.5 text-xs font-semibold ${presentation.className}`}>
+      {presentation.label}
     </span>
   );
 }
@@ -334,10 +343,11 @@ export function SupportedConnectorMatrix() {
   return (
     <section aria-label="Supported data sources" className="not-prose my-8">
       <div className="mb-8 flex flex-wrap items-center gap-2 text-sm text-fd-muted-foreground">
-        <span className="font-medium text-fd-foreground">{maturityCounts.ga + maturityCounts.preview} documented connectors</span>
+        <span className="font-medium text-fd-foreground">{maturityCounts.ga + maturityCounts.preview + maturityCounts.deprecated} documented connectors</span>
         <span aria-hidden="true">·</span>
         <span className="inline-flex items-center gap-1.5"><DirectoryMaturity maturity="ga" /> {maturityCounts.ga}</span>
         <span className="inline-flex items-center gap-1.5"><DirectoryMaturity maturity="preview" /> {maturityCounts.preview}</span>
+        <span className="inline-flex items-center gap-1.5"><DirectoryMaturity maturity="deprecated" /> {maturityCounts.deprecated}</span>
       </div>
 
       <div className="space-y-9">

@@ -34,6 +34,7 @@
     "paimon",
     "starrocks",
     "kafka",
+    "kafka-legacy",
     "activemq",
     "rabbitmq",
     "rocketmq",

@@ -20,8 +20,9 @@ Use this directory to choose a connector before you design a pipeline. It record
 
 - **GA** means the connector has a stable, generally available contract intended for production use.
 - **Preview** means the connector is ready to evaluate, but its configuration or behavior may still change before GA. Validate production workloads with the connector contract supplied by your TapState deployment.
+- **Deprecated** means the connector remains documented for existing deployments, but new work should use its named replacement.
 
-TapState uses these two labels deliberately. The upstream inventory's former **Beta** group maps to **Preview**, a clearer customer-facing term. We do not show **Alpha** until a connector has a documented, limited-access contract.
+TapState uses GA and Preview for current connectors. The upstream inventory's former **Beta** group maps to **Preview**, a clearer customer-facing term. **Deprecated** is retained only when a current catalog explicitly marks a legacy connector that customers may still need to maintain. We do not show **Alpha** until a connector has a documented, limited-access contract.
 
 ## How to read roles and modes
 
