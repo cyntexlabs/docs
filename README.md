@@ -65,7 +65,6 @@ src/
 ├── components/     Shared MDX and documentation UI components
 └── lib/            Fumadocs source loading and Markdown conversion
 
-docs/               Internal migration and product-evidence notes
 public/assets/       Logos and architecture assets
 ```
 

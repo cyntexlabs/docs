@@ -1,7 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { extname, join, relative } from 'node:path';
 
-const roots = ['content', 'docs', 'public', 'scripts', 'src'];
+const roots = ['content', 'public', 'scripts', 'src'];
 const rootFiles = ['AGENTS.md', 'README.md', 'package.json', 'package-lock.json', 'source.config.ts'];
 const textExtensions = new Set(['.css', '.js', '.json', '.md', '.mdx', '.mjs', '.svg', '.ts', '.tsx']);
 const forbidden = [
