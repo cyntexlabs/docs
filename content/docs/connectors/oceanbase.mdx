@@ -56,6 +56,8 @@ Use **Snapshot + CDC** when the target must start current and then receive later
 
 Record the Root Server list, raw-log server host and port, plus CDC credentials required by your deployment. The catalog exposes these values as `rootServerList`, `rawLogServerHost`, `rawLogServerPort`, `cdcUser`, and `cdcPassword`; validate the service endpoint with the deployed runtime before relying on incremental delivery.
 
+The catalog also exposes `useNativeCdc` (default `false`). When enabled, the connector selects its native CDC reader. Set it only when the deployed TapState runtime and OceanBase topology have been validated for that path.
+
 </SourceModeTab>
 </SourceModeTabs>
 
@@ -89,6 +91,7 @@ config:
   rawLogServerPort: "50051"
   cdcUser: root@sys
   cdcPassword: ${OCEANBASE_CDC_PASSWORD}
+  useNativeCdc: false
   timezone: "+00:00"
 mode: cdc
 tables:
@@ -126,6 +129,7 @@ Local validation checks the resource, declared mode, and catalog-known field sha
 | `rootServerList` | No | — | Catalog-defined OceanBase Root Server list for a CDC deployment. |
 | `rawLogServerHost`, `rawLogServerPort` | No | `50051` port | Raw log service endpoint exposed by the catalog. |
 | `cdcUser`, `cdcPassword` | No | `root@sys` user | Catalog-defined CDC service credentials. |
+| `useNativeCdc` | No | `false` | Selects the connector's native CDC reader when the deployed runtime supports it. |
 | `timezone` | No | empty | UTC offset used by the connector. |
 
 ### Data compatibility

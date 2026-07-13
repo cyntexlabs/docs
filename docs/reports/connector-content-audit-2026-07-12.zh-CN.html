@@ -88,7 +88,7 @@
         <h1>TapState 连接器文档完整性报告</h1>
         <p class="hero-copy">逐篇核对 docs-en 原文、TapState 内置 catalog 与当前可获得的 connector 代码，确认客户准备步骤、权限、CDC、限制、数据类型和配置字段是否完整，并区分文档完成度与真实运行验证。</p>
         <div class="meta">
-          <span><strong>报告日期：</strong>2026-07-12</span>
+          <span><strong>报告日期：</strong>2026-07-13</span>
           <span><strong>docs-en：</strong><code>bc2a576</code></span>
           <span><strong>connector 代码：</strong><code>3fa3f0e</code></span>
           <span><strong>TapState 代码：</strong><code>02f0267</code></span>
@@ -106,7 +106,7 @@
         <article class="metric good"><strong>0</strong><span>遗漏的 catalog 字段</span><small>47 个可对照 catalog 的页面</small></article>
         <article class="metric"><strong>19</strong><span>重点补强页面</span><small>复杂数据库及高缺口页面</small></article>
         <article class="metric"><strong>45</strong><span>规格未漂移</span><small>相对 catalog 采集 SHA</small></article>
-        <article class="metric"><strong>3</strong><span>产品证据缺口</span><small>PostgreSQL、Oracle、SQL Server</small></article>
+        <article class="metric"><strong>2</strong><span>产品证据缺口</span><small>Oracle、SQL Server</small></article>
       </div>
 
       <section id="conclusion">
@@ -131,7 +131,7 @@
           <article><b>04 · RUNTIME</b><p>只有真实执行结果才能证明网络、认证、读写、TLS、恢复和容量表现。</p></article>
         </div>
         <div class="grid-2" style="margin-top:14px">
-          <article class="card panel"><h3>来源版本</h3><ul><li>docs-en 发布分支：<code>bc2a576</code>，Apache-2.0。</li><li>tapdata-connectors：<code>3fa3f0e</code>，与 <code>origin/main</code> 一致。</li><li>TapState 产品：<code>02f0267</code>，与官方 <code>upstream/main</code> 一致。</li><li>catalog 内记录的 connector 采集 SHA：<code>b4151f21</code>。</li></ul></article>
+          <article class="card panel"><h3>来源版本</h3><ul><li>docs-en 发布分支：<code>bc2a576</code>，Apache-2.0。</li><li>tapdata-connectors：<code>3fa3f0e</code>，与 <code>origin/main</code> 一致。</li><li>TapState 产品基线：<code>02f0267</code>，与官方 <code>upstream/main</code> 一致；本次在该基线之上刷新 PostgreSQL 与 OceanBase catalog。</li><li>其余 catalog 条目仍记录采集 SHA：<code>b4151f21</code>。</li></ul></article>
           <article class="card panel"><h3>完成判定</h3><ul><li>复杂 Source 按 Snapshot 与 Snapshot + CDC 分开准备。</li><li>Source、Target 使用独立三级标题。</li><li>权限、日志和服务端设置放在 Before you begin。</li><li>字段、默认值和数据类型放在 Reference。</li><li>限制与验证边界不藏在迁移备注或 AI 专用文件中。</li></ul></article>
         </div>
       </section>
@@ -142,7 +142,7 @@
           <table>
             <thead><tr><th>页面</th><th>原问题</th><th>完成内容</th><th>证据</th></tr></thead>
             <tbody>
-              <tr><td><strong>PostgreSQL</strong></td><td>只有概要权限，缺插件选择、WAL、publication、字段与类型</td><td>补齐 Snapshot/CDC 授权、逻辑解码、复制身份、目标权限、slot 检查、17 个 catalog 字段和类型限制</td><td><span class="pill warn">catalog 能力不完整</span> docs-en + connector code</td></tr>
+              <tr><td><strong>PostgreSQL</strong></td><td>只有概要权限，缺插件选择、WAL、publication、字段与类型</td><td>补齐 Snapshot/CDC 授权、逻辑解码、复制身份、目标权限、slot 检查、catalog 字段和类型限制；以实时能力探测补齐模式与写入能力</td><td><span class="pill good">catalog + live probe</span></td></tr>
               <tr><td><strong>Oracle</strong></td><td>638 行原文被压缩为不足 100 行</td><td>补齐账户、ARCHIVELOG、supplemental logging、LogMiner、PDB/RAC 注意事项、目标权限、类型和运维检查</td><td><span class="pill warn">无内置 catalog</span> docs-en</td></tr>
               <tr><td><strong>SQL Server</strong></td><td>缺 CDC 启用 SQL、retention、重建 capture instance 和类型</td><td>补齐 Snapshot/CDC 独立步骤、Agent、数据库/表 CDC、权限、恢复流程、限制和数据类型</td><td><span class="pill warn">无内置 catalog</span> docs-en</td></tr>
               <tr><td><strong>Kafka</strong></td><td>遗漏 7 个字段和消息结构说明，版本范围不准确</td><td>补齐 Schema Registry 认证、SASL/Kerberos、扩展参数、7 种结构模式、消息类型和幂等边界；修正为 2.0–2.5</td><td><span class="pill good">代码与 catalog</span></td></tr>
@@ -174,13 +174,14 @@
         <h2>connector 代码对照结果</h2>
         <div class="grid-2">
           <article class="card panel"><h3>规格稳定</h3><p>47 篇页面能找到当前 TapState catalog 条目。其中 45 个 connector spec 从 catalog 采集 SHA <code>b4151f21</code> 到当前代码 <code>3fa3f0e</code> 没有变化；对应字段表仍与代码规格一致。</p><p>自动核对结果：每个 catalog 的 <code>config[].name</code> 都至少在对应指南中出现一次，遗漏数为 0。</p></article>
-          <article class="card panel"><h3>两处代码已领先 catalog</h3><p><strong>PostgreSQL：</strong>代码新增 DDL 事件声明、<code>physical</code> 插件、<code>ddlTriggerEnable</code> 和 <code>keepWalHours</code>。</p><p><strong>OceanBase：</strong>代码新增 <code>useNativeCdc</code>，用于直接驱动部署主机上的 obcdc。</p><p>这些字段尚未进入 TapState 内置 catalog，因此正文没有把它们写成当前可配置字段。</p></article>
+          <article class="card panel"><h3>两处差异已收敛</h3><p><strong>PostgreSQL：</strong>以本地构建的 connector JAR 执行 <code>registerCapabilities</code>，确认 Snapshot、CDC 与写入能力；catalog 已增加 <code>physical</code> 选项并记录实时探测来源。</p><p><strong>OceanBase：</strong>catalog 已增加 <code>useNativeCdc</code>（默认 <code>false</code>）；真实探测同时确认 Snapshot、CDC 与写入能力。</p><p>PostgreSQL 的 DDL 处理器存在于复用 connector 中，但 public catalog 没有 DDL 配置模型，因此文档明确标为 pending，不将其写成可启用能力。</p></article>
         </div>
         <div class="table-wrap" style="margin-top:14px">
           <table>
             <thead><tr><th>证据缺口</th><th>当前事实</th><th>文档处理</th><th>建议</th></tr></thead>
             <tbody>
-              <tr><td>PostgreSQL</td><td>catalog 有 17 个字段，但没有 Source modes 和 Target capability</td><td>保留 GA 与完整准备指南；明确本地只校验字段形状，不提供无法校验的 mode YAML</td><td>刷新 catalog 或补服务端权威契约</td></tr>
+              <tr><td>PostgreSQL</td><td>catalog 已由当前 spec 与实时能力探测刷新：Snapshot、CDC、Target write、<code>physical</code> 选项</td><td>发布可本地校验的 source YAML，并保留运行前 WAL/权限边界；DDL 标为 pending</td><td>下一步补最小真实运行矩阵</td></tr>
+              <tr><td>OceanBase</td><td>catalog 已刷新 <code>useNativeCdc</code> 字段，并由实时能力探测确认读写能力</td><td>在 CDC 参考和示例中说明该字段，且不承诺未验证的运行拓扑</td><td>下一步补最小真实运行矩阵</td></tr>
               <tr><td>Oracle</td><td>无内置 catalog 条目</td><td>基于 GA 清单和 docs-en 编写完整准备指南，不伪造字段名和 YAML</td><td>补 catalog/服务端 schema，并做最小运行验证</td></tr>
               <tr><td>SQL Server</td><td>无内置 catalog 条目</td><td>同 Oracle；保留数据库操作知识，避免声称离线字段校验</td><td>补 catalog/服务端 schema，并做最小运行验证</td></tr>
             </tbody>
@@ -216,7 +217,6 @@
           <table>
             <thead><tr><th>优先级</th><th>工作</th><th>完成标准</th></tr></thead>
             <tbody>
-              <tr><td><span class="pill warn">P0</span></td><td>刷新 PostgreSQL 与 OceanBase catalog</td><td>当前 connector spec 的新增字段和模式经过产品评审后进入权威 catalog，文档自动核对无漂移</td></tr>
               <tr><td><span class="pill warn">P0</span></td><td>补 Oracle 与 SQL Server 产品契约</td><td>有权威字段 schema、角色、模式、Target/DDL 声明，不再依赖文档级推断</td></tr>
               <tr><td><span class="pill info">P1</span></td><td>建立 GA 最小运行矩阵</td><td>每个 GA 连接器至少完成连通、Snapshot、CDC/stream、Target、断点恢复和代表性类型测试</td></tr>
               <tr><td><span class="pill info">P1</span></td><td>把字段和 spec 漂移检查加入 CI</td><td>connector spec 或 catalog 变化时自动指出受影响页面和缺失字段</td></tr>
