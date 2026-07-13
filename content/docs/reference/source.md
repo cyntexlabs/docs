@@ -1,11 +1,15 @@
 ---
 title: source
-description: Complete field reference for kind:source
+description: Documentation contract for kind:source connection resources
 sidebar:
   order: 2
+ai:
+  kind: reference
+  id: source-resource
+  aliases: [tapstate source reference, source connection yaml, target connection yaml]
 ---
 
-`source` defines a data source connection, containing the connector type, config, and read mode.
+`source` is the documented connection resource. Treat the fields below as the contract to reconcile with the next TapState-branded implementation baseline; verify acceptance and defaults against the artifact supplied by your deployment.
 
 ```yaml
 version: tapstate/v1
@@ -33,13 +37,13 @@ metadata:
 experimental: {}       # experimental field zone; no compatibility guarantee
 ```
 
-## Field Reference
+## Field reference
 
 ### `id`
 Globally unique identifier. Rules: letters, digits, and hyphens only; no `.`; unique within the workspace.
 
 ### `connector`
-Connector ID from the bundled catalog. The current offline validator applies catalog rules when it recognizes the ID, but it does not yet reject every unknown connector ID.
+Connector ID from the bundled Catalog. The selected artifact determines how unknown IDs and incomplete Catalog entries are handled.
 
 ### `mode`
 
@@ -51,12 +55,12 @@ Connector ID from the bundled catalog. The current offline validator applies cat
 | `api` | API / SaaS pull (polling or webhook) |
 | `file` | File scanning |
 
-Valid `connector × mode` combinations are verified by the capability matrix and intercepted at the third validate layer for invalid combinations.
+The documented validation model compares `connector × mode` combinations with the capability Catalog. Verify exact enforcement against the selected artifact.
 
 ### `config`
-Connector-specific fields defined in the connector's `spec.json`. Offline validation checks known required fields and types when the catalog contract is available.
+Connector-specific fields inherited through the connector contract. See the connector page for exact documented fields; verify enforcement against the selected artifact.
 
-Sensitive fields support `${ENV_VAR}` externalization (treated as a valid string at validate time; expanded at runtime).
+Use `${ENV_VAR}` placeholders for sensitive values when the selected artifact and deployment document that expansion behavior.
 
 ### `options.start_from`
 Data read starting point:

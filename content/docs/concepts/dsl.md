@@ -1,38 +1,72 @@
 ---
-title: DSL & Pipelines
-description: Core concepts of the TapState DSL — resource model, dual-layer storage, and pipeline lifecycle
+title: Resources and pipelines
+description: Understand the documented TapState resource model and how a pipeline references source and target connections
+ai:
+  kind: concept
+  id: resources-and-pipelines
+  aliases: [tapstate dsl, tapstate resources, tapstate pipeline, tapstate yaml]
 ---
 
-TapState pipelines are described in a declarative YAML DSL. Files use the extension `.tapstate.yml` and the schema version `tapstate/v1`. For complete syntax, see the [DSL Grammar Reference](/docs/reference/dsl-grammar).
+TapState uses declarative resources to describe a data path. The current documentation contract uses `.tapstate.yml` files and `version: tapstate/v1`; verify those identifiers against the product artifact supplied by your deployment before execution.
 
-## Core Concepts
+For exact syntax, see the [DSL grammar reference](/docs/reference/dsl-grammar).
 
-- **Resource model**: two resource kinds today — `source` (a data connection plus read mode) and `pipeline` (references a source, applies transforms, and declares sync or serving intent). Additional kinds such as `serve` are planned for later phases.
-- **Everything in the pipeline**: transforms (`transforms:` block), sync targets (`sync:` block), and push/serving intent are declared inside the pipeline resource, so one file describes one data path end to end.
-- **Dual-layer storage**: the local file is the authoring draft; the server's resource store (MongoDB) is the single source of truth once the runtime applies it.
-- **Apply semantics**: validate → canonicalize → upsert (no-op if the content hash is unchanged).
-- **Single schema**: one JSON Schema drives `validate`, `explain`, editor completion, MCP, and end-to-end tests — there is no second, divergent definition of correctness.
+## Resource relationships
 
-## Example
+Two documented resource kinds define the basic authoring model:
+
+- A `source` resource identifies a connector and its configuration. When it has a read `mode`, it can supply records to a pipeline. Without a read mode, it can supply target connection configuration.
+- A `pipeline` resource references a source, applies documented policies or transforms, and identifies one or more delivery targets.
+
+```text
+source connection ──┐
+                    ├── pipeline ──→ target connection
+target connection ──┘
+```
+
+This naming reflects the current resource contract. It does not mean a target is conceptually a source or that every deployment must expose the same command surface.
+
+## Example relationship
 
 ```yaml
 version: tapstate/v1
 kind: pipeline
-id: my-pipeline
+id: active-users
 source: mysql-prod
 transforms:
-  - name: filter
+  - name: filter-active
     filter: "record.status == 'active'"
 sync:
   - source: users
     target:
+      connection: profile-store
       collection: user_profiles
 ```
 
-A matching `kind: source` resource with `id: mysql-prod` supplies the connection; `tapstate validate` confirms the reference closes and every field is legal for the connector.
+Matching connection resources with IDs `mysql-prod` and `profile-store` close the references. The selected artifact determines which pipeline fields and transform shapes it accepts.
 
-## Why a declarative contract
+## Why use declarative resources
 
-Because resources are ordinary files, pipelines get the whole software-engineering toolchain for free: Git review and history, environment-variable substitution for credentials, editor completion from the JSON Schema, deterministic scaffolding for automation, and coded diagnostics that machines (including AI assistants) can act on.
+Ordinary files provide:
 
-Continue with the [DSL Grammar Reference](/docs/reference/dsl-grammar) for field-level syntax, or [Authoring with AI](/docs/for-ai/authoring) for the assisted workflow.
+- reviewable changes in Git;
+- stable IDs and explicit references;
+- secret placeholders instead of committed credentials;
+- editor assistance from a schema;
+- deterministic diagnostics;
+- a common context for people, automation, and AI assistants.
+
+Declarative does not mean automatically correct. Network access, permissions, source consistency, recovery, and target data behavior still require deployment and runtime evidence.
+
+## Authoring lifecycle
+
+A safe resource workflow is:
+
+1. Choose the connector role and mode.
+2. Prepare the external source or target.
+3. Create or edit resources.
+4. Review IDs, references, fields, and secrets.
+5. Run the validation command documented for the selected artifact.
+6. Exercise connectivity and data behavior in a non-production deployment.
+
+Continue with the [Quickstart](/docs/overview/quickstart) for a complete relationship, or [Troubleshooting](/docs/guides/troubleshooting) when a resource and runtime produce different evidence.

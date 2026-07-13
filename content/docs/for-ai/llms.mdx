@@ -3,6 +3,10 @@ title: AI-readable documentation
 description: Canonical TapState documentation surfaces for search engines, agents, and language models
 sidebar:
   order: 1
+ai:
+  kind: reference
+  id: ai-readable-docs
+  aliases: [tapstate llms txt, tapstate markdown, ai documentation, llm documentation]
 ---
 
 import { Aside } from '@/components/mdx';
@@ -30,7 +34,7 @@ Read https://tapstate.com/llms.mdx/docs/connectors/mysql/content.md,
 then help me prepare a MySQL Snapshot + CDC source.
 ```
 
-The public site does not currently expose standalone JSON Schema or example-corpus URLs. Use the DSL reference and current CLI validation until those routes are published and verified.
+The public site does not currently expose standalone JSON Schema or example-corpus URLs. Use the DSL reference and the validation interface documented for your TapState artifact until those routes are published and verified.
 
 ## Content contract
 
@@ -43,7 +47,7 @@ The public site does not currently expose standalone JSON Schema or example-corp
 ## MCP integration
 
 <Aside type="note" title="Planned for a later runtime phase">
-  The current release supports offline CLI authoring and validation. It does not expose a live MCP control endpoint.
+  MCP endpoints and live control are product-release facts. This site does not claim an endpoint until a published TapState artifact and deployment contract expose it.
 </Aside>
 
 When a future TapState runtime exposes MCP, an AI agent will be able to operate it through the published protocol endpoint. See [MCP Integration](/docs/for-ai/mcp) for the planned boundary.

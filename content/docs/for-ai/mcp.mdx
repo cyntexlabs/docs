@@ -1,79 +1,57 @@
 ---
-title: MCP Integration
-description: Planned MCP integration for operating a future TapState runtime from AI agents
+title: MCP integration
+description: Understand the proposed boundary for operating TapState through an MCP-compatible AI client
 sidebar:
   order: 2
+ai:
+  kind: concept
+  id: mcp-integration
+  aliases: [tapstate mcp, tapstate agent tools, model context protocol]
 ---
 
 import { Aside } from '@/components/mdx';
 
-<Aside type="note" title="Available in Alpha Phase">
-  The MCP server is enabled in the **Alpha phase**. The current POC phase has only the offline CLI.
+MCP is a possible client interface for a future TapState control plane. It would allow an AI assistant to call published product operations while TapState remains responsible for validation, authorization, runtime state, and audit behavior.
+
+<Aside type="caution" title="No endpoint or toolset is published by this page">
+  Server URL, transport, authentication, tool names, scopes, and lifecycle behavior require a TapState release contract. Do not use examples from an earlier product name or an internal design as deployment instructions.
 </Aside>
 
-## Overview
+## Intended boundary
 
-The planned TapState runtime embeds an in-process MCP server over HTTP. An AI agent will connect through the standard MCP protocol to gain operational access to a running TapState instance.
-
-```
-AI Agent (Claude / GPT-4o …)
-    │  MCP protocol (HTTP)
-    ▼
-TapState MCP server (in-process)
-    │  direct call
-    ▼
-Control Core (CRUD + lifecycle + read-only runtime)
+```text
+AI client
+   │  MCP request with explicit scope
+   ▼
+TapState control interface
+   │  shared validation, authorization, and audit
+   ▼
+Resource and runtime operations
 ```
 
-**Key design: the MCP server contains no LLM** — the model is on the user's agent side; TapState only provides the operational interface.
+The MCP server would contain no bundled language model. Users choose the client and model; TapState exposes deterministic operations and their results.
 
-## Planned connection model
+## Candidate operation groups
 
-The endpoint, authentication flow, and startup command are not part of the current release contract. The example below illustrates the intended client configuration only; do not use it as deployment instructions.
+| Group | Examples of intent | Required safeguards |
+|---|---|---|
+| Documentation | Explain a field or connector | Versioned canonical content |
+| Discovery | List resources or inspect a source schema | Read scope and sensitive-field filtering |
+| Authoring | Scaffold or validate a resource draft | Deterministic schema and no implicit apply |
+| Observation | Read status, lag, or diagnostics | Deployment identity and read authorization |
+| Mutation | Apply, start, stop, or delete | Explicit target, write scope, audit, and confirmation |
 
-```
-Server URL: http://localhost:7778/mcp
-Auth: Bearer <token>
-```
+These are design categories, not a promised list of MCP tools.
 
-The Alpha release will document the final endpoint, token lifecycle, and startup workflow when they are available in the product.
+## Client safety requirements
 
-## Planned Alpha Toolset (Read-Only + Scaffold)
+- Display the TapState deployment and resource before a mutation.
+- Keep credentials out of prompts and generated resource files.
+- Require explicit authorization for destructive or lifecycle operations.
+- Return structured errors that separate validation, authorization, and runtime failures.
+- Do not let an assistant treat documentation as live deployment state.
+- Record enough audit context to identify the client, operation, target, and result.
 
-| Tool | Description |
-|---|---|
-| `list_sources` | List all registered sources |
-| `list_pipelines` | List all pipelines and their runtime status |
-| `get_pipeline_status` | Query the status, lag, and error rate of a specific pipeline |
-| `get_source_schema` | Get the table schema of a source (DiscoverSchema) |
-| `scaffold_pipeline` | Generate a pipeline YAML draft from a source id and table name |
-| `explain_field` | Look up documentation for any DSL field |
-| `validate_yaml` | Validate a YAML content snippet (three-layer validation) |
+## What you can use now
 
-## Planned Beta Toolset (Full CRUD + Lifecycle)
-
-In the Beta phase, all control core operations will be exposed as MCP tools:
-
-- `create_source` / `update_source` / `delete_source`
-- `apply_pipeline` / `delete_pipeline`
-- `start_pipeline` / `stop_pipeline` / `restart_pipeline`
-- `export_pipeline` (canonical YAML round-trip)
-
-## Using with Claude
-
-Add TapState MCP to Claude's MCP configuration:
-
-```json
-{
-  "mcpServers": {
-    "tapstate": {
-      "url": "http://localhost:7778/mcp",
-      "headers": {
-        "Authorization": "Bearer cyxt_xxxxxxxxxxxx"
-      }
-    }
-  }
-}
-```
-
-Once the Alpha MCP surface is available, a compatible client will be able to use the published toolset against a running TapState instance. The current release supports offline CLI authoring and validation only.
+Use [`llms.txt`](/llms.txt) and page-level Markdown as canonical AI context. Use [Authoring with AI](/docs/for-ai/authoring) for the review workflow, and verify executable interfaces against [Release status](/docs/overview/release-status) and the artifact supplied by your deployment.

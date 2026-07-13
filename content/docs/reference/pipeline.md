@@ -1,11 +1,15 @@
 ---
 title: pipeline
-description: Complete field reference for kind:pipeline
+description: Documentation contract for kind:pipeline resources
 sidebar:
   order: 3
+ai:
+  kind: reference
+  id: pipeline-resource
+  aliases: [tapstate pipeline reference, pipeline yaml, sync target]
 ---
 
-`pipeline` defines a data pipeline: references a source, applies optional transforms, and outputs to sync or push.
+`pipeline` describes a data path: it references a source, applies documented transforms, and declares delivery intent. Verify every field and default against the TapState artifact supplied by your deployment.
 
 ```yaml
 version: tapstate/v1
@@ -20,7 +24,7 @@ tables:                   # optional; further filters the source's table set
 transforms:               # optional; executed in order
   - name: <string>
     filter: <CEL>         # filter; rows not satisfying the condition are discarded
-    js: <script>          # GraalVM JS row-by-row processing
+    js: <script>          # row-by-row script processing
     rename:               # field renaming
       <old>: <new>
     # ... more node types: see transforms reference
@@ -52,13 +56,7 @@ metadata:
 
 ## Lifecycle
 
-```
-File draft → apply → MongoDB (id upsert) → start → running
-                                          ↓
-                                        stop / restart
-```
-
-`run` = implicit apply + start (if apply fails, run does not execute).
+The product direction separates local authoring, application to a deployment, and runtime lifecycle. Exact `apply`, `run`, `start`, `stop`, and recovery semantics require a published command and server contract; they are intentionally not defined by this reference page yet.
 
 ## sync vs push
 

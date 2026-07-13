@@ -11,6 +11,8 @@ This repository publishes TapState documentation. Use **TapState** in reader-fac
 
 ## Verification
 
+Before aligning release status, commands, installers, runtime behavior, or other product facts, follow `research/product-fact-alignment.md`. Defer that work until the latest product implementation is committed and its TapState rebrand has landed.
+
 Run these before handing off a documentation change:
 
 ```bash

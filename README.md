@@ -51,6 +51,13 @@ TAPSTATE_CATALOG_DIR=/path/to/tapstate/core/core-catalog/src/main/resources/cata
 
 Use the same catalog path with `npm run connectors:coverage` to verify the canonical connector-page structure: profile, role-specific preparation, mode-specific CDC paths, validation boundary, limitations, and reference.
 
+When the docs-en migration baseline is available, verify that every independent upstream connector page is migrated, covered by a consolidated guide, or explicitly deferred:
+
+```bash
+DOCS_EN_CONNECTORS_DIR=/path/to/docs-en/docs/connectors \
+  npm run connectors:closure
+```
+
 Preview the production export locally:
 
 ```bash
@@ -64,8 +71,9 @@ Then open [http://localhost:3000](http://localhost:3000), unless `serve` selects
 ```text
 content/docs/
 ├── overview/       Product introduction, quickstart, architecture, and roadmap
-├── concepts/       DSL, connectors, storage, and AI-control concepts
+├── concepts/       Connections, capture modes, resources, state, and AI concepts
 ├── connectors/     Connector preparation, creation, limitations, and reference
+├── guides/         Cross-connector workflows and troubleshooting
 ├── reference/      Canonical DSL field and resource reference
 └── for-ai/         LLM context and AI-assisted authoring guidance
 
@@ -75,7 +83,8 @@ src/
 └── lib/            Fumadocs source loading and Markdown conversion
 
 research/brand/     Non-runtime brand research, concepts, and source assets
-public/assets/       Page-served assets (currently the architecture diagram)
+research/product-fact-alignment.md
+                    Deferred implementation and rebrand verification checklist
 ```
 
 ## Generated routes
@@ -114,6 +123,8 @@ The current implementation still exposes several compatibility identifiers. Keep
 - workspace environment variable: `TAPSTATE_WORKDIR`
 
 These are implementation identifiers, not the public product name.
+
+Do not finalize commands, installers, runtime status, or release claims until the latest implementation is committed and rebranded. Use `research/product-fact-alignment.md` for that later alignment pass.
 
 ## Deployment
 

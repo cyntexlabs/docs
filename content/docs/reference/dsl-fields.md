@@ -1,11 +1,15 @@
 ---
 title: DSL Fields Reference
-description: Machine-verifiable field reference generated from the TapState JSON Schema
+description: Field lookup for the documented TapState resource contract
 sidebar:
   order: 2
+ai:
+  kind: reference
+  id: dsl-fields
+  aliases: [tapstate fields, tapstate schema, yaml field reference]
 ---
 
-This page is generated from the TapState DSL JSON Schema and supports automated field-completeness checks. Edit the upstream schema first when a DSL field changes, then regenerate this page.
+This table reflects the documentation's current schema baseline. Reconcile it with the next TapState-branded implementation and published JSON Schema before treating it as machine-verifiable.
 
 | Field | Type | Required | Default | Enum |
 |---|---|---|---|---|

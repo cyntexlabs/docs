@@ -1,65 +1,64 @@
 ---
-title: AI Control Layer
-description: Current AI-assisted authoring and the planned TapState runtime control surface
+title: AI-assisted control
+description: Understand how AI clients can use TapState documentation and deterministic product contracts without becoming the source of truth
+ai:
+  kind: concept
+  id: ai-assisted-control
+  aliases: [tapstate ai, tapstate agents, tapstate mcp, ai pipeline authoring]
 ---
 
 import { Aside } from '@/components/mdx';
 
-TapState separates AI assistance from deterministic product control. No model is bundled: teams bring their own assistant, while the TapState schema, catalog, and validation code remain authoritative.
+TapState separates AI assistance from deterministic product control. An assistant can help discover documentation, draft resources, and interpret diagnostics; schema, connector contracts, runtime state, authorization, and human review remain authoritative.
 
-## Available today: offline authoring
-
-The current open-source release supports a human-reviewable loop:
+## Documentation-assisted authoring
 
 ```text
-Docs / skill / JSON Schema
+Docs and page Markdown
           ↓
-AI or human drafts .tapstate.yml
+AI or human drafts resources
           ↓
-tapstate new / explain / validate
+Product schema and validation
           ↓
-Coded diagnostics and reviewed files
+Reviewed files and diagnostics
 ```
 
-Useful interfaces include:
+Useful documentation surfaces include:
 
-- `llms.txt` and page-level Markdown for documentation discovery;
-- JSON Schema for completion and editor diagnostics;
-- `tapstate new --non-interactive` for deterministic scaffolding;
-- `tapstate explain` for field-level grammar help;
-- `tapstate validate --output json` for machine-readable results.
+- `llms.txt` for discovery;
+- page-level Markdown for canonical content;
+- connector frontmatter for IDs, roles, modes, and aliases;
+- resource reference for exact field lookup;
+- coded diagnostics from an identified product artifact.
 
-An assistant can draft and repair resources, but offline validation does not connect to sources or execute data movement.
+An assistant should never convert a successful syntax check into a claim that credentials, connectivity, or data movement succeeded.
 
-## Planned runtime control
+## Runtime control direction
 
-The target architecture adds a server-side operation registry and thin CLI, API, and MCP frontends. Operations are intended to carry explicit read, write, or administrative scopes and to share validation and audit behavior.
+A future live control surface can expose discovery, apply, lifecycle, status, logs, and metrics through CLI, API, Web, or MCP clients. Those clients should call the same operation contracts and authorization layer rather than implement separate behavior.
 
-<Aside type="note" title="Arrives with the runtime">
-  Live source discovery, apply, run, start, stop, status, logs, lag metrics, and MCP lifecycle tools require a TapState server. See [Release Status](/docs/overview/release-status) for the current boundary.
+<Aside type="note" title="Interface details require a release contract">
+  MCP endpoints, tool names, authentication, and lifecycle commands are product facts. Treat them as design direction until an identified TapState release publishes and verifies them.
 </Aside>
 
-## Human-in-the-loop boundary
+## Human authorization boundary
 
-Even after live control is available, generated changes should remain reviewable:
+- Read operations must remain within granted scope.
+- Generated writes must identify the resource and intended change.
+- Destructive and lifecycle operations require explicit authorization.
+- Credentials should stay outside generated resources where possible.
+- An AI suggestion cannot override schema, Catalog, runtime, or access-control decisions.
+- A human should review generated permissions and database commands before execution.
 
-- read operations may be automated within granted scope;
-- writes must name the resource and intended change;
-- destructive or lifecycle operations require explicit authorization;
-- credentials stay outside generated YAML where possible;
-- AI suggestions never override catalog, schema, runtime, or access-control decisions.
+## Deterministic surfaces
 
-## Why this design matters
-
-AI improves discoverability and authoring speed. Deterministic interfaces provide safety:
-
-| Need | Deterministic surface |
+| Need | Authoritative surface |
 |---|---|
-| Correct resource shape | JSON Schema and parser |
-| Correct connector fields | Embedded catalog |
+| Resource shape | Published schema and parser |
+| Connector fields and modes | Current connector contract |
 | Closed references | Workspace validation |
-| Repairable failures | Stable error code, location, message, and solution |
-| Automation | JSON/YAML CLI output |
-| Future live access | Scoped server operations exposed through thin frontends |
+| Runtime condition | Deployment status and logs |
+| Authorization | Product access-control decision |
+| AI context | Canonical page body and versioned reference |
 
-See [Authoring with AI](/docs/for-ai/authoring) for the current workflow.
+See [Authoring with AI](/docs/for-ai/authoring) for the documentation workflow and [Release status](/docs/overview/release-status) for the evidence boundary.

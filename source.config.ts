@@ -14,7 +14,7 @@ const aiSchema = z.object({
     'saas-business-commerce-apis',
     'custom-development',
   ]).optional(),
-  maturity: z.enum(['experimental', 'preview', 'ga', 'deprecated']),
+  maturity: z.enum(['experimental', 'preview', 'ga', 'deprecated']).optional(),
   useAs: z.array(z.enum(['source', 'target'])).min(1).optional(),
   modes: z.array(z.string().min(1)).optional(),
   aliases: z.array(z.string().min(1)).optional(),

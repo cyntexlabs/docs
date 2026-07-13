@@ -1,63 +1,67 @@
 ---
-title: Use Cases
-description: Operational-data patterns TapState is designed for, and what's available today
+title: Use cases
+description: Evaluate operational-data outcomes and the evidence required before using them in production
+ai:
+  kind: concept
+  id: use-cases
+  aliases: [tapstate use cases, database offloading, database migration, operational data for ai]
 ---
 
 import { Aside } from '@/components/mdx';
 
-TapState is designed for operational data that loses value when it becomes stale. Each pattern below describes the customer outcome and what the current release covers.
+TapState is designed for operational data that loses value when it becomes stale. Use the patterns below to identify a customer outcome, then verify its connector, runtime, and operational evidence separately.
 
-<Aside type="note" title="Release status">
-  The current release ships the authoring layer for these patterns; live execution arrives with the runtime. See [Release Status](/docs/overview/release-status).
+<Aside type="note" title="Use cases are not release claims">
+  A product pattern explains where TapState is intended to fit. It does not prove that every required runtime capability is present in the artifact or deployment you have.
 </Aside>
 
-## Core-system offloading
+## Offload reads from a system of record
 
-**Problem:** Applications, dashboards, and AI systems query a production database directly, increasing coupling and operational risk.
+**Customer need:** Applications, dashboards, or agents should not add unpredictable query load to the production database.
 
-**With TapState:** Capture source changes and maintain a read-oriented copy or materialized view for downstream consumers — the source database is never queried during steady-state processing.
+**TapState model:** Capture selected changes and maintain a read-oriented destination or materialized state for downstream consumers.
 
-**Available today:** Define source, pipeline, transform, and target intent as validated `.tapstate.yml` resources.
+**Verify before production:** Initial-load consistency, CDC continuity, destination freshness, query behavior, source impact, and recovery after an interruption.
 
-## Database migration and coexistence
+## Migrate while the source remains active
 
-**Problem:** A new system must be prepared while the old system remains active.
+**Customer need:** A replacement system must be prepared while the current system continues to accept writes.
 
-**With TapState:** Start with a snapshot, continue with CDC, validate consistency, and cut over once the target is current.
+**TapState model:** Start with a bounded copy, continue with CDC, compare source and target, and cut over after the target is current.
 
-**Available today:** Connector preparation guides, snapshot/CDC modes, target connection resources, reference closure, and offline config validation.
+**Verify before production:** Supported source version, log retention, full-load-to-CDC handoff, schema compatibility, update/delete keys, cutover procedure, and rollback plan.
 
-## Current customer or account views
+## Maintain a current customer or account view
 
-**Problem:** Account, order, inventory, and entitlement data is fragmented across systems, while applications need one current view.
+**Customer need:** Customer, order, inventory, and entitlement data is fragmented across systems, while an application needs one current view.
 
-**With TapState:** Capture changes, join or reshape records in flight, and materialize current operational state as always-fresh views.
+**TapState model:** Capture relevant changes, reshape or join records, and maintain a consumer-oriented representation.
 
-**Available today:** Declarative transform and view resource models plus schema validation.
+**Verify before production:** Join semantics, late and duplicate records, key changes, delete propagation, source-of-truth ownership, and reconciliation.
 
-## Operational context for AI
+## Supply operational context to AI systems
 
-**Problem:** Retrieval from documents or a warehouse can omit the latest system-of-record state — and agents that act on stale data act wrongly.
+**Customer need:** Document retrieval and analytical stores can omit recent committed business state.
 
-**With TapState:** Provide governed, queryable operational state to agents and applications, while keeping model choice separate from the data platform.
+**TapState model:** Expose governed operational state through a deterministic data contract while keeping the model and agent outside the data platform boundary.
 
-**Available today:** AI-readable docs, JSON Schema, non-interactive scaffolding, coded diagnostics, and structured CLI output.
+**Verify before production:** Access control, data minimization, freshness requirements, auditability, failure behavior, and human authorization for actions.
 
-## Event and analytics feeds
+## Publish governed event and analytics feeds
 
-**Problem:** Downstream teams need a clean stream without independently reading the same production database.
+**Customer need:** Multiple teams need a consistent stream or destination without independently reading the same production database.
 
-**With TapState:** Capture once, apply common transformations, and route approved records to Kafka or other targets.
+**TapState model:** Capture once, apply common policies, and deliver approved records through connector-defined targets.
 
-**Available today:** Catalog-backed Kafka authoring and pipeline intent.
+**Verify before production:** Delivery semantics, replay, retention, serialization, schema evolution, consumer ownership, and cost under representative load.
 
-## Evaluating a use case for production
+## Production-readiness questions
 
-Before treating a pattern as production-ready, verify four layers separately:
+Assess every use case across four layers:
 
-1. **Connector contract:** ID, mode, fields, permissions, and source-system preparation.
-2. **Authoring contract:** valid resources and closed references.
-3. **Runtime behavior:** connectivity, snapshots, CDC, transformations, checkpoints, and recovery.
-4. **Operational evidence:** data correctness, latency, source impact, security, and failure handling in the intended environment.
+1. **Connector contract:** Are the ID, role, mode, fields, permissions, and external-system preparation documented?
+2. **Resource contract:** Does the selected product artifact accept the resource shape and references?
+3. **Runtime behavior:** Does the deployment connect, move data, checkpoint, recover, and handle schema changes correctly?
+4. **Operational evidence:** Have correctness, latency, source impact, security, capacity, and failure handling been measured in the intended environment?
 
-The current release directly covers the first two layers; the [Roadmap](/docs/overview/roadmap) tracks the rest.
+Start with the [connector directory](/docs/connectors), then use [Release status](/docs/overview/release-status) to determine which product facts still require verification.

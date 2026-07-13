@@ -1,19 +1,23 @@
 ---
-title: DSL Grammar Overview
-description: Complete syntax reference for the TapState DSL (.tapstate.yml) — multi-resource declaration model
+title: DSL grammar overview
+description: Documentation contract for TapState resource files, relationships, and validation rules
 sidebar:
   order: 1
+ai:
+  kind: reference
+  id: dsl-grammar
+  aliases: [tapstate yaml reference, tapstate dsl grammar, tapstate resource syntax]
 ---
 
 import { Aside } from '@/components/mdx';
 
-The TapState DSL is YAML format with file extension `.tapstate.yml`, declared with `version: tapstate/v1`.
+The current documentation contract uses YAML files with the extension `.tapstate.yml` and `version: tapstate/v1`.
 
-<Aside type="tip">
-  The current implementation includes a JSON Schema for editor tooling and validation, but the documentation site does not yet publish it at a stable public URL. Do not configure a remote schema URL until that route is released.
+<Aside type="caution" title="Verify against the selected product artifact">
+  The latest implementation and rebrand have not yet been established as this site's release baseline. Treat this page as the resource contract to reconcile, not proof that an artifact accepts every field. The site does not currently publish a stable JSON Schema URL.
 </Aside>
 
-## Resource Types
+## Resource types
 
 TapState uses a **multi-resource declaration model**. Each `.tapstate.yml` file can contain one resource, distinguished by `kind`:
 
@@ -21,8 +25,6 @@ TapState uses a **multi-resource declaration model**. Each `.tapstate.yml` file 
 |---|---|
 | `source` | Defines a data source connection (connector type + config + mining mode) |
 | `pipeline` | Defines a data pipeline (references source + transforms + output) |
-
-Future extensions: `workspace` (batch multi-resource), `serve` (API publishing, GA phase)
 
 ---
 
@@ -53,7 +55,7 @@ tables:
   - name: /orders_.*/   # regex = dynamic matching (requires discovery capability)
 ```
 
-### mode — Four Values
+### mode — five values
 
 | mode | Semantics | Typical connectors |
 |---|---|---|
@@ -63,9 +65,9 @@ tables:
 | `api` | API / SaaS pull (polling or webhook) | Salesforce, HubSpot |
 | `file` | File scanning | S3, SFTP, local directory |
 
-Valid combinations of connector and mode are verified by the **capability matrix** (bundled catalog) at validate time — invalid combinations produce an error, not silent failures.
+The documented validation model compares connector and mode combinations with a bundled capability Catalog. Verify the exact rejection behavior against the selected artifact.
 
-### tables Omission Semantics
+### `tables` omission semantics
 
 - `tables` omitted = all tables (equivalent to `/.*/`)
 - Literal string = fixed table name; does not track new tables
@@ -111,24 +113,20 @@ settings:
   parallelism: 1
 ```
 
-### transforms (Transform Nodes)
+### `transforms`
 
 Each transform is a processing step in the pipeline, executed in declaration order.
 
 | Node type | Field | Semantics |
 |---|---|---|
 | Filter | `filter: <CEL>` | Discard rows that do not satisfy the condition |
-| JS transform | `js: <script>` | GraalVM JS row-by-row processing |
+| JS transform | `js: <script>` | Row-by-row script processing |
 | rename | `rename: {old: new}` | Field renaming |
 | typeFilter | `type_filter: <type>` | Filter by data type |
 | unwind | `unwind: <array field>` | Array flattening |
-| nest | `nest:` | Master-detail merge (Beta; MERGE family) |
+Additional transform designs are not part of this reference until an identified TapState artifact publishes their schema and behavior.
 
-<Aside type="note">
-  `nest` (master-detail merge) is not available in Alpha; it lands in Beta. See [Roadmap](/overview/roadmap/).
-</Aside>
-
-### sync Output
+### `sync` output
 
 Full snapshot / CDC write to target storage:
 
@@ -143,7 +141,7 @@ sync:
       auto_create_table: true   # default: true
 ```
 
-### push Output (Event Stream)
+### `push` output
 
 Publish data as an event stream (Kafka, etc.):
 
@@ -158,7 +156,7 @@ push:
 
 ---
 
-## Expressions: CEL
+## Expressions
 
 Fields such as `filter` and `format` use CEL (Common Expression Language):
 
@@ -168,12 +166,12 @@ format: "{'id': record.user_id, 'ts': record.created_at}"
 ```
 
 - Compiled + type-checked at validate time (not evaluated)
-- Evaluated by the engine at runtime
-- JS nodes (`js:` field) are the escape hatch beyond CEL, supporting complex logic
+- Runtime evaluation depends on the selected implementation contract.
+- Script nodes can express logic beyond the documented expression fields when the artifact exposes them.
 
 ---
 
-## id Rules
+## ID rules
 
 - Top-level `id`: globally unique within the workspace; must not contain `.`
 - Inline private resources: `<pipeline_id>.<local_id>` (auto-naming for inline transforms/views)
@@ -181,7 +179,7 @@ format: "{'id': record.user_id, 'ts': record.created_at}"
 
 ---
 
-## Version Evolution
+## Version evolution
 
 ```yaml
 version: tapstate/v1
@@ -192,12 +190,12 @@ version: tapstate/v1
 
 ---
 
-## validate — Three Layers
+## Validation model
 
-`tapstate validate <file.tapstate.yml>` runs three layers of validation:
+The documented validation model has three layers:
 
 1. **Structural layer**: JSON Schema validation (unknown fields, types, required fields)
 2. **Reference layer**: id reference closure within this batch of resources (offline; no server connection needed)
-3. **Capability matrix layer**: connector × mode validity + required config fields (bundled catalog)
+3. **Capability layer**: connector and mode validity plus the Catalog rules implemented by the selected artifact
 
-Error format: file path / line number / field path + plain-language explanation.
+Verify command syntax, required fields, unknown-field behavior, exit codes, and diagnostic format against the artifact supplied by your deployment.

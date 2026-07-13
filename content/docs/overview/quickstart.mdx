@@ -1,40 +1,49 @@
 ---
 title: Quickstart
-description: Create and validate a TapState workspace in about five minutes
+description: Create a source, target, and pipeline workspace, then run the documented offline validation flow
 ai:
   kind: guide
   id: quickstart
-  maturity: preview
-  aliases: [tapstate quickstart, create cyn yml, validate workspace]
+  aliases: [tapstate quickstart, tapstate workspace, create tapstate yml, validate workspace]
 ---
 
 import { Aside } from '@/components/mdx';
 
-This quickstart exercises the current release: create declarative resources, inspect them, and validate the workspace offline.
+This walkthrough shows how TapState resources fit together. You will define a MySQL Snapshot source, a MongoDB target connection, and a pipeline that references both.
 
-<Aside type="note" title="Offline authoring">
-  These steps do not connect to a database or move data — that arrives with the runtime. See [Release Status](/docs/overview/release-status).
+<Aside type="caution" title="Verify the artifact before running this walkthrough">
+  The command and resource names below are the current documentation contract. A TapState-branded release artifact has not yet been established as the implementation baseline for this site. Confirm the CLI version and supported commands supplied by your deployment before treating the examples as executable release instructions.
 </Aside>
 
-## 1. Get the CLI
+## What you will create
 
-If a `tapstate` binary is already installed, verify it:
+```text
+tapstate-work/
+├── source/
+│   ├── orders_source.tapstate.yml
+│   └── customer_view.tapstate.yml
+└── pipeline/
+    └── orders_to_customer_view.tapstate.yml
+```
+
+The source resource reads existing MySQL rows. The target connection supplies MongoDB destination settings. The pipeline links the two.
+
+## Before you begin
+
+- Obtain the TapState CLI artifact and command contract provided by your deployment.
+- Keep credentials in environment variables or your deployment's secret mechanism.
+- Read the [MySQL](/docs/connectors/mysql) and [MongoDB](/docs/connectors/mongodb) preparation guides.
+- Use non-production credentials and endpoints for an authoring walkthrough.
+
+Check the artifact identity first:
 
 ```bash
 tapstate --version
 ```
 
-A hosted installer (`install.tapstate.dev`) is planned. Until it ships, build the native binary from a source checkout with Maven and GraalVM for JDK 21:
+If that command or its reported product name differs, stop and follow the release instructions that accompany the artifact.
 
-```bash
-cd /path/to/tapstate-source
-mvn -Pnative -pl cli -am -DskipTests package
-export PATH="$PWD/cli/target:$PATH"
-```
-
-## 2. Create a MySQL source
-
-The non-interactive command is suitable for terminals, scripts, and AI agents:
+## 1. Create the MySQL source
 
 ```bash
 tapstate new --non-interactive \
@@ -50,11 +59,9 @@ tapstate new --non-interactive \
   --workdir tapstate-work
 ```
 
-The CLI creates `tapstate-work/source/orders_source.tapstate.yml` with canonical `tapstate/v1` YAML. See the [MySQL connector guide](/docs/connectors/mysql) before choosing CDC.
+Snapshot copies the selected current data as a bounded read. It does not continue with later changes. To evaluate continuous capture, follow the complete Full load + CDC preparation path in the MySQL guide.
 
-## 3. Create a target connection
-
-A mode-less source resource acts as a target connection supplier:
+## 2. Create the target connection
 
 ```bash
 tapstate new --non-interactive \
@@ -66,7 +73,9 @@ tapstate new --non-interactive \
   --workdir tapstate-work
 ```
 
-## 4. Connect them with a pipeline
+A target-only connection supplies connector configuration to a pipeline. It does not declare a source read mode.
+
+## 3. Create the pipeline
 
 ```bash
 tapstate new --non-interactive \
@@ -77,21 +86,26 @@ tapstate new --non-interactive \
   --workdir tapstate-work
 ```
 
-## 5. Validate the workspace
+Review the generated files before continuing. Confirm that IDs and references match and that no secret value was written literally.
+
+## 4. Validate the workspace
 
 ```bash
 tapstate validate --workdir tapstate-work
 ```
 
-A valid three-resource workspace returns:
+An exit code of `0` means the artifact accepted the resource structure, references, and locally known connector rules. The number and wording in success output can vary by artifact version.
 
-```text
-valid: 3 resources in tapstate-work
-```
+Local validation does not prove:
 
-Exit code `0` means the offline contract passed: structure, references, connector fields, and mode combinations are all consistent. Credentials, network access, and data movement are verified by the runtime, not by offline validation.
+- credentials or network access;
+- database discovery or connection tests;
+- Snapshot or CDC execution;
+- target writes, recovery, or data correctness.
 
-## 6. Inspect and explain
+## 5. Inspect the resources
+
+If the artifact exposes the documented inspection commands, use them to review the workspace and field grammar:
 
 ```bash
 tapstate ls --workdir tapstate-work
@@ -99,10 +113,11 @@ tapstate desc orders_to_customer_view --workdir tapstate-work
 tapstate explain source.mode
 ```
 
-Use `ls` and `desc` for concrete workspace resources. Use `explain` for grammar fields. Add `--output json` when an agent or CI job needs structured results.
+Use structured output only when the selected artifact documents it. Do not infer runtime success from an authoring or inspection command.
 
 ## Next steps
 
-- Prepare the database with the [MySQL connector guide](/docs/connectors/mysql).
-- Learn the resource model in the [DSL Grammar](/docs/reference/dsl-grammar).
-- Read [What is TapState?](/docs/overview/what-is-tapstate) for the full product story.
+- Learn how [connections and connectors](/docs/concepts/connections-and-connectors) differ.
+- Choose the right [capture mode](/docs/concepts/capture-modes).
+- Use [Troubleshooting](/docs/guides/troubleshooting) to isolate authoring, deployment, and data problems.
+- Check [Release status](/docs/overview/release-status) before treating this walkthrough as a production contract.

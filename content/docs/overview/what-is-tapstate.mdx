@@ -1,103 +1,88 @@
 ---
 title: What is TapState?
-description: TapState turns database change into live operational state — one data path for capture, transform, and serve
+description: Understand TapState's approach to capture, transform, and serve operational data through one governed data path
+ai:
+  kind: concept
+  id: what-is-tapstate
+  aliases: [tapstate overview, operational data platform, capture transform serve, fresh operational state]
 ---
 
 import { Aside, LinkCard, CardGrid } from '@/components/mdx';
 
-> **Kafka moves events. Warehouses analyze history. TapState turns database truth into live operational state.**
+TapState is designed to keep operational data useful after it leaves the system of record. It brings capture, in-flight transformation, and delivery into one governed data path so teams can define the outcome without assembling a different control model for every hop.
 
-TapState is an open-source data platform built around one idea: **Capture. Transform. Serve. One deployable.** It taps your production databases with log-based change data capture, reshapes change streams in flight, and serves continuously fresh, queryable state to applications, APIs, and AI agents — one product boundary instead of a four-system assembly project.
-
-<Aside type="note" title="Where the product is today">
-  The current open-source release ships the offline authoring layer: a CLI that creates, inspects, and validates the declarative resources the runtime executes. See [Release Status](/docs/overview/release-status) for exactly what is shipped versus in progress.
+<Aside type="note" title="Product direction and release evidence are separate">
+  This page explains the product model. It does not establish that every runtime layer is available in a published TapState release. Use [Release status](/docs/overview/release-status) to understand the current evidence boundary.
 </Aside>
 
-## The problem: the assembly project
+## The problem TapState addresses
 
-Keeping operational data fresh today usually means assembling and operating four separate systems:
+Keeping operational data current often requires separate capture, broker, processing, and serving systems:
 
 ```text
-The assembly project:
-[Source DBs] → [CDC tool] → [Kafka] → [Flink] → [Redis/Mongo] → [Apps & Agents]
-                4 systems · 4 failure surfaces · a team gluing them together
-
-The TapState way:
-[Source DBs] ──────────────→ [ TapState ] ──────────────→ [Apps & Agents]
-                      capture · transform · serve
+Source systems → Capture → Broker → Processing → Serving store → Apps and agents
 ```
 
-Each layer in the assembled stack is good software. The cost is the glue: offsets, retries, schema drift, serialization, upgrades, and dashboards duplicated across every hop — an integration project that exists only to move your own data.
+Each component can be a sound choice. The operational cost comes from the seams: duplicated configuration, offset ownership, schema evolution, serialization, retries, access control, and observability across multiple products.
 
-Composable stacks remain the right choice for some workloads; [TapState and the Streaming Stack](/docs/overview/vs-streaming-stack) gives an honest decision guide. TapState targets the common case: teams whose dominant problem is keeping operational state current, not building bespoke stream topologies.
+TapState focuses on a narrower customer outcome: keep selected operational state current and usable without turning every data path into a custom streaming platform.
 
-## One data path, three depths
+## One path, three responsibilities
 
-TapState is not three features — it is one road with three depths of adoption. Most teams enter at Capture; each stage makes the next one a configuration change instead of a new system.
+### Capture
 
-### Capture — CDC you can bet the database on
+Read an initial state and, when the connector contract allows it, continue from transaction logs, WAL, Oplog, changelogs, message streams, files, or APIs. The connector guide defines the supported role, mode, preparation, and limitations.
 
-Log-based change capture from transaction logs (MySQL binlog, PostgreSQL WAL, MongoDB oplog, and more), plus snapshot, stream, API, and file modes — all behind connector-defined contracts. Initial load and continuous sync are the same pipeline, not two tools.
+### Transform
 
-### Transform — reshape data in flight, not in batch
+Filter, reshape, enrich, and route records as they move through the data path. A declarative resource keeps those decisions reviewable alongside the source and destination intent.
 
-Filter, rename, enrich, join, and route change streams inside the same engine, so downstream consumers receive answer-shaped data instead of raw tables plus a to-do list. No separate processing cluster to size, deploy, and babysit.
+### Serve
 
-### Serve — fresh state, queryable now
+Deliver useful state to a destination, event consumer, application, or agent-facing interface. The serving shape should follow the consumer's access pattern rather than expose raw source tables by default.
 
-Pipelines terminate in an endpoint, not another queue: materialized, always-current views of your business — accounts, orders, inventory, entitlements — served to applications and agents, and pushed onward to Kafka, lakes, or webhooks when other teams need the stream.
+## Where TapState fits
 
-## Who it's for
+TapState is a candidate when:
 
-TapState is built for operational data that loses value when it goes stale: fintech operations and fraud/risk, e-commerce inventory, logistics tracking, operational-cache replacement, cross-system customer/account views, and internal copilots or AI agents that need the latest system-of-record state. [Use Cases](/docs/overview/use-cases) walks through each pattern.
+- applications need a current read model without querying the production database;
+- a migration requires an initial copy followed by continuous changes;
+- multiple consumers need the same governed operational data;
+- teams want connector, transformation, and destination intent in reviewable resources;
+- agents need recent system-of-record state with deterministic product controls.
 
-## Why fresh state matters more now
+A composable Kafka and Flink stack remains appropriate for complex event-time processing, established organization-wide streaming platforms, or independent scaling of every layer. See [TapState and the streaming stack](/docs/overview/vs-streaming-stack) for the tradeoffs.
 
-For thirty years the consumer of enterprise data was a human reading a dashboard, and humans tolerate staleness. AI moves consumption to software that *acts* — agents approving refunds, adjusting inventory, answering customers. When the consumer acts instead of reads, stale data doesn't mean an outdated chart; it means wrong actions. TapState is not "AI-native" — it is the infrastructure that AI adoption stresses. Vector search gives agents semantic memory; TapState's job is committed business truth.
+## The documentation contract
 
-## Provenance
+The documentation is organized around four reader questions:
 
-TapState is built for teams that need a reviewable, declarative path from operational changes to continuously fresh data. It combines an offline authoring workflow with connector contracts and runtime-oriented resource definitions, without requiring a separate stack of bespoke integration assets.
-
-## What ships today
-
-The current release delivers the authoring layer of that data path, and it stands on its own:
-
-- **A reviewable data contract.** Sources and pipelines are ordinary `.tapstate.yml` files that work with Git review, environment-variable substitution, and automated generation:
-
-  ```text
-  tapstate-work/
-  ├── source/
-  └── pipeline/
-  ```
-
-- **Deterministic offline guardrails.** A complete `new → edit → ls / desc / explain → validate` loop checks resource structure, reference closure, connector configuration rules, and mode combinations — with stable diagnostic codes, locations, suggested fixes, and JSON/YAML output.
-
-- **Connector-aware authoring.** The CLI embeds the connector catalog, scaffolds exact config keys, and rejects unsupported mode/config combinations.
-
-- **Built for people and agents.** JSON Schema for editors, non-interactive scaffolding for automation, structured output for CI, and [`llms.txt`](/llms.txt) for AI discovery. No LLM is bundled — you bring your own assistant; validation stays deterministic.
+1. **What outcome does the product model support?** Start with this overview and the use cases.
+2. **What must the external system provide?** Use the connector guide and capture-mode concepts.
+3. **How is the intent represented?** Use the resource and reference documentation.
+4. **What has been verified in a release?** Use the release-status page and evidence from your deployment.
 
 ## Next steps
 
 <CardGrid>
   <LinkCard
-    title="Quickstart"
-    description="Create a source and pipeline, then validate the workspace — in about five minutes."
+    title="Follow the authoring walkthrough"
+    description="See how a source, target, and pipeline fit together."
     href="/docs/overview/quickstart"
   />
   <LinkCard
-    title="Architecture"
-    description="The target Capture–Transform–Serve runtime and how its four layers fit together."
+    title="Review use cases"
+    description="Match the product model to a customer outcome and its production evidence."
+    href="/docs/overview/use-cases"
+  />
+  <LinkCard
+    title="Understand the architecture"
+    description="See the logical data plane, control plane, and state boundaries."
     href="/docs/overview/architecture"
   />
   <LinkCard
-    title="Release Status"
-    description="Exactly what is shipped today versus in progress."
+    title="Check release status"
+    description="Separate documented intent, code-backed contracts, and runtime verification."
     href="/docs/overview/release-status"
-  />
-  <LinkCard
-    title="Roadmap"
-    description="The POC → Alpha → Beta → GA path to the full runtime."
-    href="/docs/overview/roadmap"
   />
 </CardGrid>

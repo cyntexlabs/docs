@@ -1,13 +1,17 @@
 ---
 title: transforms
-description: Complete reference for pipeline transform node types
+description: Documentation contract for pipeline transform node shapes
 sidebar:
   order: 4
+ai:
+  kind: reference
+  id: transforms
+  aliases: [tapstate transforms, pipeline filter, pipeline javascript, rename fields]
 ---
 
-`transforms` is the list of processing nodes in a pipeline, executed in declaration order. Each node has a `name` and one or more processing fields.
+`transforms` is the documented list of ordered processing nodes in a pipeline. Verify node availability, field shapes, and runtime behavior against the TapState artifact supplied by your deployment.
 
-## Node Types
+## Node types
 
 ### filter — Row Filtering
 
@@ -32,7 +36,7 @@ transforms:
       return record;   // null = discard this row
 ```
 
-- GraalVM JS runtime (same process as Java; no subprocess overhead)
+- Runtime, sandbox, available APIs, resource limits, and failure behavior depend on the implementation contract.
 - `return null` = discard this row
 - Returning an array = one row becomes multiple rows (fan-out)
 
@@ -67,24 +71,7 @@ transforms:
 
 Flattens an array field: one record → N records (N = array length).
 
-### nest — Master-Detail Merge (Beta)
-
-```yaml
-transforms:
-  - name: embed-orders
-    nest:
-      into: users
-      from: orders
-      by: user_id
-      as: orders           # embedded field name
-      mode: array          # array | object
-```
-
-:::caution
-`nest` is available in the **Beta phase**; not included in POC/Alpha.
-:::
-
-## Node Combination Example
+## Node combination example
 
 ```yaml
 transforms:

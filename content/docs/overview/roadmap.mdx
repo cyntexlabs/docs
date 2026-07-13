@@ -1,90 +1,49 @@
 ---
-title: Roadmap
-description: TapState v1 release roadmap — POC → Alpha → Beta → GA
+title: Product direction
+description: Understand the outcomes TapState is designed to deliver without treating them as dated release commitments
+ai:
+  kind: concept
+  id: product-direction
+  aliases: [tapstate roadmap, tapstate product direction, future tapstate capabilities]
 ---
 
-import { Badge } from '@/components/mdx';
+import { Aside } from '@/components/mdx';
 
-TapState v1 is delivered in four phases. Each phase is independently demo-able, runnable against real data, and covered by end-to-end tests. [Release Status](/docs/overview/release-status) tracks exactly what is shipped at any moment.
+TapState is being developed toward a complete operational-data path. The sequence below describes durable customer outcomes, not dates, release phases, or availability commitments.
 
-## Release Phases
+<Aside type="note" title="Check release evidence separately">
+  A capability belongs to a release only after it appears in versioned artifacts and release notes. See [Release status](/docs/overview/release-status) for the evidence model used by this site.
+</Aside>
 
-### POC <Badge text="Current" variant="tip" />
+## Author safely
 
-**Goal:** a runnable skeleton — a single-node CDC pipeline works end-to-end.
+Define connections and pipelines as reviewable resources. Provide deterministic schema validation, connector-aware fields, closed references, coded diagnostics, and AI-readable documentation.
 
-| Deliverable | Status |
-|---|---|
-| Maven mono-repo skeleton with enforced architecture boundaries | ✅ Done |
-| Native CLI tooling (GraalVM 21, ~10ms startup) | ✅ Done |
-| Full DSL grammar (model / parser / schema) | 🔄 In progress |
-| Connector catalog build pipeline (60+ connectors) | 🔄 In progress |
-| Offline CLI (`new` / `validate` / `explain`, native binary) | 🔄 In progress |
-| Connector loading + single-node basic CDC (MySQL → MongoDB) | ⏳ Not started |
-| Control core (CRUD + lifecycle) + basic auth | ⏳ Not started |
+**Outcome:** teams and assistants can describe the intended data path without guessing its structure.
 
-**Exit criteria:** register a connector, run a YAML single-table task (full snapshot / basic CDC) end-to-end, and query its status.
+## Connect and run
 
----
+Load connector implementations, discover source objects, execute bounded reads and continuous capture, apply transformations, write destinations, and persist recovery positions.
 
-### Alpha (~4 weeks, soft release)
+**Outcome:** an authored data path becomes an executable path with explicit lifecycle and recovery behavior.
 
-**Goal:** a real sync pipeline with basic processing, demoable end-to-end; minimal AI integration.
+## Operate reliably
 
-| Deliverable |
-|---|
-| CDC connectors (directly included) |
-| Basic processing nodes (rename / JavaScript / typeFilter / unwind / date / row-level filter) |
-| **Minimal MCP** (read-only + scaffold/explain; bring-your-own agent) |
-| End-to-end test framework (declarative YAML specs) |
-| OpenTelemetry metrics and logging |
+Add status, logs, metrics, lag, controlled lifecycle operations, distributed coordination, schema-change handling, and end-to-end test evidence.
 
-**Exit criteria:** a sync task with basic processing operators runs end-to-end.
+**Outcome:** operators can understand, recover, and change a running path without reconstructing state across unrelated systems.
 
----
+## Serve governed state
 
-### Beta (~8 weeks, OSS core complete)
+Expose current operational state and approved event outputs through documented interfaces, access controls, lineage, and deployment options.
 
-**Goal:** distributed CDC, joins and merges, orchestration, and monitoring — CLI + basic UI dual frontend.
+**Outcome:** applications and agents consume useful state through a governed product boundary.
 
-| Deliverable |
-|---|
-| Distributed cluster (quorum + heartbeat) |
-| Distributed CDC with shared log mining, offset persistence, and resume |
-| Cache management (two-level in-memory cache) |
-| **DuckDB join node** |
-| **Master-detail merge operator (MERGE family)** |
-| DDL / schema-drift handling |
-| Multi-task dependency orchestration (task-of-tasks) |
-| **Complete MCP toolset** (mutable CRUD + full lifecycle operations) |
-| **Basic UI (open source)** |
-| OpenLineage field-level lineage |
+## Release principles
 
----
-
-### GA (~8 weeks, enterprise-ready)
-
-**Goal:** external API, external data lake, automatic HA, and enterprise plugin integration.
-
-| Deliverable |
-|---|
-| **API server with API management** — open source |
-| Custom processing nodes |
-| Debezium integration |
-| **Paimon incremental data lake** (external storage) |
-| Automatic task failover (HA) |
-| Containerization and port consolidation |
-| Enterprise UI |
-| **Enterprise plugins (closed-source)**: RBAC / LDAP / lineage & tracing / enterprise connectors (DB2, Sybase, SQL Server, PostgreSQL, Oracle agents) |
-
----
-
-## Key Design Decisions
-
-Locked invariants, tracked as architecture decision records in the source repository:
-
-- **YAML-only authoring**: SQL is not an authoring format; it appears only as an embedded value inside DuckDB nodes
-- **Bring your own agent, no bundled LLM**: the MCP server contains no model
-- **No auto-fix**: AI monitoring/alerting is read-only; mutable operations require a human in the loop
-- **Open core**: no license gating; closed-source functionality ships as SPI plugins
-- **Single binary + `--role`**: merged deployment for small scale; role-separated for large scale
+- Keep the resource model reviewable and deterministic.
+- Keep model choice outside TapState; AI clients use published interfaces.
+- Require explicit authorization for writes and lifecycle changes.
+- Separate product claims from target architecture.
+- Publish performance and reliability only with reproducible evidence.
+- Preserve compatibility identifiers until their implementation contracts change.

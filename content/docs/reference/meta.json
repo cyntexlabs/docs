@@ -5,8 +5,6 @@
     "dsl-fields",
     "source",
     "pipeline",
-    "transforms",
-    "serve",
-    "internals"
+    "transforms"
   ]
 }

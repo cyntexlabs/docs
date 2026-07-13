@@ -139,11 +139,16 @@ function cleanMdxForLLM(markdown: string) {
       const description = readAttribute(attrs, 'description');
       return `- [${title}](${href})${description ? `: ${description}` : ''}\n`;
     })
-    .replace(/<Aside\s+([^>]*)>\n?/g, (_match, attrs: string) => {
+    .replace(/<Aside\s+([^>]*)>\n?([\s\S]*?)<\/Aside>/g, (_match, attrs: string, body: string) => {
       const title = readAttribute(attrs, 'title');
-      return title ? `\n> **${title}**\n>\n` : '\n';
+      const content = body
+        .replace(/^ {2}/gm, '')
+        .trim()
+        .split('\n')
+        .map((line) => `> ${line}`)
+        .join('\n');
+      return `${title ? `\n> **${title}**\n>` : '\n>'}\n${content}\n`;
     })
-    .replace(/<\/Aside>\n?/g, '\n\n')
     .replace(/<Badge\s+([^>]*)\/>/g, (_match, attrs: string) => {
       const text = readAttribute(attrs, 'text');
       return text ? `(${text})` : '';
@@ -171,7 +176,7 @@ type AIPageMetadata = {
   kind: 'connector' | 'concept' | 'reference' | 'guide';
   id: string;
   category?: string;
-  maturity: 'experimental' | 'preview' | 'ga' | 'deprecated';
+  maturity?: 'experimental' | 'preview' | 'ga' | 'deprecated';
   useAs?: Array<'source' | 'target'>;
   modes?: string[];
   aliases?: string[];

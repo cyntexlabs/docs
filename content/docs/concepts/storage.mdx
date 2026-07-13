@@ -1,71 +1,64 @@
 ---
-title: Storage Model
-description: TapState's hot/cold data philosophy, three-tier storage, and streaming-first design
+title: State and storage
+description: Understand the state a TapState data path must retain for current reads, recovery, and audit
+ai:
+  kind: concept
+  id: state-and-storage
+  aliases: [tapstate storage, operational state, checkpoints, materialized state]
 ---
 
 import { Aside } from '@/components/mdx';
 
-<Aside type="note" title="Target architecture">
-  This page describes the storage design of the full runtime. See [Release Status](/docs/overview/release-status) for what is shipped today.
+TapState's storage model is organized by responsibility rather than a promise about one database technology. A data path needs fast working state, durable recovery state, and consumer-facing materialized state.
+
+<Aside type="note" title="Target storage model">
+  Concrete storage engines, retention defaults, replication, and high-availability behavior require an identified implementation and release contract.
 </Aside>
 
-## Hot Data vs Cold Data
+## Operational state and analytical history
 
-TapState is purpose-built for **hot data** — operational, real-time data that powers customer-facing applications and AI agents. This is distinct from the cold data stored in warehouses and lakes:
+Operational consumers usually need the latest valid state of an account, order, inventory item, or entitlement. Analytical systems usually retain a longer history optimized for scans, aggregation, and model training.
 
-| | TapState | Warehouse / Lake |
+| Concern | Operational state | Analytical history |
 |---|---|---|
-| **Data temperature** | Hot (fresh to the latest commit) | Cold (minutes to hours old) |
-| **Primary use** | Apps, APIs, AI agents, fraud detection | Reports, ML training, historical analysis |
-| **Write pattern** | Continuous CDC stream | Batch loads |
-| **Query pattern** | Point queries, live views | Aggregation, scans, joins |
+| Primary question | What is true now? | What happened over time? |
+| Common access | Key lookup, current view, event reaction | Scan, aggregate, compare periods |
+| Update pattern | Continuous changes and deletes | Batch or append-oriented ingestion |
+| Failure sensitivity | Stale state can affect an action | Delayed data usually affects analysis timing |
 
-TapState does not replace your data warehouse — it complements it. The warehouse stores history for analysis; TapState maintains the current operational state for action.
+The two are complementary. A production design can maintain current state for applications while retaining approved history in a warehouse or lake.
 
-## The Streaming-First Principle
+## Working state
 
-Unlike batch ETL tools that process data in windows (hourly, nightly), TapState processes each change event the moment it is captured — not micro-batching, but true event-by-event streaming. A committed change flows from the source's transaction log, through enrichment, into the Materialized View Store, and out through the Query Context Server as one continuous motion.
+The data plane needs short-lived state for active processing, buffering, routing, and lookups. Working state improves throughput, but it must not be the only copy of information required after restart.
 
-Batch-centric thinking asks: "What changed since last night?" TapState asks: "What is changing right now?"
+## Recovery state
 
-## Three-Tier Storage Architecture
+Durable recovery state includes:
 
-### L1 — Distributed In-Memory (Hazelcast)
+- connector positions, offsets, or checkpoints;
+- pipeline identity and canonical configuration;
+- retry and failure context;
+- schema and mapping state;
+- ownership information needed to prevent conflicting execution.
 
-The hot tier. Hosts the **Change Log Ringbuffer** — the central in-memory buffer through which all captured change events flow — plus task runtime state and active CDC streams. It fans out to Transform and Materialize consumers without re-reading the source.
+Recovery semantics should answer whether a restart resumes, replays, skips, or redelivers records. Connector retention must be long enough for the saved position to remain usable.
 
-### L2 — Persistent Source of Truth (MongoDB)
+## Materialized state
 
-The operational persistence tier. Everything that must survive a process restart lives here: connection definitions and pipeline configurations, CDC offsets and checkpoints (for resume and replay), task HA leases, and connector distribution. MongoDB is the **source of truth**; the in-memory tier is derived from it on startup.
+Materialized state is the current consumer-facing result. It may live in a target database, search system, warehouse, lakehouse, or future serving layer.
 
-### L3 — Incremental Data Lake (Paimon, GA phase)
+Its correctness depends on:
 
-An external add-on for long-term, queryable audit history — bridging TapState's hot operational data and a finance-grade archival layer.
+- stable keys for updates and deletes;
+- defined append or update behavior;
+- schema-change policy;
+- ordering and duplicate handling;
+- reconciliation with the system of record;
+- retention and deletion requirements.
 
-Implementation details of the in-memory tier and the HA design live in [Engineering Internals](/docs/reference/internals).
+## Audit history
 
-## The Lookup Cache: Streaming Joins Without Querying the Source
+An audit or replay store answers different questions from a current view. Before retaining change history, define the legal basis, sensitive-field handling, retention period, access policy, and deletion process.
 
-One of the most critical patterns in real-time processing is **stream enrichment** — joining a live change event with reference data from another table. Example: as a `Transaction` event flows through, attach the matching `Customer.loyaltyTier` so the downstream consumer has full context.
-
-TapState solves this with the **Lookup Cache** (L1, in-memory), kept in sync with the **Source Replica Store**:
-
-```text
-Change Log Buffer ──→ Transform (join lookup via Lookup Cache)
-        │
-        └──→ Source Replica Store (keeps Lookup Cache fresh)
-```
-
-The source database is **never queried** during steady-state processing. The Lookup Cache provides reference data entirely in memory, enabling low-latency joins at scale.
-
-## DSL Artifact Lifecycle
-
-The server architecture keeps an authoring copy and a canonical stored copy:
-
-```text
-Local .tapstate.yml file     TapState resource store
-(authoring draft)    ──→     (official store, single source of truth)
-                    apply
-```
-
-The server workflow validates and canonicalizes a local resource before storing it by ID; export and diff operations round out the lifecycle. The local file is an authoring draft; the engine reads the canonical stored resource. These server-backed operations arrive with the runtime.
+Do not infer long-term history, replay, exactly-once behavior, or a specific storage engine from this concept page. Verify those behaviors against the deployed runtime and its published architecture.

@@ -1,0 +1,64 @@
+---
+title: Capture modes
+description: Choose how a TapState source reads existing data and later changes
+ai:
+  kind: concept
+  id: capture-modes
+  aliases: [snapshot, full load, cdc, full load and cdc, stream source, api source]
+---
+
+import { Aside } from '@/components/mdx';
+
+A source read mode answers two questions: what data should enter the pipeline first, and whether the pipeline should continue after it reaches the current state.
+
+## Choose by outcome
+
+| Outcome | Mode shown in connector guides | What it does | Typical preparation |
+|---|---|---|---|
+| Copy the rows or documents that exist now | Full load (`Snapshot`) | Reads a bounded view of the selected objects | Read permissions and a consistent source view |
+| Copy current data, then remain current | Full load + CDC | Establishes the initial state and follows later changes | Snapshot permissions plus transaction-log, WAL, Oplog, or changelog preparation |
+| Consume an unbounded message source | Stream | Reads messages from a broker or queue | Topic or queue access, consumer identity, retention, and offset policy |
+| Read objects from a remote service | API | Calls a service contract using its authorization and pagination model | API credentials, scopes, rate limits, pagination, and token renewal |
+
+Only choose a mode listed by the connector's current contract. A database that can technically expose a transaction log is not automatically documented as a TapState CDC source.
+
+## Full load (Snapshot)
+
+Use Snapshot when you need a bounded copy, a migration rehearsal, a development dataset, or a periodic refresh that does not need continuous changes.
+
+Before relying on the result, decide:
+
+- which source objects are included;
+- what consistency boundary the source provides during the scan;
+- how inserts and updates during the scan are handled;
+- how the destination is cleared, replaced, or reconciled on a rerun;
+- how record counts and representative values will be compared.
+
+## Full load + CDC
+
+Use Full load + CDC when the destination must start complete and then stay current. Treat this as one continuity problem, not two unrelated jobs.
+
+Verify all of the following:
+
+1. The account can complete the initial read.
+2. The database emits the required change records.
+3. Logs or snapshots are retained longer than the longest expected interruption.
+4. The handoff from the initial load to CDC has no gap.
+5. A restart resumes from the next expected position.
+6. The target can identify rows for updates and deletes.
+
+<Aside type="caution" title="A valid file is not a working CDC pipeline">
+  Offline validation can check a declared mode and known field shapes. It cannot prove database privileges, log retention, connectivity, recovery, or end-to-end data correctness.
+</Aside>
+
+## Stream and API sources
+
+Stream sources begin from an offset or broker-defined position and can redeliver records during recovery. Design downstream processing to tolerate duplicates when the connector does not establish stronger delivery guarantees.
+
+API sources depend on a remote contract. Pagination, token renewal, rate limits, retries, and schema changes can affect completeness even when credentials are valid.
+
+## Validate the chosen path
+
+Use a staging dataset that includes inserts, updates, deletes, nulls, large values, and representative data types. For a continuous source, stop and resume the pipeline and compare the destination with a trusted query from the source.
+
+The connector guide provides the exact preparation steps for its supported modes. Start from the [connector directory](/docs/connectors), not from a generic database tutorial.

@@ -1,8 +1,10 @@
 {
   "title": "Concepts",
   "pages": [
+    "connections-and-connectors",
+    "capture-modes",
     "dsl",
-    "ai-control",
-    "storage"
+    "storage",
+    "ai-control"
   ]
 }
