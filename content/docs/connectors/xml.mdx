@@ -13,7 +13,7 @@ ai:
   aliases: [xml, xml file, xml snapshot, xml cdc, xml source, sftp xml, s3 xml]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use XML files from local or supported remote storage as a source for structured pipeline data.
@@ -27,10 +27,6 @@ Use XML files from local or supported remote storage as a source for structured 
   compatibility="Local, FTP, SFTP, SMB, S3FS, OSS"
 />
 
-<Aside type="note" title="Local validation boundary">
-  Local validation checks the selected mode and configuration field shapes. It does not read XML, authenticate to storage, watch files, or validate XML schema.
-</Aside>
-
 ## Before you begin
 
 ### Source
@@ -43,7 +39,7 @@ Use **Snapshot** to read the matching XML files once. Make files available to th
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** only after verifying changed-file handling in the deployed runtime. TapState does not define polling, watcher, delete, XML-schema, or record-mapping behavior, so validate those cases with representative files.
+Use **Snapshot + CDC** when new or changed XML files should be picked up after the initial read. The connector scans the configured path every 60 seconds. New and modified files are re-read; deleting a file does not emit row deletions.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -78,8 +74,9 @@ tapstate validate --workdir tapstate-work
 
 ## Limitations
 
-- TapState supports a source only; target writes and DDL behavior are not declared.
-- It does not specify XML schema validation, record mapping, file polling, or deletion behavior.
+- This connector reads XML files only. Target writes and schema changes are not included.
+- CDC detects new and modified files on a 60-second scan. File or row deletion is not propagated.
+- Decide how repeating elements and attributes map to records, and validate representative nested content before production use.
 - Keep transport credentials out of committed workspace files.
 
 ## Reference
@@ -93,3 +90,7 @@ tapstate validate --workdir tapstate-work
 | S3FS / OSS | `accessKey`, `secretKey`, `endpoint`, `region`, `bucket` |
 
 `protocol` accepts `local`, `ftp`, `sftp`, `smb`, `s3fs`, and `oss`; `encoding` defaults to `UTF-8`.
+
+### Data compatibility
+
+XML input supports `ARRAY`, `BOOLEAN`, `DATETIME`, `INTEGER`, `NUMBER`, `OBJECT`, `STRING`, and `TEXT`.

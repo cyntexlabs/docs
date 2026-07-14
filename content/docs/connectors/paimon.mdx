@@ -13,7 +13,7 @@ ai:
   aliases: [apache paimon, paimon, paimon snapshot, paimon cdc, paimon target, paimon s3, paimon hdfs]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { PreparationStep, PreparationSteps, SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Read existing Apache Paimon tables, follow their change stream, or write pipeline results into a Paimon warehouse.
@@ -27,15 +27,11 @@ Read existing Apache Paimon tables, follow their change stream, or write pipelin
   compatibility="Paimon 0.6+ · 0.8.2+ recommended"
 />
 
-<Aside type="note" title="One connection, one filesystem catalog">
-  A Paimon connection opens the filesystem catalog rooted at `warehouse` and selects one `database`. It does not accept Hive, JDBC, or REST catalog settings. Create another connection for a different warehouse or database.
-</Aside>
-
 ## Before you begin
 
 ### Source
 
-Choose the outcome you need. Both paths require direct access to the warehouse storage; there is no separate database server to authorize.
+Choose the outcome you need. Both paths require direct access to the warehouse storage; there is no separate database server to authorize. A connection is scoped to one filesystem-backed catalog: select one `warehouse` root and one `database`; create another connection for a different warehouse or database.
 
 <SourceModeTabs label="Choose the Apache Paimon source read mode">
 <SourceModeTab value="snapshot" label="Full load (Snapshot)" description="Copy the current table state once">
@@ -131,11 +127,11 @@ Define a stable primary key for efficient updates and deletes. Paimon has primar
 Choose dynamic buckets for a flexible general-purpose layout or fixed buckets when you have tested an appropriate bucket count. The default target-table settings use dynamic buckets; a fixed layout uses four buckets unless a different positive count is supplied. An existing table keeps its current bucket mode even when the requested setting differs.
 
 </PreparationStep>
-<PreparationStep title="Decide how new tables should be created">
+<PreparationStep title="Prepare new target tables">
 
-The settings below apply when the target table does not exist and the deployment exposes Paimon target-table controls. Existing tables keep their schema and table options. These keys are not connection fields, so do not place them under `config` in the connection YAML.
+When you need specific keys, partitions, buckets, file formats, or compaction behavior, create the Paimon target table before starting the pipeline. Existing tables keep their schema and table options. The values below are table-creation options, not connection fields, so do not place them under `config` in the connection YAML.
 
-| Setting | Purpose and confirmed behavior |
+| Setting | Purpose |
 |---|---|
 | `hashKey` | When enabled and more than five key fields are present, create `_hash_key` and use it as the Paimon primary key. Default: `false`. |
 | `partitionKey` | Fields used to partition a newly created table. Empty means unpartitioned. |
@@ -151,7 +147,7 @@ The settings below apply when the target table does not exist and the deployment
 | `targetFileSize` | Target data-file size in MiB. Connector default: `128`. |
 | `enablePrimaryKeyUpdate` | Detect a changed primary key and write a delete for the old key followed by an insert for the new key. Requires complete before-update data. Default: `false`. |
 
-The exact TapState resource placement for these target-table controls is pending. Until your deployment exposes them, create the table with the desired Paimon options before starting the pipeline.
+Use your Paimon table-management workflow to apply these options before the first TapState write.
 
 </PreparationStep>
 <PreparationStep title="Choose append or upsert behavior">
@@ -202,7 +198,7 @@ config:
   database: analytics
 ```
 
-Reference the target connection from a pipeline. Use `ddl: fail` because the documented Paimon contract does not support runtime schema evolution:
+Reference the target connection from a pipeline. Use `ddl: fail` because existing Paimon tables are not changed automatically:
 
 ```yaml title="tapstate-work/pipeline/orders_to_paimon.tapstate.yml"
 version: tapstate/v1
@@ -226,8 +222,6 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, `snapshot` or `cdc` mode, target write semantics, and the recognized connection-field shapes. It does not open the Paimon catalog, access the warehouse, discover tables, inspect changelog options, test a saved snapshot position, create a database or table, or write data.
-
 Before production, verify the actual storage and table behavior in a staging pipeline:
 
 1. discover the configured database and a selected table;
@@ -237,16 +231,16 @@ Before production, verify the actual storage and table behavior in a staging pip
 
 ## Limitations
 
-- The published compatibility baseline covers Paimon 0.6 and later and recommends 0.8.2 or later. The packaged connector uses Paimon 1.3.1 client libraries; verify older warehouses and mixed-version readers in staging.
-- The connection always creates a filesystem catalog from `warehouse`. Hive, JDBC, and REST catalog configuration is not part of this connection contract.
-- The guaranteed operation baseline is DML: insert, update, and delete. Do not use pipeline DDL apply for runtime schema evolution. A missing target table may be created, but an existing table's schema and options are not replaced.
+- Paimon 0.6 and later are supported, with 0.8.2 or later recommended. The included client libraries are Paimon 1.3.1; verify older warehouses and mixed-version readers in staging.
+- The connection creates a filesystem catalog from `warehouse`. Hive, JDBC, and REST catalogs are not supported by these connection fields.
+- Insert, update, and delete are supported. Do not use pipeline DDL apply for schema evolution. A missing target table may be created, but an existing table's schema and options are not replaced.
 - Snapshot reads return the current final state; their offset argument is not used for resumable batch progress. Restarting an interrupted Snapshot can rescan data, so the destination write mode must tolerate replay.
-- CDC positions are maintained per table as Paimon snapshot IDs. A new stream with no position starts after the latest snapshot. Snapshot retention and the initial-load handoff must be proven for the deployed runtime before production use.
+- CDC positions are maintained per table as Paimon snapshot IDs. A new stream with no position starts after the latest snapshot. Test snapshot retention and the initial-load handoff before production use.
 - The CDC reader represents `UPDATE_BEFORE` as a delete and `UPDATE_AFTER` as an insert. Use stable keys and test downstream update semantics with representative changes.
 - Paimon does not provide secondary indexes. Primary-key, partition, and bucket choices affect update routing, file layout, and compaction cost.
 - A primary-key change requires complete before-update data when `enablePrimaryKeyUpdate` is enabled. Without it, the write fails rather than silently moving the row.
 - When soft-delete handling converts a delete into an update marker, the source event must contain the complete row before deletion. Otherwise non-key columns can be written as `null`.
-- Write concurrency, batching, file size, and compaction settings are workload-dependent. TapState does not publish unverified speed or tuning values; measure them with the target storage and query engines you will use.
+- Write concurrency, batching, file size, and compaction settings are workload-dependent. Measure them with the target storage and query engines you will use.
 - Keep S3 and OSS secrets outside committed resource files. Limit them to the required bucket and prefix and rotate them through your deployment's secret-management process.
 
 ## Reference
@@ -284,7 +278,7 @@ s3Properties:
 
 ### Data compatibility
 
-The documented baseline covers Paimon 0.6+ data types. The current mapping includes:
+Paimon 0.6 and later support the following data-type baseline:
 
 | Family | Paimon types and behavior |
 |---|---|

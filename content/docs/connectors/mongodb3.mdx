@@ -127,8 +127,6 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the source mode and recognized connection fields. It does not connect to MongoDB, inspect the Oplog, validate TLS material, or write a document.
-
 Verify a small snapshot, an insert, an update, and a delete in staging. Confirm that the Oplog window still contains the stored position after a controlled pause.
 
 ## Limitations
@@ -136,11 +134,18 @@ Verify a small snapshot, an insert, an update, and a delete in staging. Confirm 
 - This guide covers only MongoDB 3.2 and 3.4. Use the current MongoDB connector for later versions.
 - CDC requires an Oplog. If it rotates past the stored position, recovery requires a new snapshot.
 - Shard balancing and orphaned documents can affect snapshot consistency.
-- Legacy Oplog update events may contain only modified fields. When a pipeline depends on a non-`_id` key, a changed sub-document, or an embedded-array `PULL`, verify that the deployed runtime reconstructs the complete document before routing or writing it.
+- Legacy Oplog update events may contain only modified fields. When a pipeline depends on a non-`_id` key, a changed sub-document, or an embedded-array `PULL`, verify that the captured event contains the complete document needed for routing or writing.
 - Delete events normally contain only `_id`. A target update condition that does not include `_id` needs an explicitly tested delete-handling design.
-- TLS files, certificate validation, and server policy must be tested against the deployment; local validation only checks the documented field shapes.
+- Test TLS files, certificate validation, and server policy against the deployment before using production data.
 
 ## Reference
+
+### Supported operations
+
+| Direction | Data changes | Schema changes |
+|---|---|---|
+| Source CDC | `INSERT`, `UPDATE`, `DELETE` from the Oplog | Not included |
+| Target | Insert, update, and delete documents | Not included |
 
 ### Data compatibility
 

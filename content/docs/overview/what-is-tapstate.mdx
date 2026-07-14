@@ -12,7 +12,7 @@ import { LinkCard, CardGrid, DataPathComparison, ProductOverviewHero } from '@/c
 
 <ProductOverviewHero />
 
-## The problem: the assembly project
+## The problem: fragmented ownership
 
 Keeping operational data fresh today usually means assembling and operating separate capture, broker, processing, and serving systems:
 
@@ -22,21 +22,21 @@ Each layer in the assembled stack is good software. The cost is the glue: offset
 
 Composable stacks remain the right choice for some workloads; [TapState vs. a streaming stack](/docs/overview/vs-streaming-stack) gives an honest decision guide. TapState targets the common case: teams whose dominant problem is keeping operational state current, not building bespoke stream topologies.
 
-## One data path, three depths
+## One data path, three responsibilities
 
-TapState is not three features — it is one road with three depths of adoption. Most teams enter at Capture; each stage makes the next one a configuration change instead of a new system.
+Capture, Transform, and Serve are not separate products. They describe the responsibilities in one operational data path, so teams can add processing depth without assembling another platform at every stage.
 
-### Capture — CDC you can bet the database on
+### Capture — move existing data, then follow changes
 
-Log-based change capture from transaction logs (MySQL binlog, PostgreSQL WAL, MongoDB oplog, and more), plus snapshot, stream, API, and file modes — all behind connector-defined contracts. Initial load and continuous sync are the same pipeline, not two tools.
+Capture reads an initial data set and, when the connector supports it, follows later changes from database logs, streams, APIs, or files. Each connector guide states the available modes and the preparation required by the external system.
 
-### Transform — reshape data in flight, not in batch
+### Transform — shape records while they move
 
-Filter, rename, enrich, join, and route change streams inside the same engine, so downstream consumers receive answer-shaped data instead of raw tables plus a to-do list. No separate processing cluster to size, deploy, and babysit.
+Transform filters, maps, enriches, joins, and routes records so downstream systems receive data shaped for their job. The resource definition keeps those changes reviewable alongside the source and destination contract.
 
-### Serve — fresh state, queryable now
+### Serve — keep destinations ready for use
 
-Pipelines terminate in an endpoint, not another queue: materialized, always-current views of your business — accounts, orders, inventory, entitlements — served to applications and agents, and pushed onward to Kafka, lakes, or webhooks when other teams need the stream.
+Serve applies records to a destination or consumer-facing state. The target connector defines how writes, keys, deletes, and schema changes behave for that system.
 
 ## Who it's for
 
@@ -46,9 +46,9 @@ TapState is built for operational data that loses value when it goes stale: fint
 
 For thirty years the consumer of enterprise data was a human reading a dashboard, and humans tolerate staleness. AI moves consumption to software that *acts* — agents approving refunds, adjusting inventory, answering customers. When the consumer acts instead of reads, stale data doesn't mean an outdated chart; it means wrong actions. TapState is not "AI-native" — it is the infrastructure that AI adoption stresses. Vector search gives agents semantic memory; TapState's job is committed business truth.
 
-## Provenance
+## A reviewable product contract
 
-TapState is built for teams that need a reviewable, declarative path from operational changes to continuously fresh data. It combines an offline authoring workflow with connector definitions and runtime-oriented resource files, without requiring a separate stack of bespoke integration assets.
+TapState uses declarative connection and pipeline resources to describe the path from operational changes to destination-ready state. Connector definitions supply the documented fields, roles, and modes for each external system.
 
 ## How to use these docs
 

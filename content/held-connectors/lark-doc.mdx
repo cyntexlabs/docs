@@ -13,7 +13,7 @@ ai:
   aliases: [lark doc, lark docs, feishu doc, lark doc api, lark doc source]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Lark Doc as a supported API source for document content.
 
@@ -25,10 +25,6 @@ Use Lark Doc as a supported API source for document content.
   capabilities="API read"
   compatibility="Lark / Feishu Open Platform"
 />
-
-<Aside type="note" title="Runtime access is outside local validation">
-  TapState supports an API source with application credentials. It does not declare a document selector, a target, or a credential test; those behaviors must be confirmed in the deployed connector contract.
-</Aside>
 
 ## Before you begin
 
@@ -64,11 +60,9 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, API mode, and recognized field names. It does not authenticate to Lark/Feishu, test app publication or permissions, enumerate documents, or retrieve content.
-
 ## Limitations
 
-- TapState supports an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- This connector reads Lark documents only. Target writes and schema changes are not included.
 - Document visibility, tenant policy, rate limits, and API responses are enforced by Lark/Feishu at runtime.
 - Do not commit App Secret values in a `.tapstate.yml` file.
 

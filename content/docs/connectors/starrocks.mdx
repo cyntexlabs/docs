@@ -13,7 +13,7 @@ ai:
   aliases: [starrocks, starrocks snapshot, starrocks target, starrocks stream load]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use StarRocks for supported Snapshot reads or as a destination for analytical data.
 
@@ -23,12 +23,8 @@ Use StarRocks for supported Snapshot reads or as a destination for analytical da
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
   capabilities="Snapshot, Data write, Target DDL apply"
-  compatibility="StarRocks 3.x"
+  compatibility="StarRocks 3.x · all deployment architectures"
 />
-
-<Aside type="note" title="Source use needs staging validation">
-  TapState supports Snapshot source and target roles. Verify a live source read and target write separately in staging.
-</Aside>
 
 ## Before you begin
 
@@ -78,14 +74,12 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, Snapshot mode, and recognized field shapes. It does not authenticate to StarRocks, discover source tables, access FE or BE endpoints, or load a target row.
-
 ## Limitations
 
-- TapState supports Snapshot and does not publish CDC for StarRocks. The target connector implements add column, alter column attributes, and drop column; column rename is not registered.
+- StarRocks supports Snapshot reads, not CDC. A target can add columns, alter column attributes, and drop columns; column rename is not included.
 - Target writes use Stream Load in the documented connector baseline. Detail/Duplicate-style tables are append-oriented; update and delete behavior depends on the table model.
 - Frequent updates and deletes can be expensive. Validate write semantics against the exact table type instead of relying only on generic `upsert` and `append` labels.
-- Batch-size recommendations have not been measured for TapState and are not published as product defaults.
+- Measure batch size with representative data instead of relying on a generic default.
 - Confirm HTTPS behavior, certificate handling, target table design, and type mapping in staging.
 
 ## Reference

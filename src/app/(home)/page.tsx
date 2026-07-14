@@ -1,187 +1,189 @@
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { FullSearchTrigger } from 'fumadocs-ui/layouts/shared/slots/search-trigger';
 import {
   ArrowRight,
   Bot,
   Braces,
   Cable,
+  CircleHelp,
   Database,
-  GitBranch,
+  FileText,
   Layers3,
   RadioTower,
-  Sparkles,
+  Rocket,
+  TerminalSquare,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'TapState Documentation',
   description:
-    'Learn how TapState captures operational changes, transforms data in flight, and serves current state to applications and agents.',
+    'Learn TapState, prepare source and target systems, configure connectors, and define reviewable data paths.',
 };
 
-const entryPoints = [
+const tasks = [
   {
-    eyebrow: 'Start here',
-    title: 'Understand TapState',
-    description: 'See the problem TapState solves and how Capture, Transform, and Serve fit together.',
+    eyebrow: 'New to TapState',
+    title: 'Understand the model',
+    description: 'Learn how Capture, Transform, and Serve fit together before you design a data path.',
     href: '/docs/overview/what-is-tapstate',
+    linkLabel: 'Read the overview',
     icon: Layers3,
   },
   {
-    eyebrow: 'Connect data',
-    title: 'Prepare a connector',
-    description: 'Choose a source or target, then follow its permissions and setup guide.',
+    eyebrow: 'Preparing a system',
+    title: 'Configure a connector',
+    description: 'Find the permissions, network access, capture modes, and limitations for your system.',
     href: '/docs/connectors',
+    linkLabel: 'Browse connectors',
     icon: Cable,
   },
   {
-    eyebrow: 'Build a path',
-    title: 'Create your first pipeline',
-    description: 'Connect a source and target with reviewable TapState resources.',
+    eyebrow: 'Ready to build',
+    title: 'Create your first data path',
+    description: 'Define connections and a pipeline as reviewable resources, then validate the workspace.',
     href: '/docs/overview/quickstart',
-    icon: GitBranch,
-  },
-  {
-    eyebrow: 'Look it up',
-    title: 'Use the resource reference',
-    description: 'Find resource shapes, fields, modes, and pipeline syntax.',
-    href: '/docs/reference/dsl-grammar',
-    icon: Braces,
+    linkLabel: 'Start the quickstart',
+    icon: Rocket,
   },
 ];
 
-function ActionLink({
-  href,
-  children,
-  variant = 'primary',
-}: {
-  href: string;
-  children: string;
-  variant?: 'primary' | 'secondary';
-}) {
-  const className = variant === 'primary'
-    ? 'border-fd-primary bg-fd-primary text-fd-primary-foreground shadow-sm hover:bg-fd-primary/90'
-    : 'border-fd-border bg-fd-background/80 text-fd-foreground hover:border-fd-primary/35 hover:bg-fd-muted/70';
+const connectorGroups = [
+  { label: 'Databases', description: 'Relational and document stores', icon: Database },
+  { label: 'Streams', description: 'Event and message systems', icon: RadioTower },
+  { label: 'APIs', description: 'SaaS and HTTP services', icon: Braces },
+  { label: 'Files', description: 'Structured file formats', icon: FileText },
+];
 
+const popularConnectors = [
+  { label: 'MySQL', href: '/docs/connectors/mysql' },
+  { label: 'PostgreSQL', href: '/docs/connectors/postgresql' },
+  { label: 'MongoDB', href: '/docs/connectors/mongodb' },
+  { label: 'Oracle', href: '/docs/connectors/oracle' },
+  { label: 'Kafka', href: '/docs/connectors/kafka' },
+];
+
+const secondaryLinks = [
+  {
+    title: 'Resource reference',
+    description: 'Fields, syntax, and complete examples for TapState resources.',
+    href: '/docs/reference/dsl-grammar',
+    icon: TerminalSquare,
+  },
+  {
+    title: 'Troubleshooting',
+    description: 'Resolve validation, configuration, and connectivity problems.',
+    href: '/docs/guides/troubleshooting',
+    icon: CircleHelp,
+  },
+];
+
+function ArrowLink({ href, children }: { href: string; children: string }) {
   return (
     <Link
       href={href}
-      className={`inline-flex h-11 items-center justify-center gap-2 rounded-lg border px-5 text-sm font-semibold no-underline transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:ring-offset-2 ${className}`}
+      className="group inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-fd-primary no-underline outline-none transition-colors duration-200 hover:text-fd-foreground focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:ring-offset-2"
     >
       {children}
-      <ArrowRight className="size-4" aria-hidden="true" />
+      <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
     </Link>
-  );
-}
-
-function FlowNode({ children }: { children: ReactNode }) {
-  return (
-    <div className="rounded-xl border border-fd-border bg-fd-background/90 px-4 py-3 shadow-sm">
-      <p className="m-0 text-sm font-semibold text-fd-foreground">{children}</p>
-    </div>
   );
 }
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-fd-background text-fd-foreground">
-      <section className="relative border-b border-fd-border">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(circle_at_18%_5%,color-mix(in_oklab,var(--color-fd-primary)_14%,transparent),transparent_35%),radial-gradient(circle_at_82%_16%,color-mix(in_oklab,#38bdf8_10%,transparent),transparent_32%)]"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:32px_32px]"
-        />
-
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(0,1.05fr)_minmax(25rem,0.95fr)] lg:items-center lg:gap-16 lg:py-28">
-          <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-fd-primary/20 bg-fd-primary/5 px-3 py-1.5 text-xs font-semibold tracking-wide text-fd-primary">
-              <Sparkles className="size-3.5" aria-hidden="true" />
-              Capture · Transform · Serve
-            </div>
-            <h1 className="max-w-4xl text-balance text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-fd-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-              Turn database truth into live operational state.
-            </h1>
-            <p className="mt-6 max-w-2xl text-pretty text-base leading-8 text-fd-muted-foreground md:text-lg">
-              TapState brings change capture, in-flight transformation, and current-state delivery into one governed data path for applications, APIs, and AI agents.
+    <main className="min-h-screen bg-fd-background text-fd-foreground">
+      <section className="border-b border-fd-border bg-fd-background">
+        <div className="mx-auto max-w-6xl px-5 pb-14 pt-16 md:px-8 md:pb-20 md:pt-24">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="m-0 text-xs font-semibold uppercase tracking-[0.16em] text-fd-primary">
+              TapState documentation
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ActionLink href="/docs/overview/what-is-tapstate">Explore TapState</ActionLink>
-              <ActionLink href="/docs/connectors" variant="secondary">Browse connectors</ActionLink>
+            <h1 className="mt-5 text-balance text-[2.65rem] font-semibold leading-[1.06] tracking-[-0.045em] sm:text-5xl md:text-[3.6rem]">
+              Build reliable data paths.
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-7 text-fd-muted-foreground md:text-lg md:leading-8">
+              Prepare your systems, choose the right connector, and define a TapState workspace that people and agents can review together.
+            </p>
+
+            <div className="mx-auto mt-8 max-w-2xl">
+              <FullSearchTrigger
+                aria-label="Search TapState documentation"
+                className="h-14 w-full cursor-pointer rounded-xl border-fd-border bg-fd-card px-4 text-left text-base text-fd-muted-foreground shadow-sm transition-[border-color,box-shadow,background-color] duration-200 hover:border-fd-primary/35 hover:bg-fd-card hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:ring-offset-2 [&_kbd]:bg-fd-muted [&_kbd]:px-2 [&_svg]:size-5 [&_svg]:text-fd-primary"
+              />
+            </div>
+
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
+              <span className="text-fd-muted-foreground">Popular:</span>
+              {popularConnectors.map((connector) => (
+                <Link
+                  key={connector.href}
+                  href={connector.href}
+                  className="cursor-pointer font-medium text-fd-foreground no-underline underline-offset-4 transition-colors duration-200 hover:text-fd-primary hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                >
+                  {connector.label}
+                </Link>
+              ))}
             </div>
           </div>
 
-          <div className="relative">
-            <div aria-hidden="true" className="absolute -inset-6 rounded-[2rem] bg-fd-primary/5 blur-2xl" />
-            <div className="relative rounded-2xl border border-fd-border bg-fd-card/90 p-4 shadow-xl shadow-black/[0.06] backdrop-blur-sm dark:shadow-black/25 sm:p-6">
-              <div className="mb-5 flex items-center justify-between gap-4">
-                <div>
-                  <p className="m-0 text-xs font-semibold uppercase tracking-[0.14em] text-fd-primary">One governed path</p>
-                  <p className="mb-0 mt-1 text-sm text-fd-muted-foreground">From source changes to useful state</p>
-                </div>
-                <RadioTower className="size-5 text-fd-primary" aria-hidden="true" />
-              </div>
-
-              <div className="grid gap-3">
-                <FlowNode>Source systems</FlowNode>
-                <div className="flex justify-center" aria-hidden="true"><span className="h-5 w-px bg-fd-border" /></div>
-                <div className="rounded-2xl border border-fd-primary/25 bg-fd-primary/[0.06] p-4">
-                  <div className="flex items-center gap-3">
-                    <span className="flex size-9 items-center justify-center rounded-lg bg-fd-primary text-fd-primary-foreground">
-                      <Database className="size-4.5" aria-hidden="true" />
-                    </span>
-                    <div>
-                      <p className="m-0 text-sm font-semibold text-fd-foreground">TapState</p>
-                      <p className="m-0 text-xs text-fd-muted-foreground">Capture · Transform · Serve</p>
-                    </div>
-                  </div>
-                  <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs font-medium text-fd-foreground">
-                    <span className="rounded-lg border border-fd-border/80 bg-fd-background/75 px-2 py-2">Capture</span>
-                    <span className="rounded-lg border border-fd-border/80 bg-fd-background/75 px-2 py-2">Transform</span>
-                    <span className="rounded-lg border border-fd-border/80 bg-fd-background/75 px-2 py-2">Serve</span>
-                  </div>
-                </div>
-                <div className="flex justify-center" aria-hidden="true"><span className="h-5 w-px bg-fd-border" /></div>
-                <FlowNode>Applications · APIs · AI agents</FlowNode>
-              </div>
-            </div>
+          <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-5">
+            {tasks.map((task) => {
+              const Icon = task.icon;
+              return (
+                <Link
+                  key={task.href}
+                  href={task.href}
+                  className="group flex min-h-60 cursor-pointer flex-col rounded-2xl border border-fd-border bg-fd-card p-6 text-fd-foreground no-underline shadow-sm outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-fd-primary/30 hover:bg-fd-card hover:shadow-lg hover:shadow-black/[0.05] focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:ring-offset-2 dark:hover:shadow-black/20"
+                >
+                  <span className="flex size-10 items-center justify-center rounded-xl border border-fd-primary/15 bg-fd-primary/[0.07] text-fd-primary">
+                    <Icon className="size-5" aria-hidden="true" />
+                  </span>
+                  <span className="mt-5 text-xs font-semibold uppercase tracking-[0.12em] text-fd-muted-foreground">
+                    {task.eyebrow}
+                  </span>
+                  <span className="mt-2 block text-xl font-semibold tracking-[-0.025em]">{task.title}</span>
+                  <span className="mt-2 block text-sm leading-6 text-fd-muted-foreground">{task.description}</span>
+                  <span className="mt-auto flex items-center gap-1.5 pt-5 text-sm font-semibold text-fd-primary transition-colors group-hover:text-fd-foreground">
+                    {task.linkLabel}
+                    <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-fd-primary">Documentation paths</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.035em] md:text-4xl">Start with the outcome you need.</h2>
-          <p className="mt-4 text-base leading-7 text-fd-muted-foreground">
-            Learn the product model, prepare an external system, build a pipeline, or look up exact resource syntax.
-          </p>
+      <section className="mx-auto max-w-6xl px-5 py-14 md:px-8 md:py-20">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="m-0 text-xs font-semibold uppercase tracking-[0.15em] text-fd-primary">Connector guides</p>
+            <h2 className="mb-0 mt-3 text-3xl font-semibold tracking-[-0.035em]">Prepare the system you already use.</h2>
+            <p className="mb-0 mt-3 max-w-2xl text-base leading-7 text-fd-muted-foreground">
+              Each guide brings permissions, capture preparation, supported operations, limitations, and connection fields into one place.
+            </p>
+          </div>
+          <ArrowLink href="/docs/connectors">View all connectors</ArrowLink>
         </div>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-2">
-          {entryPoints.map((item) => {
-            const Icon = item.icon;
+        <div className="mt-8 grid overflow-hidden rounded-2xl border border-fd-border bg-fd-card sm:grid-cols-2 lg:grid-cols-4">
+          {connectorGroups.map((group, index) => {
+            const Icon = group.icon;
             return (
               <Link
-                key={item.href}
-                href={item.href}
-                className="group rounded-2xl border border-fd-border bg-fd-card p-6 text-fd-card-foreground no-underline transition-colors duration-200 hover:border-fd-primary/30 hover:bg-fd-muted/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                key={group.label}
+                href="/docs/connectors"
+                className={`group cursor-pointer p-5 text-fd-foreground no-underline outline-none transition-colors duration-200 hover:bg-fd-muted/55 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fd-ring ${
+                  index > 0 ? 'border-t border-fd-border sm:border-t-0 sm:border-l' : ''
+                } ${index === 2 ? 'sm:border-l-0 sm:border-t lg:border-l lg:border-t-0' : ''}`}
               >
-                <div className="flex items-start gap-4">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-fd-primary/15 bg-fd-primary/[0.07] text-fd-primary">
-                    <Icon className="size-5" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-fd-primary">{item.eyebrow}</span>
-                    <span className="mt-1.5 flex items-center gap-2 text-lg font-semibold tracking-tight text-fd-foreground">
-                      {item.title}
-                      <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
-                    </span>
-                    <span className="mt-2 block text-sm leading-6 text-fd-muted-foreground">{item.description}</span>
-                  </span>
-                </div>
+                <Icon className="size-5 text-fd-primary" aria-hidden="true" />
+                <span className="mt-5 flex items-center justify-between gap-3 text-base font-semibold">
+                  {group.label}
+                  <ArrowRight className="size-4 text-fd-muted-foreground transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:text-fd-primary" aria-hidden="true" />
+                </span>
+                <span className="mt-1 block text-sm leading-6 text-fd-muted-foreground">{group.description}</span>
               </Link>
             );
           })}
@@ -189,31 +191,56 @@ export default function HomePage() {
       </section>
 
       <section className="border-y border-fd-border bg-fd-muted/25">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 md:px-8 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div className="flex items-start gap-4">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-fd-border bg-fd-background text-fd-primary">
-              <Bot className="size-5" aria-hidden="true" />
-            </span>
-            <div>
-              <h2 className="m-0 text-2xl font-semibold tracking-tight">The same docs for people and agents</h2>
-              <p className="mb-0 mt-2 max-w-2xl text-sm leading-7 text-fd-muted-foreground">
-                Use the documentation in your browser, discover pages through llms.txt, or give an assistant the page-level Markdown for exact connector and resource context.
-              </p>
+        <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.72fr)] lg:items-center lg:gap-16 lg:py-16">
+          <div>
+            <p className="m-0 text-xs font-semibold uppercase tracking-[0.15em] text-fd-primary">Continue building</p>
+            <h2 className="mb-0 mt-3 text-3xl font-semibold tracking-[-0.035em]">From a valid connection to a reviewable workspace.</h2>
+            <p className="mb-0 mt-3 max-w-2xl text-base leading-7 text-fd-muted-foreground">
+              Use the reference when you need exact resource syntax, and troubleshooting when a prepared system still does not validate as expected.
+            </p>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              {secondaryLinks.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="group cursor-pointer rounded-xl border border-fd-border bg-fd-background p-4 text-fd-foreground no-underline outline-none transition-[border-color,background-color] duration-200 hover:border-fd-primary/30 hover:bg-fd-card focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:ring-offset-2"
+                  >
+                    <span className="flex items-center gap-3">
+                      <Icon className="size-5 text-fd-primary" aria-hidden="true" />
+                      <span className="font-semibold">{item.title}</span>
+                      <ArrowRight className="ml-auto size-4 text-fd-muted-foreground transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:text-fd-primary" aria-hidden="true" />
+                    </span>
+                    <span className="mt-2 block text-sm leading-6 text-fd-muted-foreground">{item.description}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <ActionLink href="/docs/for-ai/llms" variant="secondary">AI-ready docs</ActionLink>
-            <ActionLink href="/llms.txt" variant="secondary">View llms.txt</ActionLink>
+
+          <div className="rounded-2xl border border-fd-border bg-fd-background p-6 shadow-sm">
+            <span className="flex size-10 items-center justify-center rounded-xl border border-fd-primary/15 bg-fd-primary/[0.07] text-fd-primary">
+              <Bot className="size-5" aria-hidden="true" />
+            </span>
+            <h2 className="mb-0 mt-5 text-xl font-semibold tracking-[-0.025em]">Documentation for people and agents</h2>
+            <p className="mb-0 mt-2 text-sm leading-6 text-fd-muted-foreground">
+              The same canonical pages are available through the site, llms.txt, and page-level Markdown.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-3">
+              <ArrowLink href="/docs/for-ai/llms">AI-ready docs</ArrowLink>
+              <ArrowLink href="/llms.txt">Open llms.txt</ArrowLink>
+            </div>
           </div>
         </div>
       </section>
 
-      <footer className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-8 text-sm text-fd-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
+      <footer className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-fd-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
         <p className="m-0">TapState documentation</p>
         <div className="flex flex-wrap gap-x-5 gap-y-2">
-          <Link href="/docs" className="text-fd-muted-foreground no-underline hover:text-fd-foreground">All docs</Link>
-          <Link href="/docs/connectors" className="text-fd-muted-foreground no-underline hover:text-fd-foreground">Connectors</Link>
-          <Link href="/docs/reference/dsl-grammar" className="text-fd-muted-foreground no-underline hover:text-fd-foreground">Reference</Link>
+          <Link href="/docs" className="cursor-pointer text-fd-muted-foreground no-underline transition-colors hover:text-fd-foreground">All docs</Link>
+          <Link href="/docs/connectors" className="cursor-pointer text-fd-muted-foreground no-underline transition-colors hover:text-fd-foreground">Connectors</Link>
+          <Link href="/docs/reference/dsl-grammar" className="cursor-pointer text-fd-muted-foreground no-underline transition-colors hover:text-fd-foreground">Reference</Link>
         </div>
       </footer>
     </main>

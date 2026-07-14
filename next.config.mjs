@@ -9,6 +9,9 @@ const projectRoot = dirname(fileURLToPath(import.meta.url));
 const config = {
   output: 'export',
   reactStrictMode: true,
+  images: {
+    unoptimized: true,
+  },
   turbopack: {
     root: projectRoot,
   },

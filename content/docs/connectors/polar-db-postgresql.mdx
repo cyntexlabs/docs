@@ -13,16 +13,12 @@ ai:
   aliases: [polardb postgresql, polar db postgres, aliyun polardb postgres, polardb wal]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use PolarDB for PostgreSQL for snapshots, WAL-based change capture, and destination writes.
 
 <ConnectorProfile category="Databases" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source, Target" capabilities="Snapshot, CDC, Data write" compatibility="Alibaba Cloud PolarDB for PostgreSQL 11+" />
-
-<Aside type="note" title="Local validation boundary">
-  Local validation checks the source mode and configuration shape. It does not test cluster networking, database credentials, replication privileges, WAL settings, publications, or a live write.
-</Aside>
 
 ## Before you begin
 
@@ -116,7 +112,7 @@ Run a staging snapshot and verify an insert, update, and delete through the sele
 
 - CDC depends on retained WAL and an available replication slot. If the required position is no longer available, take a new snapshot.
 - Tables without a usable replica identity can produce incomplete keys for updates and deletes.
-- The documented connector options do not establish a TLS, connection-test, or DDL-control workflow; configure those only through the deployment capabilities provided to you.
+- Configure TLS and DDL handling only through options available in your TapState environment, then test them before production.
 
 ## Reference
 

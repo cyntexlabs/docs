@@ -7,7 +7,7 @@ ai:
   aliases: [tapstate troubleshooting, validation error, connector error, cdc not working]
 ---
 
-Start by identifying which layer produced the failure. A local validation result, a connection failure, and incorrect destination data require different evidence and different fixes.
+Start by identifying which layer produced the failure. A resource-file error, a connection failure, and incorrect destination data require different evidence and different fixes.
 
 ## Identify the failing layer
 
@@ -18,7 +18,7 @@ Start by identifying which layer produced the failure. A local validation result
 | Deployment and connectivity | Runtime logs, network test, authentication response | Whether this deployment can reach and authenticate to the system |
 | Data movement | Checkpoints, source and target samples, record counts | Whether Snapshot, CDC, transforms, and writes behave correctly |
 
-Do not use evidence from one layer as proof of another. In particular, exit code `0` from offline validation does not test credentials or move data.
+Do not use evidence from one layer as proof of another. A valid resource file is the starting point; connectivity and data movement still need to be verified in the environment where the connection runs.
 
 ## Check the workspace first
 

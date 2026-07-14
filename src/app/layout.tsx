@@ -2,6 +2,7 @@ import { Inter } from 'next/font/google';
 import { Provider } from '@/components/provider';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { docsBaseUrl, isSiteIndexable } from '@/lib/shared';
 import './global.css';
 
 const inter = Inter({
@@ -9,11 +10,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://tapstate.com'),
+  metadataBase: new URL(docsBaseUrl),
   title: {
     default: 'TapState',
     template: '%s | TapState',
   },
+  robots: isSiteIndexable
+    ? { index: true, follow: true }
+    : { index: false, follow: false, nocache: true },
 };
 
 export default function Layout({ children }: { children: ReactNode }) {

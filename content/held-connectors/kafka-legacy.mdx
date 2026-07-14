@@ -26,12 +26,8 @@ Use this connector only to maintain an existing resource with connector ID `kafk
   compatibility="Kafka 2.3.x"
 />
 
-<Aside type="caution" title="Choose the replacement for new pipelines">
-  The current connection contract explicitly marks this connector as deprecated. Kafka Enhanced has a separate ID and a broader record, serializer, and Schema Registry contract. Do not change an existing resource's connector ID without staging the migration and validating downstream consumers.
-</Aside>
-
-<Aside type="note" title="Local validation boundary">
-  Local validation checks the `stream` mode and recognized field shapes. It does not reach brokers, authenticate, list topics, consume records, or publish a message.
+<Aside type="caution" title="Use Kafka Enhanced for new pipelines">
+  This connector is deprecated. Kafka Enhanced uses a separate ID and supports more record formats, serializers, and Schema Registry options. Do not change an existing resource's connector ID without staging the migration and validating downstream consumers.
 </Aside>
 
 ## Before you begin
@@ -43,7 +39,7 @@ Use this connector only to maintain an existing resource with connector ID `kafk
 - Supply a topic name or expression in `mqTopicString`. Validate any regular expression against the real topic set before production.
 - This legacy connector accepts JSON-object message strings. Decide whether malformed records should stop the read or be skipped with `kafkaIgnoreInvalidRecord`.
 
-Kafka is a stream, not a Snapshot or CDC source. The connection does not define the initial offset policy; confirm the start position and recovery behavior with the deployed runtime.
+Kafka is a stream, not a Snapshot or CDC source. Confirm the starting offset and recovery policy before the first production run.
 
 ### Target
 
@@ -83,7 +79,7 @@ tables:
   - orders.events
 ```
 
-For a target-only connection, omit `mode` and `tables`. Enable `krb5` only when the deployed runtime can provide the required keytab and Kerberos configuration fields.
+For a target-only connection, omit `mode` and `tables`. Enable `krb5` only after supplying the required keytab, Kerberos configuration, principal, and service name.
 
 ## Validate the configuration
 

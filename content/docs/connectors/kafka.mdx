@@ -35,7 +35,7 @@ Use the connector ID `kafka_enhanced` for new Kafka connections. The connector I
 - If Schema Registry is enabled, prepare its URL and authentication settings.
 - If SASL or Kerberos is enabled, prepare the matching credentials and Kerberos files.
 
-Kafka has no finite Snapshot/CDC split. A stream can start from the earliest available offset, the current position, or a time-derived offset, but that starting-position policy belongs to the pipeline/runtime contract rather than the connection fields documented here. Confirm it before the first production run.
+Kafka has no finite Snapshot/CDC split. Before the first production run, choose and verify whether the stream starts from the earliest available offset, the current position, or a time-derived offset. The broker connection itself does not set this policy.
 
 ### Target
 
@@ -120,8 +120,6 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the `stream` mode and recognized connection values. It does not connect to brokers, authenticate, inspect topics, or send messages.
-
 In staging, read and write one record for every selected serialization path. Verify its key, headers, partition, timestamp, and value with an independent Kafka consumer before enabling production traffic.
 
 ## Limitations
@@ -130,9 +128,9 @@ In staging, read and write one record for every selected serialization path. Ver
 - Re-reading an offset can deliver the same record more than once. Use stable keys and idempotent target writes when duplicates are unacceptable.
 - Consumer concurrency is bounded by the available topic partitions. More reader threads do not increase parallelism beyond that partition count.
 - Topic existence, partitioning, replication factor, ACLs, retention, and message compatibility require live broker checks.
-- The connector implementation contains a transactional producer path, but end-to-end exactly-once behavior also depends on the TapState runtime and target pipeline. Verify failure and recovery behavior instead of assuming exactly-once delivery.
+- Do not assume end-to-end exactly-once delivery. Verify producer transactions, pipeline recovery, and downstream idempotency together before production.
 - `kafka_enhanced` supports JSON, Avro, and Protobuf Schema Registry types. The registered schema must remain compatible with the actual key/value encoding.
-- Kerberos files, Schema Registry credentials, and custom Kafka client properties are accepted fields, but local validation cannot prove that the broker or registry will accept them.
+- Test Kerberos files, Schema Registry credentials, and custom Kafka client properties against the broker and registry before production use.
 
 ## Reference
 
@@ -167,7 +165,7 @@ In staging, read and write one record for every selected serialization path. Ver
 | `saslUsername` | No | — | SASL username. |
 | `saslPassword` | No | — | SASL password. |
 | `krb5` | No | `false` | Enable Kerberos. |
-| `krb5Keytab` | With Kerberos | — | Keytab content or path handled by the product surface. |
+| `krb5Keytab` | With Kerberos | — | Kerberos keytab content or path. |
 | `krb5Conf` | With Kerberos | — | Kerberos configuration. |
 | `krb5Principal` | With Kerberos | — | Kerberos principal. |
 | `krb5ServiceName` | With Kerberos | — | Kafka Kerberos service name. |

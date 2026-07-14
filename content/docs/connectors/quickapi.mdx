@@ -13,7 +13,7 @@ ai:
   aliases: [quickapi, quick api, postman collection source, postman api snapshot]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use QuickAPI for a one-time source read from a prepared Postman collection. The connection accepts the collection text and optional token-expiry fields, and supports Snapshot only.
 
@@ -25,10 +25,6 @@ Use QuickAPI for a one-time source read from a prepared Postman collection. The 
   capabilities="Snapshot, API collection contract"
   compatibility="Postman collection JSON"
 />
-
-<Aside type="note" title="What local validation checks">
-  QuickAPI parses `TAP_TABLE`, pagination tags, `TAP_GET_TOKEN`, token-expiry rules, and token mappings at runtime. Local `tapstate validate` checks only field shapes; it does not execute the collection or prove that a deployed runtime includes the connector package.
-</Aside>
 
 ## Before you begin
 
@@ -76,7 +72,7 @@ config:
 mode: snapshot
 ```
 
-`jsonTxt` is required. `schemaTxt` is normally derived from the collection by the connector surface; provide it only when the deployed contract expects a precomputed schema.
+`jsonTxt` is required. `schemaTxt` is normally derived from the collection; provide it only when your TapState environment requires a precomputed schema.
 
 ## Validate the configuration
 
@@ -86,14 +82,12 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource, Snapshot mode, and field shapes. It does not parse or execute the Postman collection, call an API, refresh a token, follow pagination, or discover tables.
-
 ## Limitations
 
-- TapState supports Snapshot only; it does not declare CDC, API mode, target writes, or DDL behavior.
+- This connector performs Snapshot reads only. CDC, target writes, and schema changes are not included.
 - Incorrect response paths or pagination tags can silently omit or repeat rows. Compare page boundaries and record counts with the source API in staging.
 - Token refresh depends on the exact expiry expression and response mapping supplied in the connection.
-- API rate limits, retries, pagination consistency, and schema drift are controlled by the remote API and are not checked by local validation.
+- Test API rate limits, retries, pagination consistency, and schema drift with representative responses before production use.
 - Do not commit collections containing secrets or token values.
 
 ## Reference

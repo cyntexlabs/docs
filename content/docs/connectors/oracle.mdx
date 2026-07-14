@@ -141,7 +141,7 @@ The preparation above is for LogMiner. Some Oracle deployments use a direct raw-
 
 **5. Decide whether to capture DDL**
 
-DDL capture has additional dictionary and object requirements. Enable it only when the connection flow supplied by your deployment exposes DDL collection, and stage the supported add, rename, alter, and drop-column cases before production.
+DDL capture has additional dictionary and object requirements. If DDL collection is available in your Oracle connection, enable it only after staging add, rename, alter, and drop-column changes.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -164,11 +164,9 @@ If TapState writes into another owner's schema, grant object-level `SELECT`, `IN
 
 ## Create a connection
 
-Create the Oracle connection through the connection flow supplied by your TapState deployment. This guide does not invent a `.tapstate.yml` field schema where the deployment has not documented one.
+Use the Oracle connection workflow available in your TapState environment. Enter the prepared endpoint, service name or SID, credentials, and source or target role using the fields provided there.
 
 ## Validate the configuration
-
-`tapstate validate` checks the resource envelope only for this connector. It does not verify Oracle field names, credentials, service resolution, logging, supplemental logging, or LogMiner access.
 
 Before production, use a staging schema to verify:
 

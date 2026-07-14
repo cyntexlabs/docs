@@ -123,14 +123,12 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Offline validation checks resource structure and documented fields. It does not test the Atlas network allowlist, credentials, DNS seed discovery, or Oplog access.
-
 ## Limitations
 
 - The database name must be present in the URI path.
 - The runtime network origin must be allowed by Atlas Network Access.
 - Oplog retention depends on the Atlas tier and configuration; size it beyond the longest recovery window.
-- Advanced full-document filling and sharding controls are not part of this TapState connection contract.
+- Full-document filling and advanced sharding controls are not included in this connection resource.
 
 ## Reference
 
@@ -151,3 +149,10 @@ Offline validation checks resource structure and documented fields. It does not 
 | `sslPass` | No | — | Password for the client key. |
 | `sslValidate` | No | — | Validate the server certificate. |
 | `sslCA` | With certificate validation | — | CA certificate material. |
+
+### Supported operations
+
+| Direction | Document changes | Schema changes |
+|---|---|---|
+| Source CDC | Insert, update, and delete events from the Atlas-managed Oplog | Not included |
+| Target | Insert, update, and delete by the selected write mode | Not included |

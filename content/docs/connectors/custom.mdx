@@ -13,7 +13,7 @@ ai:
   aliases: [custom connection, custom connector, script source, script target, javascript connector]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Custom Connection when the integration is defined by scripts rather than a vendor-specific connector. It is intended for controlled development and integration work where you own the script lifecycle.
@@ -24,12 +24,8 @@ Use Custom Connection when the integration is defined by scripts rather than a v
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Data write, Script-defined behavior"
-  compatibility="Custom JavaScript connector contract"
+  compatibility="Custom JavaScript connector"
 />
-
-<Aside type="caution" title="No script execution or debugger is available locally">
-  Local validation checks field types and source modes. It does not execute JavaScript, test network calls, inspect a returned record, or provide an interactive script debugger.
-</Aside>
 
 ## Before you begin
 
@@ -47,14 +43,12 @@ Set `syncType: initial_sync` and keep script inputs, secrets, retries, and error
 
 Use **Snapshot + CDC** when you need an initial script-defined read followed by incremental work. Provide both `historyScript` and `cdcScript`, use `syncType: initial_sync+cdc`, and design an idempotent checkpoint or cursor strategy in the script contract.
 
-Local validation cannot verify event ordering, polling cadence, cursor durability, or script output shape.
-
 </SourceModeTab>
 </SourceModeTabs>
 
 ### Target
 
-Use a `targetScript` only after defining its input shape and failure behavior. Give the script the smallest credentials and network access it needs. TapState supports target capability but does not describe a conflict policy, transaction boundary, or DDL behavior.
+Use a `targetScript` only after defining its input shape and failure behavior. Give the script the smallest credentials and network access it needs, and define its conflict policy and transaction boundary before production. Schema changes are not handled automatically.
 
 ## Create a connection
 
@@ -87,12 +81,10 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource, mode, known field types, and enum values. It does not run the configured scripts or prove their output is compatible with a downstream pipeline.
-
 ## Limitations
 
-- Interactive script debugging, helper APIs, heartbeat behavior, and live connection testing are not part of this documented TapState contract.
-- TapState does not define script sandboxing, timeout, retry, pagination, record schema, or error semantics.
+- Test `historyScript`, `cdcScript`, and `targetScript` with representative payloads and failure cases before production use.
+- Define timeout, retry, pagination, output-schema, checkpoint, and error-handling expectations in the script and its operational runbook.
 - Keep scripts and secret values under review. Do not commit credentials into workspace files.
 
 ## Reference

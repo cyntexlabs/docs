@@ -88,14 +88,9 @@ Review the generated files before continuing. Confirm that IDs and references ma
 tapstate validate --workdir tapstate-work
 ```
 
-An exit code of `0` means the installed validator accepted the resource structure, references, and locally known connector rules. The number and wording in success output can vary by version.
+An exit code of `0` means the installed validator accepted the resource structure, references, modes, and recognized connector fields. The number and wording in success output can vary by version.
 
-Local validation does not prove:
-
-- credentials or network access;
-- database discovery or connection tests;
-- Snapshot or CDC execution;
-- target writes, recovery, or data correctness.
+Next, run the connection in a non-production environment. Confirm credentials and network access, then verify a representative source read or target write before using production data.
 
 ## 5. Inspect the resources
 

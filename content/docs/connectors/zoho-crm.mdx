@@ -13,7 +13,7 @@ ai:
   aliases: [zoho crm, zoho-crm, zoho api, zoho crm source]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Zoho CRM as a supported API source.
 
@@ -25,10 +25,6 @@ Use Zoho CRM as a supported API source.
   capabilities="API read"
   compatibility="Zoho CRM API"
 />
-
-<Aside type="note" title="Authorization">
-  The connection requires `code`. Obtain it through the authorization flow supplied by your TapState deployment; local validation does not perform the exchange.
-</Aside>
 
 ## Before you begin
 
@@ -48,7 +44,7 @@ config:
 mode: api
 ```
 
-The current connection contract does not disclose token refresh, selected modules, or incremental behavior; confirm those with a deployed runtime.
+Before production, verify token refresh, selected modules, and incremental reads with a non-production Zoho CRM organization.
 
 ## Validate the configuration
 
@@ -57,8 +53,6 @@ tapstate validate --workdir tapstate-work
 ```
 
 <ValidationStatusGuide />
-
-Local validation does not authorize Zoho, test permissions, enumerate modules, or read records.
 
 ## Limitations
 

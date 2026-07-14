@@ -68,11 +68,9 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Validation checks resource shape and known field types. It does not load Hadoop XML, authenticate with Kerberos, reach Hive, create a Hudi table, or write files.
-
 ## Limitations
 
-- This guide covers a target connection only. Confirm source modes, CDC, DDL, and table-layout behavior with the deployed connector contract before relying on them.
+- This connector is documented for target writes only. Source reads, CDC, schema changes, and automatic table-layout behavior are not included.
 - Site XML and Kerberos material are sensitive deployment inputs; do not commit them to a workspace.
 - The documented connector baseline is Hudi 0.11.0. Verify metastore integration and exact table behavior in staging.
 

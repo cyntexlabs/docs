@@ -13,9 +13,9 @@ ai:
   aliases: [vika, vika target, vika data write, vika api]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Vika as a data-writing target. This connection does not provide a source read mode.
+Use Vika as a data-writing target.
 
 <ConnectorProfile
   category="SaaS, business & commerce APIs"
@@ -26,10 +26,6 @@ Use Vika as a data-writing target. This connection does not provide a source rea
   compatibility="Vika API"
 />
 
-<Aside type="note" title="Rate limits are service-side">
-  Keep requests within the table and API limits of the selected Vika plan. Local validation does not authenticate, measure rates, or test a write.
-</Aside>
-
 ## Before you begin
 
 ### Target
@@ -38,7 +34,7 @@ Use Vika as a data-writing target. This connection does not provide a source rea
 2. Create a credential with the minimum write scope and keep it outside source control.
 3. Confirm the selected Vika plan's table, row, and API-rate limits with the account administrator.
 
-TapState supports `upsert` and `append` write semantics, but it does not define field mapping, conflict selection, rate-limit handling, or schema evolution behavior.
+TapState supports `upsert` and `append` writes. Define and test field mapping, conflict keys, rate-limit handling, and schema changes before production.
 
 ## Create a connection
 
@@ -63,12 +59,10 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope and recognized fields. It does not authenticate to Vika, list spaces or tables, enforce a rate limit, map fields, or write a record.
-
 ## Limitations
 
-- TapState supports target capability only. It does not declare source reads, Snapshot, CDC, API mode, or DDL handling.
-- Verify Vika API limits, table permissions, schema mapping, and conflict behavior against the deployed runtime before production use.
+- This connector writes to Vika only. Source reads and schema changes are not included.
+- Verify Vika API limits, table permissions, schema mapping, and conflict behavior with a non-production datasheet before production use.
 - Keep `credential` in an environment variable or a secret manager.
 
 ## Reference

@@ -99,7 +99,7 @@ serve:
 
 Pre-create ClickHouse tables when their engine, sort key, partitioning, or retention must be controlled. Keep `ddl: fail` until table creation and evolution have been tested against the chosen engine.
 
-The target connector implements add column, rename column, alter column attributes, and drop column. Use `ddl: apply` only after those operations have passed staging against the exact ClickHouse version and table engine.
+A ClickHouse target can add, rename, alter, and drop columns. Use `ddl: apply` only after those operations have passed staging against the exact ClickHouse version and table engine.
 
 ## Validate the configuration
 
@@ -109,14 +109,12 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-This checks the local resource, Snapshot mode, and known field types. It does not test network access, ClickHouse privileges, or query results.
-
 ## Limitations
 
 - This guide covers point-in-time reads. Treat CDC and source DDL delivery as staging-test cases rather than assuming either behavior.
 - ClickHouse HTTP is commonly served on port `8123`; confirm the endpoint and any encryption settings with your deployment rather than assuming a TLS field.
-- The connector implementation creates `ReplacingMergeTree` with the primary key as the sort key when the source has a primary key; otherwise it creates `MergeTree` without a sort key. Pre-create tables when that default does not fit the query or retention design.
-- Binary source values are Base64-encoded into ClickHouse strings by the connector implementation because the documented ClickHouse type baseline has no binary type.
+- When TapState creates a target table, it uses `ReplacingMergeTree` with the primary key as the sort key when one is available; otherwise it uses `MergeTree` without a sort key. Pre-create tables when that layout does not fit the query or retention design.
+- Binary source values are Base64-encoded into ClickHouse strings because the supported ClickHouse type set has no binary type.
 - Updates and deletes on MergeTree-family tables are operationally different from row-store DML. Test table engines, sort keys, mutation behavior, and deduplication with representative data before production writes.
 
 ## Reference

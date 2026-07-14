@@ -13,23 +13,19 @@ ai:
   aliases: [oceanbase, oceanbase mysql mode, oceanbase snapshot, oceanbase cdc, oceanbase source, oceanbase target]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
-Use the current OceanBase connector for MySQL-compatible OceanBase deployments. It can copy current rows or use its declared CDC mode after the required log service is prepared.
+Use OceanBase for MySQL-compatible deployments. Copy current rows once, or continue with CDC after preparing the required log service. Oracle-compatible deployments need a separate connector and are not covered by this guide.
 
 <ConnectorProfile
   category="Databases"
   maturity="Preview"
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
-  capabilities="Snapshot, CDC, Data write, Target DDL apply"
-  compatibility="OceanBase 4.0+ · MySQL-compatible"
+  capabilities="Snapshot, CDC, DDL capture, Data write, Target DDL apply"
+  compatibility="OceanBase 4.0+ · MySQL-compatible · single node or cluster"
 />
-
-<Aside type="note" title="CDC setup">
-  This guide covers MySQL-compatible OceanBase only. It does not cover Oracle-compatible mode, source DDL capture, live connection testing, or deployment-specific advanced settings.
-</Aside>
 
 ## Before you begin
 
@@ -38,7 +34,7 @@ Use the current OceanBase connector for MySQL-compatible OceanBase deployments. 
 <SourceModeTabs>
 <SourceModeTab value="snapshot">
 
-Use **Snapshot** when you need the rows that exist now. Allow the future runtime network to reach the selected tenant, then create a least-privilege reader:
+Use **Snapshot** when you need the rows that exist now. Add the runtime network to the OceanBase [tenant allowlist](https://en.oceanbase.com/docs/common-oceanbase-database-10000000001971592), confirm access to the selected tenant, then create a least-privilege reader:
 
 ```sql
 CREATE USER 'tapstate_reader' IDENTIFIED BY 'replace_with_a_secret';
@@ -50,7 +46,7 @@ A one-time copy does not require the OceanBase log service.
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** when the target must start current and then receive later data changes. In addition to the reader access, deploy the OceanBase Binlog Service described by the connector. It uses OBProxy for client access and `obbinlog` for incremental log conversion.
+Use **Snapshot + CDC** when the target must start with existing rows and then receive later data and supported schema changes. In addition to the reader access, deploy the [OceanBase Binlog Service](https://en.oceanbase.com/docs/community-obd-en-10000000002136447). It uses OBProxy for client access and `obbinlog` for incremental log conversion.
 
 **1. Create a dedicated reader**
 
@@ -61,18 +57,18 @@ GRANT SELECT ON `orders`.* TO 'tapstate_reader';
 
 **2. Prepare the Binlog Service path**
 
-Record the Root Server list, raw-log server host and port, plus CDC credentials required by your deployment. Configure them as `rootServerList`, `rawLogServerHost`, `rawLogServerPort`, `cdcUser`, and `cdcPassword`, then validate the service endpoint with the deployed runtime before relying on incremental delivery.
+Record the Root Server list, raw-log server host and port, plus CDC credentials required by your deployment. Configure them as `rootServerList`, `rawLogServerHost`, `rawLogServerPort`, `cdcUser`, and `cdcPassword`. The [Binlog Service overview](https://en.oceanbase.com/docs/common-ocp-10000000002168919) explains the roles of OBProxy and `obbinlog`.
 
 **3. Decide whether to use native CDC**
 
-`useNativeCdc` defaults to `false`. When enabled, the connector uses its native CDC reader. Set it only when the deployed TapState runtime and OceanBase topology have been validated for that path.
+`useNativeCdc` defaults to `false`. Enable it only after validating native CDC with the intended OceanBase topology.
 
 </SourceModeTab>
 </SourceModeTabs>
 
 ### Target
 
-Create a dedicated writer for the destination database. Grant schema-management privileges only when a pipeline is explicitly allowed to create or alter destination tables.
+Add the runtime network to the tenant allowlist, then create a dedicated writer for the destination database. Grant schema-management privileges only when a pipeline is explicitly allowed to create or alter destination tables.
 
 ```sql
 CREATE USER 'tapstate_writer' IDENTIFIED BY 'replace_with_a_secret';
@@ -117,13 +113,12 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource, selected mode, and configuration shape. It does not reach OBProxy, check a tenant allowlist, verify Binlog Service deployment, authenticate CDC credentials, or write destination data.
-
 ## Limitations
 
 - This page covers MySQL-compatible OceanBase only. Oracle-compatible OceanBase needs its own guide.
-- Source DDL capture is not documented. The target connector implements add column, rename column, alter column attributes, and drop column; stage each operation before using `ddl: apply`.
-- Treat tenant access, cluster topology, Binlog Service setup, and type compatibility as deployment-specific. Test them with representative data before production use.
+- Source CDC parses add column, rename column, change column attributes, and drop column events. Other DDL remains outside the documented scope.
+- The target connector applies the same four column-level operations when the pipeline DDL policy permits them.
+- Test tenant access, Binlog Service recovery, and representative data types before production use.
 
 ## Reference
 
@@ -138,8 +133,15 @@ Local validation checks the resource, selected mode, and configuration shape. It
 | `rootServerList` | No | — | OceanBase Root Server list for a CDC deployment. |
 | `rawLogServerHost`, `rawLogServerPort` | No | `50051` port | Raw log service endpoint. |
 | `cdcUser`, `cdcPassword` | No | `root@sys` user | CDC service credentials. |
-| `useNativeCdc` | No | `false` | Selects the connector's native CDC reader when the deployed runtime supports it. |
+| `useNativeCdc` | No | `false` | Select the native CDC reader when it is available in your TapState environment. |
 | `timezone` | No | empty | UTC offset used by the connector. |
+
+### Supported operations
+
+| Direction | Data changes | Schema changes |
+|---|---|---|
+| Source CDC | `INSERT`, `UPDATE`, `DELETE` | Add, rename, change, and drop columns |
+| Target | Insert, update, and delete by the selected write mode | Add, rename, change, and drop columns when the pipeline DDL policy allows it |
 
 ### Data compatibility
 

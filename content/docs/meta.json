@@ -3,11 +3,6 @@
   "pages": [
     "[What is TapState?](/docs/overview/what-is-tapstate)",
     "[Quickstart](/docs/overview/quickstart)",
-    "---Learn---",
-    "[Use cases](/docs/overview/use-cases)",
-    "[Architecture](/docs/overview/architecture)",
-    "[TapState vs. streaming stack](/docs/overview/vs-streaming-stack)",
-    "---Build---",
     "concepts",
     "connectors",
     "reference",

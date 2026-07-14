@@ -269,7 +269,7 @@ This target connection deliberately omits `mode` and `tables`: in the TapState r
 
 ## Validate the configuration
 
-Run the offline validation gate after creating or editing the connection files:
+Run validation after creating or editing the connection files:
 
 ```bash
 tapstate validate --workdir tapstate-work
@@ -278,8 +278,6 @@ tapstate validate --workdir tapstate-work
 <ValidationStatusGuide />
 
 The validation result shown above illustrates the CLI resource contract. Filenames, locations, resource counts, and error codes vary with the workspace.
-
-Validation checks workspace structure, references, known connector field types and enums, and supported mode combinations. It does not test MySQL credentials, network reachability, Binlog values, source permissions, or data movement. Before production, run a small staging pipeline that completes the intended full-load path and observes an `INSERT`, `UPDATE`, and `DELETE` through the selected read mode.
 
 ## Limitations
 
@@ -322,12 +320,12 @@ Validation checks workspace structure, references, known connector field types a
 | `database` | Yes | — | Database name. Create separate connections for separate databases. |
 | `username` | Yes | — | Database account name. |
 | `password` | No | — | Database password. Supply this from secret-aware environment handling. |
-| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Additional connection parameters. The inherited spelling is exact and must not be corrected to `additionalString`. |
+| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Additional connection parameters. Use this exact field spelling; do not change it to `additionalString`. |
 | `timezone` | No | empty | UTC offset for timezone-naive values, for example `+00:00` or `+08:00`. |
 
 ### Data compatibility
 
-| Category | MySQL types in the inherited connector baseline |
+| Category | Supported MySQL types |
 | --- | --- |
 | String | `CHAR`, `VARCHAR`, `TINYTEXT`, `TEXT`, `MEDIUMTEXT`, `LONGTEXT`, `BINARY`, `VARBINARY` |
 | Integer | `TINYINT`, `SMALLINT`, `MEDIUMINT`, `INT`, `BIGINT` |

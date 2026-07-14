@@ -13,7 +13,7 @@ ai:
   aliases: [snowflake, snowflake snapshot, snowflake source, snowflake target, snowflake pat, snowflake key pair]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Snowflake to read existing tables or to deliver pipeline data into a selected database and schema.
 
@@ -23,12 +23,8 @@ Use Snowflake to read existing tables or to deliver pipeline data into a selecte
   maturityLabel="Available for evaluation"
   worksAs="Source, Target"
   capabilities="Snapshot, Schema discovery, Data write, Target DDL apply"
-  compatibility="Snowflake accounts supported by JDBC"
+  compatibility="All Snowflake versions with JDBC support"
 />
-
-<Aside type="note" title="Local validation boundary">
-  The local configuration schema validates Snapshot mode and the selected authentication-field shapes. It does not authenticate to Snowflake, test a warehouse, or prove target-write behavior.
-</Aside>
 
 ## Before you begin
 
@@ -105,8 +101,6 @@ tapstate validate --workdir tapstate-work
 ```
 
 <ValidationStatusGuide />
-
-Local validation checks mode, field types, and authentication-method enum values. It does not verify account identifiers, network policy, credentials, roles, or warehouse availability.
 
 ## Limitations
 

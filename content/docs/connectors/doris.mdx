@@ -23,7 +23,7 @@ Use Apache Doris for point-in-time reads or as an analytical destination.
   maturityLabel="General availability"
   worksAs="Source, Target"
   capabilities="Snapshot, Data write, Target DDL apply"
-  compatibility="Apache Doris 1.2–3.0"
+  compatibility="Apache Doris 1.2–3.0 · all deployment architectures"
 />
 
 ## Before you begin
@@ -104,7 +104,7 @@ serve:
 
 Choose the Doris key model before using `upsert`. Keep `ddl: fail` until table creation and schema changes have been tested with the destination's key model, distribution, and partitioning.
 
-The target connector implements add column, rename column, alter column attributes, and drop column. Change the pipeline `ddl` policy to `apply` only after those operations have passed staging against the exact Doris version and table model.
+A Doris target can add, rename, alter, and drop columns. Change the pipeline `ddl` policy to `apply` only after those operations have passed staging against the exact Doris version and table model.
 
 ## Validate the configuration
 
@@ -114,12 +114,10 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Validation checks the resource shape, Snapshot mode, and known field types. It does not connect to a Frontend node, authenticate, or prove a write.
-
 ## Limitations
 
 - This guide covers point-in-time reads. Treat CDC and source DDL delivery as staging-test cases rather than assuming either behavior.
-- `useHTTPS` enables the connector's HTTPS setting. Confirm certificate and verification behavior with the deployed runtime before relying on a private CA or mutual TLS.
+- `useHTTPS` enables HTTPS. Test certificate trust and hostname verification before relying on a private CA or mutual TLS.
 - The connector writes through Doris Stream Load. Frequent updates and deletes can be expensive and should be tested against the chosen key model.
 - Duplicate Key and Aggregate Key tables do not provide the same update/delete semantics as a Unique Key table. Do not assume upsert behavior without a staging write test.
 - Large ingestion batches consume Frontend/Backend memory and I/O. Size batches from measurements in your own environment.

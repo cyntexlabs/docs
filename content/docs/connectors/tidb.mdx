@@ -24,7 +24,7 @@ Use TiDB for an initial full load, TiCDC-based change capture, or destination wr
   maturityLabel="General availability"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, DDL capture, Data write, Target DDL apply"
-  compatibility="TiDB 6.0.0–8.1.9"
+  compatibility="Snapshot: all documented TiDB versions · CDC: 6.0.0–8.1.9 · single node or cluster"
 />
 
 ## Before you begin
@@ -78,7 +78,7 @@ SHOW GLOBAL VARIABLES LIKE 'tidb_gc_life_time';
 
 Confirm that the runtime host architecture is supported by the supplied TiCDC binary (`amd64` or `arm64`).
 
-Do not substitute a self-compiled TiCDC binary in a production deployment without compatibility and recovery testing; that changes the connector runtime contract.
+Do not substitute a self-compiled TiCDC binary in production until compatibility and recovery testing passes.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -156,14 +156,11 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Validation checks the resource shape, source mode, and known connection fields. It does not test PD or TiKV reachability, credentials, a CDC position, or a TiDB write.
-
 ## Limitations
 
 - Full reads support the documented TiDB baseline, while integrated TiCDC is documented for TiDB 6.0.0–8.1.9. Validate the exact TiDB, PD, and TiKV topology in staging.
 - Tables without a non-null primary or unique key do not meet the documented TiCDC row-identity requirement.
 - TiDB GC can remove history needed for restart. Choose `tidb_gc_life_time` from your recovery objective and monitor its operational cost.
-- Configure transport encryption according to the TiDB deployment and the connection contract supplied by your TapState environment.
 
 ## Reference
 
@@ -177,6 +174,15 @@ Validation checks the resource shape, source mode, and known connection fields. 
 | `tiKvAddress`, `tiKvPort` | No | `20160` for port | TiKV endpoint used for CDC. |
 | `extParams` | No | — | Additional connector parameters. |
 | `timezone` | No | `+00:00` | UTC offset for timezone-naive values. |
+
+### Supported operations
+
+| Direction | Data changes | Schema changes |
+|---|---|---|
+| Source CDC | `INSERT`, `UPDATE`, `DELETE` | Add, rename, change, and drop columns |
+| Target | Insert, update, and delete by the selected write mode | Add, rename, change, and drop columns when the pipeline DDL policy allows it |
+
+TiDB CDC is implemented through the connector's integrated [TiFlow/TiCDC](https://github.com/pingcap/tiflow) path. See the [TiCDC overview](https://docs.pingcap.com/tidb/stable/ticdc-overview) for the database-side architecture and operational model.
 
 ### Data compatibility
 

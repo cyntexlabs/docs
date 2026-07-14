@@ -24,7 +24,7 @@ Use PostgreSQL with TapState for an initial full load, WAL-based CDC, DDL captur
   maturityLabel="General availability"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, DDL capture, Data write"
-  compatibility="PostgreSQL 9.4–16"
+  compatibility="PostgreSQL 9.4–16 · standalone or replication architecture"
 />
 
 ## Before you begin
@@ -152,7 +152,7 @@ CREATE PUBLICATION dbz_publication_root
 CREATE PUBLICATION dbz_publication FOR ALL TABLES;
 ```
 
-Use the exact publication names configured by your deployment. The names above are the connector defaults inherited by the current PostgreSQL contract.
+Use the publication names configured for your environment. The examples above use the connector defaults.
 
 </PreparationStep>
 <PreparationStep title="Decide whether to enable DDL capture">
@@ -285,8 +285,6 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation can check the resource envelope, the supported Snapshot or CDC source mode, and recognized PostgreSQL field shapes. It cannot test credentials, network reachability, `pg_hba.conf`, replication privileges, publication ownership, slots, or a live target write.
-
 Before a production pipeline, run a staging check that:
 
 1. discovers a selected table;
@@ -314,7 +312,7 @@ FROM pg_replication_slots;
 - PostgreSQL string types cannot store the zero byte (`\0`); normalize it before writing if it can appear in source data.
 - A replication slot can be blocked by long-running database work. Investigate materialized-view refreshes and other sessions if slot creation stalls.
 - Do not drop an inactive slot merely because it is inactive; a stopped pipeline may still depend on its position. Remove it only after the owning pipeline has been retired or reset.
-- This guide does not define TLS fields. Configure server-side encryption as required, then use the connection settings supplied by your TapState deployment.
+- Configure server-side encryption as required and use the TLS connection options available in your TapState environment.
 
 ## Reference
 

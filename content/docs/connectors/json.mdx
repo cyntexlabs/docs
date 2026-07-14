@@ -13,7 +13,7 @@ ai:
   aliases: [json, json file, json snapshot, json cdc, json source, sftp json, s3 json]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use JSON files from local or supported remote storage as a source for structured pipeline data.
@@ -27,10 +27,6 @@ Use JSON files from local or supported remote storage as a source for structured
   compatibility="Local, FTP, SFTP, SMB, S3FS, OSS"
 />
 
-<Aside type="note" title="Local validation boundary">
-  Local validation checks the selected mode and known field shapes. It does not open or parse a JSON file, authenticate to storage, or observe file changes.
-</Aside>
-
 ## Before you begin
 
 ### Source
@@ -43,7 +39,7 @@ Use **Snapshot** to read the files that match the configured path now. Make them
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** only after testing file-change behavior in the deployed runtime. TapState does not define a watcher, file-replacement policy, deletion event, or JSON parse-error policy, so test each case with representative files.
+Use **Snapshot + CDC** when new or changed JSON files should be picked up after the initial read. The connector scans the configured path every 60 seconds. New and modified files are re-read; deleting a file does not emit row deletions.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -79,8 +75,9 @@ tapstate validate --workdir tapstate-work
 
 ## Limitations
 
-- TapState supports a source only; it does not declare JSON target writes or DDL behavior.
-- TapState does not specify a JSON record convention, file-change mechanism, deletion behavior, or parsing-error policy.
+- This connector reads JSON files only. Target writes and schema changes are not included.
+- CDC detects new and modified files on a 60-second scan. File or row deletion is not propagated.
+- Keep a consistent record shape within one logical table, and test nested arrays, objects, and malformed input before production use.
 - Store credentials outside committed workspace files.
 
 ## Reference
@@ -94,3 +91,7 @@ tapstate validate --workdir tapstate-work
 | SMB | `smbHost`, `smbUsername`, `smbPassword`, `smbShareDir` |
 | S3FS / OSS | `accessKey`, `secretKey`, `endpoint`, `region`, `bucket` |
 | All paths | `filePathString` |
+
+### Data compatibility
+
+JSON input supports `ARRAY`, `BOOLEAN`, `DATETIME`, `INTEGER`, `NUMBER`, `OBJECT`, `STRING`, and `TEXT`.

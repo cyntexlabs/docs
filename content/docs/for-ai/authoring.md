@@ -57,7 +57,7 @@ Use `--dry-run` when the assistant should preview canonical YAML without writing
 tapstate validate --workdir tapstate-work --output json
 ```
 
-On failure, give the assistant the diagnostic `code`, location, message, and solution. Ask it to change only the reported resource, then validate again. Exit code `0` establishes only what that artifact's validator checks; it does not prove database connectivity or runtime execution.
+On failure, give the assistant the diagnostic `code`, location, message, and solution. Ask it to change only the reported resource, then validate again. Require runtime evidence before the assistant reports successful connectivity or execution.
 
 ## Use the schema and explain command
 
@@ -74,6 +74,6 @@ tapstate explain pipeline.sync
 
 - Keep credentials in environment variables.
 - Do not infer fields from upstream UI screenshots or unrelated connector versions.
-- Do not let an assistant claim a connection test, data run, latency, or success state from offline validation.
+- Require runtime evidence before an assistant claims a successful connection, data run, or latency result.
 - Review generated permissions and database commands before execution.
 - Do not give an assistant live control unless your TapState environment exposes an authenticated, authorized interface for it.

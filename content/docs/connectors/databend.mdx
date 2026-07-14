@@ -13,7 +13,7 @@ ai:
   aliases: [databend, databend target, databend warehouse]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Databend as a destination for analytical pipeline data.
 
@@ -25,10 +25,6 @@ Use Databend as a destination for analytical pipeline data.
   capabilities="Data write"
   compatibility="Databend 0.9+"
 />
-
-<Aside type="note" title="Local validation boundary">
-  TapState supports a target role and validates field shapes. It does not connect to Databend, authenticate, create a table, or execute a write.
-</Aside>
 
 ## Before you begin
 

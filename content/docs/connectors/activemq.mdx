@@ -13,7 +13,7 @@ ai:
   aliases: [apache activemq, activemq, activemq stream, activemq queue, activemq source, activemq target]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Apache ActiveMQ to read or write queue messages through the supported stream connector.
 
@@ -26,15 +26,11 @@ Use Apache ActiveMQ to read or write queue messages through the supported stream
   compatibility="ActiveMQ Classic 5.14.x · Artemis 2.39.x"
 />
 
-<Aside type="note" title="Local validation boundary">
-  Local validation checks Stream mode and the listed connection fields. It does not open a broker connection, verify credentials, list queues, consume a message, or publish one.
-</Aside>
-
 ## Before you begin
 
 ### Source
 
-Create a broker account restricted to consuming from the intended queues. The connector accepts JSON-object messages and queue mode; test message shape and acknowledgement behavior with the deployed runtime.
+Create a broker account restricted to consuming from the intended queues. Messages must use JSON-object bodies. Test acknowledgements, redelivery, and malformed records in a staging queue.
 
 ### Target
 
@@ -67,8 +63,8 @@ tapstate validate --workdir tapstate-work
 
 ## Limitations
 
-- TapState does not define delivery guarantee, acknowledgement, transactions, topic support, CDC, or DDL behavior.
-- The documented compatibility is not a deployed TapState runtime test; stage Classic and Artemis broker URLs separately.
+- Queue reads and writes are supported. Topic mode, transactions, schema changes, and a specific delivery guarantee are not included.
+- Stage ActiveMQ Classic and Artemis broker URLs separately, including acknowledgements and recovery after a broker restart.
 
 ## Reference
 

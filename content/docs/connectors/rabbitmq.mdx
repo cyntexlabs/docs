@@ -62,7 +62,7 @@ config:
 mode: stream
 ```
 
-For a target connection, omit `mode`. The default `apiPort` in this connection contract is `8090`; change it to the RabbitMQ management port used by your deployment, commonly `15672`.
+For a target connection, omit `mode`. The default `apiPort` is `8090`; change it to the RabbitMQ management port used by your deployment, commonly `15672`.
 
 ## Validate the configuration
 
@@ -72,13 +72,11 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation cannot prove that a queue exists, that the account has virtual-host access, or that message bodies match the runtime's accepted shape.
-
 ## Limitations
 
 - RabbitMQ messages must contain JSON object bodies. Arrays and scalar JSON values are supported as field values inside that object, not as the top-level message body.
-- TapState supports direct routing through the default exchange. Custom exchanges, routing keys, and more complex routing are not part of this connector contract.
-- This connector does not define Snapshot, CDC, DDL, acknowledgement, or delivery-guarantee semantics.
+- Queue delivery uses direct routing through the default exchange. Custom exchanges and routing keys are not configurable here.
+- Test acknowledgements, redelivery, and failure recovery before production; no transactional delivery guarantee is documented.
 - Do not put broker credentials in a committed `.tapstate.yml` file.
 
 ## Troubleshooting

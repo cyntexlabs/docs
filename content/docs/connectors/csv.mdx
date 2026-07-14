@@ -13,7 +13,7 @@ ai:
   aliases: [csv, csv file, csv snapshot, csv cdc, csv source, csv target, sftp csv, s3 csv]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use CSV files from local storage, FTP, SFTP, SMB, S3-compatible storage, or OSS as a pipeline source or target.
@@ -27,10 +27,6 @@ Use CSV files from local storage, FTP, SFTP, SMB, S3-compatible storage, or OSS 
   compatibility="Local, FTP, SFTP, SMB, S3FS, OSS"
 />
 
-<Aside type="note" title="Local validation boundary">
-  Local validation checks the selected mode and file-transport field shapes. It does not open a file, authenticate to remote storage, watch for changes, parse CSV, or write an output file.
-</Aside>
-
 ## Before you begin
 
 ### Source
@@ -43,7 +39,7 @@ Use **Snapshot** to read the files that match the configured path now. Place fil
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** only after staging the deployed file-change behavior. TapState supports `cdc`, but does not define the watcher, polling interval, changed-file policy, or deletion behavior. Confirm those semantics with a controlled add, replace, rename, and delete in the actual storage system.
+Use **Snapshot + CDC** when new or changed files should be picked up after the initial read. The connector scans the configured path every 60 seconds. New and modified files are re-read; deleting a file does not emit row deletions.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -82,8 +78,10 @@ tapstate validate --workdir tapstate-work
 
 ## Limitations
 
-- The connection exposes Snapshot, CDC, and target roles but does not define a file-change mechanism, deletion behavior, output layout, or write conflict policy.
-- The connector describes file polling and source types, but that behavior is not published as a TapState runtime guarantee.
+- The connection exposes Snapshot, CDC, and target roles. Target output layout and conflict behavior depend on the selected storage path and downstream file contract.
+- CDC detects new and modified files on a 60-second scan. File or row deletion is not propagated from the source.
+- A connection represents one logical table. When matching CSV files have different headers, schema discovery uses the combined header set.
+- Target naming, overwrite, partitioning, and conflict behavior must be agreed with downstream file consumers.
 - Treat `oss` as a storage protocol option, not an endorsement of a regional deployment; S3-compatible storage is also available through `s3fs`.
 
 ## Reference
@@ -96,4 +94,8 @@ tapstate validate --workdir tapstate-work
 | SMB | `smbHost`, `smbUsername`, `smbPassword`, `smbShareDir` | Select this group only for `smb`. |
 | S3FS / OSS | `accessKey`, `secretKey`, `endpoint`, `region`, `bucket` | Use secret-aware variables for key material. |
 
-`protocol` accepts `local`, `ftp`, `sftp`, `smb`, `s3fs`, or `oss`. The connection schema marks transport-specific fields as required; provide only the fields relevant to the selected protocol and verify the deployed connector's conditional validation.
+`protocol` accepts `local`, `ftp`, `sftp`, `smb`, `s3fs`, or `oss`. Provide only the transport-specific fields for the selected protocol, then validate that resource before production.
+
+### Data compatibility
+
+CSV schema inference supports `BOOLEAN`, `DATETIME`, `INTEGER`, `NUMBER`, `STRING`, and `TEXT`. Keep headers, delimiters, and value formats consistent across files that belong to the same logical table.

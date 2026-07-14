@@ -155,21 +155,26 @@ function cleanMdxForLLM(markdown: string) {
       const text = readAttribute(attrs, 'text');
       return text ? `(${text})` : '';
     })
+    .replace(/<img\s+alt="([^"]*)"\s+src="__img\d+"\s*\/>/g, (_match, alt: string) => {
+      return `> **Screenshot:** ${alt}`;
+    })
     .replace(/<ValidationStatusGuide\s*\/>/g, `### Interpret the result
 
-- **Example — validation passed:** \`valid: 3 resources in tapstate-work\`. Exit code 0 means workspace structure, references, and known mode and configuration rules passed. The resource count varies by workspace.
-- **Example — changes required:** \`invalid: orders_source.tapstate.yml:12:1 dsl.unknown-field\`. Exit code 1 means at least one local rule failed. The filename, location, error code, message, and suggested fix identify the affected resource.`)
+- **Configuration accepted:** \`valid: 3 resources in tapstate-work\`. The resource files, references, modes, and recognized field formats were accepted.
+- **Changes required:** \`invalid: orders_source.tapstate.yml:12:1 dsl.unknown-field\`. Use the filename, location, diagnostic code, and suggested fix to update the resource.
+
+Next, run the connection in a non-production environment and confirm credentials, network access, permissions, and a representative read or write.`)
     .replace(/<DataPathComparison\s*\/>/g, `## The assembly project and the TapState model
 
 | Approach | Data path | Operating implication |
 |---|---|---|
 | Assembly project | Source systems → Capture → Broker → Processing → Serving store → Apps and agents | Separate systems and operating boundaries. |
 | TapState model | Source systems → TapState (Capture, Transform, Serve) → Apps and agents | One governed Capture–Transform–Serve data path. |`)
-    .replace(/<ProductOverviewHero\s*\/>/g, `TapState is an open-source operational data platform. It brings capture, in-flight transformation, and current-state delivery into one governed data path for applications, APIs, and AI agents.
+    .replace(/<ProductOverviewHero\s*\/>/g, `TapState brings capture, in-flight transformation, and current-state delivery into one governed model for applications, APIs, and AI agents.
 
-- **Capture:** Read existing data and follow later changes.
-- **Transform:** Reshape, enrich, join, and route records in flight.
-- **Serve:** Keep useful state current for applications and agents.
+- **Capture:** Move the data that exists, then follow later changes.
+- **Transform:** Shape and route records while they move.
+- **Serve:** Keep destination-ready state current.
 
 [Start the quickstart](/docs/overview/quickstart) or [browse connectors](/docs/connectors).`)
     .replace(/<TapStateArchitecture\s*\/>/g, `## Logical architecture

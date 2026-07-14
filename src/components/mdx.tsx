@@ -65,50 +65,62 @@ export function CardGrid({ children }: { children: ReactNode }) {
 /** A product-led introduction for the What is TapState page. */
 export function ProductOverviewHero() {
   const pillars = [
-    { label: 'Capture', text: 'Read existing data and follow later changes.', icon: Database },
-    { label: 'Transform', text: 'Reshape, enrich, join, and route records in flight.', icon: GitBranch },
-    { label: 'Serve', text: 'Keep useful state current for applications and agents.', icon: Layers3 },
+    { label: 'Capture', text: 'Move the data that exists, then follow later changes.', icon: Database },
+    { label: 'Transform', text: 'Shape and route records while they move.', icon: GitBranch },
+    { label: 'Serve', text: 'Keep destination-ready state current.', icon: Layers3 },
   ];
 
   return (
-    <section className="not-prose relative mb-12 overflow-hidden rounded-2xl border border-fd-border bg-fd-card px-5 py-8 shadow-sm shadow-black/[0.035] dark:shadow-black/20 sm:px-8 sm:py-10 lg:px-10">
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-48 bg-[radial-gradient(circle_at_20%_0%,color-mix(in_oklab,var(--color-fd-primary)_18%,transparent),transparent_50%)]" />
-      <div className="relative">
-        <p className="mb-4 inline-flex rounded-full border border-fd-primary/20 bg-fd-primary/[0.06] px-3 py-1 text-xs font-semibold tracking-wide text-fd-primary">
-          Open-source operational data platform
-        </p>
-        <h1 className="m-0 max-w-4xl text-balance text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-fd-foreground md:text-5xl lg:text-6xl">
-          Database truth, kept current for the systems that act on it.
-        </h1>
-        <p className="mb-0 mt-5 max-w-3xl text-pretty text-base leading-8 text-fd-muted-foreground md:text-lg">
-          TapState brings capture, in-flight transformation, and current-state delivery into one governed data path for applications, APIs, and AI agents.
-        </p>
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <Link href="/docs/overview/quickstart" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-fd-primary px-4 text-sm font-semibold text-fd-primary-foreground no-underline transition-colors hover:bg-fd-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
-            Start the quickstart
-            <ArrowRight aria-hidden="true" className="size-4" />
-          </Link>
-          <Link href="/docs/connectors" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-fd-border bg-fd-background/80 px-4 text-sm font-semibold text-fd-foreground no-underline transition-colors hover:border-fd-primary/30 hover:bg-fd-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
-            Browse connectors
-            <ArrowRight aria-hidden="true" className="size-4" />
-          </Link>
+    <section className="not-prose relative mb-14 border-b border-fd-border pb-12 pt-3 sm:pb-14 sm:pt-6">
+      <div aria-hidden="true" className="absolute -left-24 -top-20 -z-10 size-72 rounded-full bg-fd-primary/[0.055] blur-3xl" />
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)] lg:items-center lg:gap-14">
+        <div>
+          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.15em] text-fd-primary">
+            Product overview
+          </p>
+          <h1 className="m-0 max-w-4xl text-balance text-4xl font-semibold leading-[1.06] tracking-[-0.047em] text-fd-foreground md:text-5xl lg:text-[3.6rem]">
+            One data path from source change to useful state.
+          </h1>
+          <p className="mb-0 mt-5 max-w-3xl text-pretty text-base leading-8 text-fd-muted-foreground md:text-lg">
+            TapState brings capture, in-flight transformation, and current-state delivery into one governed model for applications, APIs, and AI agents.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/docs/overview/quickstart" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-fd-primary px-4 text-sm font-semibold text-fd-primary-foreground no-underline transition-colors hover:bg-fd-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
+              Start the quickstart
+              <ArrowRight aria-hidden="true" className="size-4" />
+            </Link>
+            <Link href="/docs/connectors" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-fd-border bg-fd-background px-4 text-sm font-semibold text-fd-foreground no-underline transition-colors hover:border-fd-primary/30 hover:bg-fd-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
+              Browse connectors
+              <ArrowRight aria-hidden="true" className="size-4" />
+            </Link>
+            <Link href="/llms.mdx/docs/overview/what-is-tapstate/content.md" className="inline-flex h-10 items-center justify-center gap-2 px-2 text-sm font-semibold text-fd-muted-foreground no-underline hover:text-fd-foreground">
+              <FileText aria-hidden="true" className="size-4" />
+              View as Markdown
+            </Link>
+          </div>
         </div>
 
-        <div className="mt-9 grid gap-3 border-t border-fd-border pt-6 md:grid-cols-3">
-          {pillars.map((pillar) => {
-            const Icon = pillar.icon;
-            return (
-              <div key={pillar.label} className="rounded-xl border border-fd-border bg-fd-background/70 p-4">
-                <div className="flex items-center gap-2.5">
-                  <span className="flex size-8 items-center justify-center rounded-lg bg-fd-primary/[0.09] text-fd-primary">
+        <div className="overflow-hidden rounded-2xl border border-fd-border bg-fd-card shadow-lg shadow-black/[0.04] dark:shadow-black/20">
+          <div className="border-b border-fd-border bg-fd-muted/30 px-5 py-4">
+            <p className="m-0 text-xs font-semibold uppercase tracking-[0.13em] text-fd-muted-foreground">The TapState model</p>
+          </div>
+          <ol className="m-0 list-none p-0">
+            {pillars.map((pillar, index) => {
+              const Icon = pillar.icon;
+              return (
+                <li key={pillar.label} className="grid grid-cols-[2.25rem_minmax(0,1fr)_auto] gap-3 border-b border-fd-border px-5 py-5 last:border-0">
+                  <span className="flex size-9 items-center justify-center rounded-lg bg-fd-primary/[0.08] text-fd-primary">
                     <Icon aria-hidden="true" className="size-4" />
                   </span>
-                  <h2 className="m-0 text-sm font-semibold text-fd-foreground">{pillar.label}</h2>
-                </div>
-                <p className="mb-0 mt-3 text-sm leading-6 text-fd-muted-foreground">{pillar.text}</p>
-              </div>
-            );
-          })}
+                  <span>
+                    <span className="block text-sm font-semibold text-fd-foreground">{pillar.label}</span>
+                    <span className="mt-1 block text-sm leading-6 text-fd-muted-foreground">{pillar.text}</span>
+                  </span>
+                  <span className="pt-0.5 text-[0.65rem] font-semibold tracking-widest text-fd-muted-foreground">0{index + 1}</span>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </div>
     </section>
@@ -427,35 +439,40 @@ export function ConnectorProfile({
   );
 }
 
-/** Illustrative offline-validation outcomes; this does not simulate a live connection test. */
+/** Common validation outcomes followed by the next customer-facing verification step. */
 export function ValidationStatusGuide() {
   return (
-    <div className="not-prose my-5 grid gap-3 sm:grid-cols-2">
-      <section className="rounded-xl border border-emerald-200 bg-emerald-50/65 p-4 dark:border-emerald-900 dark:bg-emerald-950/25">
-        <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-800 dark:text-emerald-200">
-          <CircleCheck aria-hidden="true" className="size-4" strokeWidth={2.25} />
-          Example: validation passed
-        </div>
-        <code className="block rounded-md border border-emerald-200/80 bg-white/70 px-2.5 py-2 text-xs text-emerald-950 dark:border-emerald-900 dark:bg-black/15 dark:text-emerald-100">
-          valid: 3 resources in tapstate-work
-        </code>
-        <p className="mb-0 mt-2 text-sm text-emerald-950/80 dark:text-emerald-100/80">
-          Exit code 0 means the workspace passed structure, reference, and known mode and configuration checks. The resource count varies by workspace.
-        </p>
-      </section>
-      <section className="rounded-xl border border-amber-200 bg-amber-50/65 p-4 dark:border-amber-900 dark:bg-amber-950/25">
-        <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-900 dark:text-amber-200">
-          <CircleAlert aria-hidden="true" className="size-4" strokeWidth={2.25} />
-          Example: changes required
-        </div>
-        <code className="block whitespace-pre-wrap rounded-md border border-amber-200/80 bg-white/70 px-2.5 py-2 text-xs leading-5 text-amber-950 dark:border-amber-900 dark:bg-black/15 dark:text-amber-100">
-          {`invalid: orders_source.tapstate.yml:12:1  dsl.unknown-field
+    <div className="not-prose my-5 overflow-hidden rounded-xl border border-fd-border bg-fd-card">
+      <div className="grid gap-px bg-fd-border sm:grid-cols-2">
+        <section className="bg-fd-card p-4">
+          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+            <CircleCheck aria-hidden="true" className="size-4" strokeWidth={2.25} />
+            Configuration accepted
+          </div>
+          <code className="block rounded-md bg-emerald-50 px-2.5 py-2 text-xs text-emerald-950 dark:bg-emerald-950/35 dark:text-emerald-100">
+            valid: 3 resources in tapstate-work
+          </code>
+          <p className="mb-0 mt-2 text-xs leading-5 text-fd-muted-foreground">
+            The resource files, references, modes, and recognized field formats were accepted.
+          </p>
+        </section>
+        <section className="bg-fd-card p-4">
+          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-rose-700 dark:text-rose-300">
+            <CircleAlert aria-hidden="true" className="size-4" strokeWidth={2.25} />
+            Changes required
+          </div>
+          <code className="block whitespace-pre-wrap rounded-md bg-rose-50 px-2.5 py-2 text-xs leading-5 text-rose-950 dark:bg-rose-950/35 dark:text-rose-100">
+            {`invalid: orders_source.tapstate.yml:12:1  dsl.unknown-field
 Unknown field 'unexpected' at unexpected.`}
-        </code>
-        <p className="mb-0 mt-2 text-sm text-amber-950/80 dark:text-amber-100/80">
-          Exit code 1 means at least one local rule failed. The filename, location, error code, message, and suggested fix reflect the affected resource.
-        </p>
-      </section>
+          </code>
+          <p className="mb-0 mt-2 text-xs leading-5 text-fd-muted-foreground">
+            Use the filename, location, diagnostic code, and suggested fix to update the resource.
+          </p>
+        </section>
+      </div>
+      <p className="m-0 border-t border-fd-border bg-fd-muted/25 px-4 py-3 text-xs leading-5 text-fd-muted-foreground">
+        Next, run the connection in a non-production environment and confirm credentials, network access, permissions, and a representative read or write.
+      </p>
     </div>
   );
 }

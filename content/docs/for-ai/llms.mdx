@@ -25,7 +25,7 @@ Use the smallest surface that answers the task:
 
 ## Give an assistant context
 
-For product discovery, start with `llms.txt`. For a connector or DSL decision, provide the page-level Markdown so the assistant receives the exact maturity, modes, limitations, local-validation boundaries, and every tab body.
+For product discovery, start with `llms.txt`. For a connector or DSL decision, provide the page-level Markdown so the assistant receives the exact maturity, modes, limitations, preparation steps, and every tab body.
 
 ```text
 Read https://tapstate.com/llms.mdx/docs/connectors/mysql/content.md,
@@ -40,7 +40,7 @@ The public site does not currently expose standalone JSON Schema or example-corp
 - Connector frontmatter is a compact discovery index; the page body remains the authoritative explanation.
 - Interactive tabs expand into labeled sections in Page Markdown and `llms-full.txt`.
 - Maturity describes the connector release level. Do not infer unverified UI, runtime, TLS, or connection-test behavior from upstream documentation.
-- An offline catalog can validate only the connector fields and modes it contains. Its absence or incompleteness does not establish what a server-side runtime supports.
+- A catalog snapshot describes the connector fields and modes it contains. Treat runtime availability and behavior as environment-specific until the product surface confirms them.
 
 ## What assistants can do with these docs
 

@@ -13,7 +13,7 @@ ai:
   aliases: [bigquery, google bigquery, bigquery target, bigquery service account]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use BigQuery as a destination for pipeline data with a Google Cloud service account and an existing dataset/table set.
 
@@ -26,17 +26,20 @@ Use BigQuery as a destination for pipeline data with a Google Cloud service acco
   compatibility="Google BigQuery"
 />
 
-<Aside type="note" title="Local validation boundary">
-  The local configuration schema declares BigQuery as a target connection. It validates the two documented field shapes only; it does not authenticate to Google Cloud or create a dataset or table.
-</Aside>
-
 ## Before you begin
 
 ### Target
 
 1. Ensure the TapState runtime can reach Google Cloud APIs.
 2. Create a dedicated Google Cloud service account and JSON key. Keep the key in a secret manager and rotate it according to your security policy.
+
+![Create a dedicated service account in Google Cloud](/images/connectors/bigquery-service-account.png)
+
+![Create and download a JSON key for the service account](/images/connectors/bigquery-service-account-key.png)
+
 3. Grant a custom role scoped to the intended project or dataset. The connector uses these permissions:
+
+![Grant the required BigQuery role to the service account](/images/connectors/bigquery-service-account-role.png)
 
 ```text
 bigquery.datasets.create
@@ -86,11 +89,9 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope and known field shapes. It does not validate JSON credentials, IAM roles, project access, dataset location, or an actual BigQuery write.
-
 ## Limitations
 
-- The current connection contract does not declare a source mode, CDC, or DDL behavior for BigQuery.
+- This connector is documented for target writes only. Source reads, CDC, and schema changes are not included.
 - Dataset location and service-account permissions are enforced by Google Cloud at runtime.
 - A service-account key is a long-lived credential. Store it outside Git, restrict its IAM scope, and rotate or replace it with a deployment-supported workload identity when available.
 - Stage representative target writes to validate data types and table policy before production use.

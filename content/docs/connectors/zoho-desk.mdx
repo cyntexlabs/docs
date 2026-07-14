@@ -13,7 +13,7 @@ ai:
   aliases: [zoho desk, zoho-desk, zoho desk snapshot, zoho desk source, zoho desk webhook]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Zoho Desk as a supported Snapshot source for service data.
 
@@ -25,10 +25,6 @@ Use Zoho Desk as a supported Snapshot source for service data.
   capabilities="Snapshot, API read"
   compatibility="Zoho Desk API"
 />
-
-<Aside type="note" title="Webhook is not a supported mode">
-  TapState currently publishes this connector as Snapshot only. Although the connection contains webhook-related fields, this page does not represent webhook incremental delivery as an available source mode.
-</Aside>
 
 ## Before you begin
 
@@ -54,7 +50,7 @@ Desk.articles.CREATE,Desk.articles.UPDATE,Desk.articles.DELETE
 
 Reduce this scope list if your selected modules need less access. Authorization codes expire; generate one immediately before the deployed connection flow exchanges it. Keep every credential in a secret manager.
 
-The connector exposes these table-like modules: `Tickets`, `Departments`, `Products`, `OrganizationFields`, and `Contracts`.
+Available modules include `Tickets`, `Departments`, `Products`, `OrganizationFields`, and `Contracts`.
 
 ## Create a connection
 
@@ -73,7 +69,7 @@ config:
 mode: snapshot
 ```
 
-`streamReadType` is a connection field with a `WebHook` default; it does not override the published Snapshot-only source mode.
+`streamReadType` defaults to `WebHook`, but the supported read mode remains Snapshot.
 
 ## Validate the configuration
 
@@ -83,15 +79,13 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation does not authenticate to Zoho Desk, exchange credentials, generate callback URLs, receive a webhook, or retrieve tickets.
-
 ## Limitations
 
-- The current connection contract declares Snapshot only; it does not declare CDC, target writes, DDL, or webhook delivery semantics.
-- Webhook delivery requires a unique externally reachable callback URL and lifecycle management that this TapState contract does not define. Do not rely on real-time delivery from this Snapshot-only resource.
+- This connector performs Snapshot reads only. It does not provide target writes, schema changes, or real-time webhook delivery.
+- Do not rely on `streamReadType: WebHook` for incremental delivery.
 - Reusing one Zoho client ID and secret across many connections can hit Zoho token limits.
 - In the connector's webhook model, deleted records arrive as update events with `IsDel = TRUE`; a later full read does not recreate those deletion events.
-- The connection exposes `getTokenMsg`, `getRefreshMsg`, and `hookText` but does not document their runtime representation; leave them unset unless the deployed contract specifies values.
+- `getTokenMsg`, `getRefreshMsg`, and `hookText` are reserved fields. Leave them unset.
 
 ## Reference
 
@@ -99,5 +93,5 @@ Local validation does not authenticate to Zoho Desk, exchange credentials, gener
 |---|---|---|---|
 | `orgId`, `clientID`, `clientSecret`, `generateCode` | Yes | — | Zoho Desk organization and authorization material. |
 | `connectionMode` | No | `DocumentMode` | Connection-mode value. |
-| `streamReadType` | No | `WebHook` | Webhook-related value; it is not a published TapState CDC mode. |
-| `getTokenMsg`, `getRefreshMsg`, `hookText` | No | — | Runtime-specific optional fields. |
+| `streamReadType` | No | `WebHook` | Compatibility value; it does not enable CDC. |
+| `getTokenMsg`, `getRefreshMsg`, `hookText` | No | — | Reserved fields; leave unset. |

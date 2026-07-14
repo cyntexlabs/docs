@@ -13,7 +13,7 @@ ai:
   aliases: [azure cosmos db, cosmos db, cosmos snapshot, azure cosmos source]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Azure Cosmos DB to copy the records that exist now from a NoSQL account and database.
 
@@ -26,19 +26,18 @@ Use Azure Cosmos DB to copy the records that exist now from a NoSQL account and 
   compatibility="Azure Cosmos DB for NoSQL"
 />
 
-<Aside type="note" title="Local validation boundary">
-  TapState supports a Snapshot source and validates the four documented fields. It does not sign in to Azure, check account permissions, list containers, or read records.
-</Aside>
-
 ## Before you begin
 
 ### Source
 
 1. Select an Azure Cosmos DB account that uses the NoSQL API and the database to read.
 2. Copy the account host and a key with the smallest practical read permission.
+
+![Locate the Azure Cosmos DB account URI and access keys](/images/connectors/azure-cosmosdb-keys.png)
+
 3. Choose the consistency level that matches the account policy. The documented default is `Session`.
 
-Keep the account key in a secret manager. This connector uses the Azure Cosmos DB for NoSQL API and does not publish another authentication field or a live connection-test command.
+Keep the account key in a secret manager. This connection uses the Azure Cosmos DB for NoSQL API and account-key authentication.
 
 ## Create a connection
 
@@ -65,11 +64,9 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, Snapshot mode, and recognized field shapes. It does not test DNS, network access, account keys, Azure RBAC, container selection, or query results.
-
 ## Limitations
 
-- TapState supports Snapshot only; it does not declare CDC, target writes, or DDL handling.
+- This connector supports Snapshot reads only. CDC, target writes, and schema changes are not included.
 - Treat consistency, partitioning, capacity settings, and API rate limits as deployment concerns. Confirm them against the selected Cosmos account before running a production pipeline.
 - TapState does not expose a TapState TLS setting. Do not infer one from Azure endpoint conventions.
 

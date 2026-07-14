@@ -13,7 +13,7 @@ ai:
   aliases: [mysql pxc, percona xtradb cluster, mysql pxc snapshot, mysql pxc cdc, mysql pxc source, mysql pxc target]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use MySQL Percona XtraDB Cluster (PXC) to copy existing rows or start with a copy and continue from binary-log changes.
@@ -26,10 +26,6 @@ Use MySQL Percona XtraDB Cluster (PXC) to copy existing rows or start with a cop
   capabilities="Snapshot, CDC, Data write"
   compatibility="MySQL PXC 5.0–8.x"
 />
-
-<Aside type="note" title="Local validation boundary">
-  Local validation checks Snapshot and CDC resource shapes. It does not inspect the cluster's binlog settings, node topology, privileges, or target write path.
-</Aside>
 
 ## Before you begin
 
@@ -111,7 +107,7 @@ tables:
   - orders
 ```
 
-Use `mode: snapshot` for a one-time copy. For a target connection, omit `mode` and `tables` and supply the writer credentials. `addtionalString` is the required inherited spelling.
+Use `mode: snapshot` for a one-time copy. For a target connection, omit `mode` and `tables` and supply the writer credentials. Use the exact field name `addtionalString`.
 
 ## Validate the configuration
 
@@ -120,8 +116,6 @@ tapstate validate --workdir tapstate-work
 ```
 
 <ValidationStatusGuide />
-
-Local validation checks the resource, declared mode, and recognized fields. It does not test cluster routing, credentials, privileges, binlog retention, or data movement.
 
 ## Limitations
 
@@ -138,5 +132,5 @@ Local validation checks the resource, declared mode, and recognized fields. It d
 | `database` | Yes | — | Database name. |
 | `username` | Yes | — | Reader or writer account. |
 | `password` | No | — | Account password; supply through an environment variable. |
-| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Extra connector parameters. The inherited spelling is exact. |
+| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Extra connector parameters. Use this exact field spelling. |
 | `timezone` | No | empty | UTC offset used by the connector. |

@@ -189,16 +189,14 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Validation checks resource structure, references, field types, and supported modes. It does not connect to MongoDB or inspect the Oplog.
-
 ## Limitations
 
-- CDC requires a replica set or sharded cluster; a standalone deployment can only be considered for Snapshot after product-level testing.
+- CDC requires a replica set or sharded cluster. Test standalone deployments with Snapshot before production.
 - If the Oplog rotates past the last captured position, recovery requires a new snapshot.
 - Sharded-cluster balancing and orphaned documents can affect snapshot consistency.
-- Oplog update events can contain only the modified fields. When a pipeline depends on a non-`_id` key, a changed sub-document, or an embedded-array `PULL`, verify that the deployed runtime reconstructs the complete document before routing or writing it.
+- Oplog update events can contain only the modified fields. When a pipeline depends on a non-`_id` key, a changed sub-document, or an embedded-array `PULL`, verify that the captured event contains the complete document needed for routing or writing.
 - Delete events normally contain only `_id`. If the target match condition does not include `_id`, enable and test MongoDB 6.0+ document pre-images when the deployed connector supports them, or design an intermediate keyed flow that preserves the deleted document.
-- Document pre-images, deleted-document caching, full-document filling, and target write concern are runtime options, not fields in this connection contract. Confirm them with your TapState deployment before relying on them.
+- Document pre-images, deleted-document caching, full-document filling, and target write concern are not configured in this connection resource. Confirm their availability in your TapState environment before relying on them.
 
 ## Reference
 

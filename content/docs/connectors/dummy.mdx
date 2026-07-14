@@ -13,7 +13,7 @@ ai:
   aliases: [dummy, dummydb, generated test data, test source, test target]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Dummy to generate deterministic test data or exercise a target path without connecting to an external data system. It is a development and verification connector, not a production data source.
@@ -24,12 +24,8 @@ Use Dummy to generate deterministic test data or exercise a target path without 
   maturityLabel="For test and evaluation only"
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Data write, Generated test data"
-  compatibility="Built-in Dummy connector contract"
+  compatibility="Built-in Dummy connector"
 />
-
-<Aside type="note" title="Use test data only">
-  Dummy is useful for validating resource shape and downstream handling. It does not validate production credentials, source privileges, data types, network routes, or production operating conditions.
-</Aside>
 
 ## Before you begin
 
@@ -93,13 +89,11 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the recognized fields and values. It does not start generation, measure cadence, inspect generated rows, or execute a live target write.
-
 ## Limitations
 
 - Dummy is for development and test fixtures; it is not evidence of production connector readiness.
-- TapState does not define the complete generated-field vocabulary or error behavior. Keep test schemas small and explicit.
-- Target write semantics remain a runtime concern even though TapState supports target capability.
+- Keep test schemas small and explicit because generated-field combinations and error behavior can vary.
+- Test target write semantics explicitly before using the Dummy connector in automated scenarios.
 
 ## Reference
 

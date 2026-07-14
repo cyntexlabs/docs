@@ -13,7 +13,7 @@ ai:
   aliases: [elasticsearch, elasticsearch target, elastic target, elasticsearch ssl]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Elasticsearch as a destination for searchable pipeline data.
 
@@ -26,15 +26,11 @@ Use Elasticsearch as a destination for searchable pipeline data.
   compatibility="Elasticsearch 7.6"
 />
 
-<Aside type="note" title="Local validation boundary">
-  The local configuration schema declares an Elasticsearch target and validates the documented connection fields. It does not connect to a cluster, verify certificates, or index a document.
-</Aside>
-
 ## Before you begin
 
 ### Target
 
-Create or select destination indices and an account with only the index privileges required by the pipeline. Decide mapping, analyzers, and lifecycle policy before the first production write; those settings are enforced by Elasticsearch rather than the local resource validator.
+Create or select destination indices and an account with only the index privileges required by the pipeline. Decide mapping, analyzers, and lifecycle policy before the first production write; Elasticsearch enforces those settings.
 
 ## Create a connection
 
@@ -63,13 +59,11 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-This checks local field shape only. It does not test DNS, TLS negotiation, certificate trust, authentication, index permissions, mappings, or writes.
-
 ## Limitations
 
-- TapState supports a target only; it does not declare source reads, Snapshot, CDC, or DDL behavior.
+- This connector writes to Elasticsearch only. Source reads and schema changes are not included.
 - The connector covers Elasticsearch 7.6. Version compatibility and mappings need staging verification.
-- The connection exposes certificate-related fields but not a complete security model. Do not assume defaults for HTTPS, certificate paths, or hostname verification.
+- When using TLS, set HTTPS, CA material, and certificate validation explicitly. Test hostname verification with the production endpoint.
 
 ## Reference
 
@@ -81,4 +75,4 @@ This checks local field shape only. It does not test DNS, TLS negotiation, certi
 | `password` | No | Account password; use an environment variable. |
 | `sslValidate` | No | Boolean for SSL validation. |
 | `validateCA` | No | Boolean for CA validation. |
-| `sslCA` | Yes | CA material required by the current connection contract. |
+| `sslCA` | Yes | CA material used to validate the Elasticsearch certificate. |

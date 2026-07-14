@@ -183,11 +183,9 @@ Remove `CREATE TABLE` or `ALTER` when TapState must write only to pre-created ta
 
 ## Create a connection
 
-Create the SQL Server connection through the connection flow supplied by your TapState deployment. This guide does not invent a `.tapstate.yml` field schema where the deployment has not documented one.
+Use the SQL Server connection workflow available in your TapState environment. Enter the prepared server, database, credentials, and source or target role using the fields provided there.
 
 ## Validate the configuration
-
-`tapstate validate` checks the resource envelope only for this connector. It does not verify SQL Server field names, credentials, listener reachability, SQL Server Agent, CDC enablement, or retention.
 
 Before production, verify in a staging table that:
 
@@ -199,13 +197,13 @@ Before production, verify in a staging table that:
 ## Limitations
 
 - CDC must be enabled and retained for every participating table. If cleanup removes the saved position, recovery requires a new snapshot.
-- Tables with CDC enabled cannot use `TRUNCATE TABLE`, and renaming columns with `sp_rename` is not supported by the documented connector baseline.
+- Tables with CDC enabled cannot use `TRUNCATE TABLE`, and renaming columns with `sp_rename` is not supported.
 - After a schema change, SQL Server does not automatically rebuild the capture instance. Disable and re-enable table CDC during a controlled window before resuming dependent DML.
 - DDL and DML close together can create a gap because some implicitly committed DDL is not represented in `cdc.ddl_history`.
-- SQL Server CDC processes up to 64 KB for an inserted or updated large field by default in the documented baseline. Capture only the required columns when large fields are involved, and verify the effective limit with representative values in staging.
+- SQL Server CDC processes up to 64 KB for an inserted or updated large field by default. Capture only the required columns when large fields are involved, and verify the effective limit with representative values in staging.
 - A task that polls hundreds of capture tables can accumulate latency and load. Split very large table sets and measure the polling interval in staging.
 - `timestamp`/`rowversion` is not supported when SQL Server is the target.
-- SQL Server 2005 does not provide native CDC and is outside this connector baseline.
+- SQL Server 2005 does not provide native CDC and is not supported for CDC.
 - Configure forced encryption on SQL Server when required, then use the connection settings supplied by your TapState deployment.
 
 ### Recreate CDC after a table change

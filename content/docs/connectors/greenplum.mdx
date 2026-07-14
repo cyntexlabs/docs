@@ -13,9 +13,9 @@ ai:
   aliases: [greenplum, greenplum snapshot, greenplum target, mpp database]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use Greenplum for point-in-time table reads or as a target for analytical data.
+Use the Greenplum MPP architecture for point-in-time table reads or as a target for analytical data.
 
 <ConnectorProfile
   category="Warehouses & analytics"
@@ -26,15 +26,11 @@ Use Greenplum for point-in-time table reads or as a target for analytical data.
   compatibility="Greenplum"
 />
 
-<Aside type="note" title="Local validation boundary">
-  Local validation checks Snapshot mode and field shapes. It does not test PostgreSQL-compatible network access, credentials, privileges, plugins, or target writes.
-</Aside>
-
 ## Before you begin
 
 ### Source
 
-Create a reader account limited to the selected schema. Although the connection includes `logPluginName`, TapState currently publishes Snapshot only for Greenplum; do not configure an incremental path based on that field alone.
+Create a reader account limited to the selected schema. Greenplum supports Snapshot reads only; do not configure an incremental path based on `logPluginName`.
 
 ### Target
 
@@ -72,9 +68,9 @@ tapstate validate --workdir tapstate-work
 
 ## Limitations
 
-- `logPluginName` is required by the connection schema but does not establish CDC support; TapState supports Snapshot only.
-- Target-side add column, rename column, alter column attributes, and drop column are implemented by the connector. Stage each operation before changing a pipeline from `ddl: fail` to `ddl: apply`.
-- This guide does not define topology/failover semantics or TLS fields.
+- `logPluginName` is required by the connection resource but does not enable CDC; Greenplum supports Snapshot only.
+- A Greenplum target can add, rename, alter, and drop columns. Stage each operation before changing a pipeline from `ddl: fail` to `ddl: apply`.
+- Test topology failover and TLS behavior for your Greenplum deployment before production.
 
 ## Reference
 

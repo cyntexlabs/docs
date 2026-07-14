@@ -13,7 +13,7 @@ ai:
   aliases: [salesforce, salesforce api, salesforce crm, salesforce source]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Salesforce as a supported API source for CRM data.
 
@@ -25,10 +25,6 @@ Use Salesforce as a supported API source for CRM data.
   capabilities="API read"
   compatibility="Salesforce API"
 />
-
-<Aside type="note" title="Authorization">
-  The resource requires `code`. Obtain it through the authorization flow supplied by your TapState deployment; local validation does not perform the browser exchange or refresh it.
-</Aside>
 
 ## Before you begin
 
@@ -48,7 +44,7 @@ config:
 mode: api
 ```
 
-Confirm authentication expiry, refresh, object selection, and incremental behavior with the deployed runtime before using this connection for production data.
+Before production, verify authentication expiry and refresh, object selection, and incremental reads with a non-production Salesforce organization.
 
 ## Validate the configuration
 
@@ -58,11 +54,9 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the API mode and `code` field shape only. It does not authenticate, test scopes, enumerate objects, or read CRM records.
-
 ## Limitations
 
-- TapState supports API source only; it does not declare target writes, Snapshot, CDC, DDL, or rate-limit behavior.
+- This connector reads Salesforce API data only. Target writes and schema changes are not included; Salesforce API limits still apply.
 - Authorization steps from the legacy product UI do not establish a TapState UI or CLI flow.
 
 ## Reference

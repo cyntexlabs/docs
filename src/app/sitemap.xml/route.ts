@@ -1,5 +1,5 @@
 import { source } from '@/lib/source';
-import { docsBaseUrl } from '@/lib/shared';
+import { docsBaseUrl, isSiteIndexable } from '@/lib/shared';
 
 export const revalidate = false;
 
@@ -17,6 +17,10 @@ function escapeXml(value: string) {
 }
 
 export function GET() {
+  if (!isSiteIndexable) {
+    return new Response('', { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
+  }
+
   const urls = [docsBaseUrl, ...source.getPages().map((page) => new URL(page.url, docsBaseUrl).toString())];
   const body = [
     '<?xml version="1.0" encoding="UTF-8"?>',

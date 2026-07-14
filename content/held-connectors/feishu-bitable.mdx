@@ -13,7 +13,7 @@ ai:
   aliases: [lark bitable, feishu bitable, feishu multi-dimensional table, lark base, bitable api]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Lark Bitable, also known as Feishu Bitable, to read records from one Bitable table through the platform API.
 
@@ -26,10 +26,6 @@ Use Lark Bitable, also known as Feishu Bitable, to read records from one Bitable
   compatibility="Lark / Feishu Bitable API"
 />
 
-<Aside type="note" title="Source-only connection">
-  This TapState connection reads from Bitable through the API. It does not provide a target-write path.
-</Aside>
-
 ## Before you begin
 
 ### Source
@@ -41,7 +37,7 @@ Use Lark Bitable, also known as Feishu Bitable, to read records from one Bitable
 
 ![Locate the App ID and App Secret in Lark or Feishu Open Platform](/images/connectors/feishu-app-credentials.png)
 
-The Bitable API enforces rate limits. Design downstream polling and retries for the limits published by Lark/Feishu, rather than assuming that a successful local YAML check has tested the API.
+The Bitable API enforces rate limits. Design polling and retries for the limits published by Lark/Feishu, and verify the selected application scopes with a representative table.
 
 ## Create a connection
 
@@ -73,7 +69,7 @@ config:
 mode: api
 ```
 
-All four fields are required by the connection schema. Keep secrets in environment variables even though the current connection contract does not mark `app_secret` as a secret field.
+All four fields are required. Always keep `app_secret` in an environment variable and out of source control.
 
 ## Validate the configuration
 
@@ -83,15 +79,22 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, API mode, and recognized field types. It does not authenticate to Lark/Feishu, check application scopes, enumerate Bitable tables, or read records.
-
 ## Limitations
 
-- The current connection contract declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- This connector reads Bitable data only. It does not write records or apply schema changes.
 - App permissions, tenant policy, and API rate limits are enforced by Lark/Feishu at runtime.
 - Do not put App Secret values in a committed `.tapstate.yml` file.
 
 ## Reference
+
+### Supported operations
+
+| Direction | Data operations |
+|---|---|
+| Source API | Read records from the selected Bitable table |
+| Target DML (`INSERT`, `UPDATE`, `DELETE`) | Not available |
+
+### Connection settings
 
 | Field | Required | Use |
 |---|---|---|

@@ -13,7 +13,7 @@ ai:
   aliases: [metabase, metabase api, metabase source, metabase analytics]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Metabase as a supported API source for analytics content.
 
@@ -26,19 +26,15 @@ Use Metabase as a supported API source for analytics content.
   compatibility="Self-hosted or cloud-registered Metabase"
 />
 
-<Aside type="note" title="Exact inherited field name">
-  The connection field is spelled `matebaseDomainName`. Preserve that spelling in a resource even though it differs from the product name.
-</Aside>
-
 ## Before you begin
 
 ### Source
 
-1. Confirm the Metabase instance is reachable by the future TapState runtime, whether it is self-hosted or cloud-registered.
+1. Confirm the Metabase instance is reachable from the TapState environment, whether it is self-hosted or cloud-registered.
 2. Create a least-privilege Metabase account for the intended analytics content.
 3. Record the full HTTP or HTTPS base URL, including a non-default port when applicable.
 
-The connector identifies a username, password, and HTTP host. It does not establish a TapState UI connection test or a selector for questions, dashboards, or collections.
+Grant the account access only to the Metabase collections and content the pipeline needs.
 
 ## Create a connection
 
@@ -62,12 +58,10 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, API mode, and recognized fields. It does not reach Metabase, authenticate the user, list collections, or read analytics content.
-
 ## Limitations
 
-- TapState supports an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
-- TapState does not expose a TapState TLS option. Use the URL and your deployment's network policy; do not assume an unlisted connector setting.
+- This connector reads Metabase content only; it does not write records or apply schema changes.
+- Use an HTTPS base URL when Metabase requires encrypted transport. There is no separate TLS field in this connection resource.
 - Metabase permissions and API limits are evaluated by the service at runtime.
 
 ## Reference
@@ -76,4 +70,4 @@ Local validation checks the resource envelope, API mode, and recognized fields. 
 |---|---|---|
 | `username` | Yes | Metabase login account. |
 | `password` | Yes | Login password; inject through an environment variable. |
-| `matebaseDomainName` | Yes | Full Metabase HTTP or HTTPS base URL. The inherited spelling is exact. |
+| `matebaseDomainName` | Yes | Full Metabase HTTP or HTTPS base URL. Use this exact field spelling. |

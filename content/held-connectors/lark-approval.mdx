@@ -13,7 +13,7 @@ ai:
   aliases: [lark approval, feishu approval, lark approval api, lark approval source]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Lark Approval as a supported API source for approval data.
 
@@ -26,10 +26,6 @@ Use Lark Approval as a supported API source for approval data.
   compatibility="Lark / Feishu Approval API"
 />
 
-<Aside type="note" title="Optional approval filters">
-  The connection exposes optional `code` and `definitionCode` fields but does not define their selection behavior. The guide records their exact names without inventing a UI, authorization exchange, or filtering semantics.
-</Aside>
-
 ## Before you begin
 
 ### Source
@@ -41,7 +37,7 @@ Use Lark Approval as a supported API source for approval data.
 
 ![Locate application credentials in Lark or Feishu Open Platform](/images/connectors/lark-app-credentials.png)
 
-Keep the secret outside source control. The connector identifies the two app credentials and approval code; it does not establish an interactive TapState authorization flow.
+Keep the secret outside source control. This connector uses application credentials supplied in the connection resource and does not start an interactive authorization flow.
 
 ## Create a connection
 
@@ -58,7 +54,7 @@ config:
 mode: api
 ```
 
-`code` and `definitionCode` are optional connection fields. Omit either one unless the deployed connector contract requires it.
+Use `code` or `definitionCode` only when the Lark/Feishu administrator provides them for the approval scope you need; otherwise omit them.
 
 ## Validate the configuration
 
@@ -68,11 +64,9 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, API mode, and recognized fields. It does not authenticate to Lark/Feishu, inspect app scopes, validate approval codes, or retrieve approval records.
-
 ## Limitations
 
-- The current connection contract declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
+- This connector reads approval data only. It does not write records or apply schema changes.
 - Lark/Feishu enforces application visibility, tenant policy, and API rate limits at runtime.
 - Do not commit App Secret values in a `.tapstate.yml` file.
 
@@ -82,5 +76,5 @@ Local validation checks the resource envelope, API mode, and recognized fields. 
 |---|---|---|
 | `app_id` | Yes | Self-built application App ID. |
 | `app_secret` | Yes | Application secret; inject through an environment variable. |
-| `code` | No | Documented approval code. |
-| `definitionCode` | No | Documented approval definition code. |
+| `code` | No | Approval code supplied for the selected approval scope. |
+| `definitionCode` | No | Approval definition code supplied for the selected workflow. |

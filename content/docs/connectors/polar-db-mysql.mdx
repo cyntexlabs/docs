@@ -13,16 +13,12 @@ ai:
   aliases: [polardb mysql, polar db mysql, aliyun polardb mysql, polardb cdc]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use PolarDB for MySQL for one-time copies, Binlog-based change capture, and destination writes.
 
-<ConnectorProfile category="Databases" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source, Target" capabilities="Snapshot, CDC, Data write" compatibility="Alibaba Cloud PolarDB for MySQL" />
-
-<Aside type="note" title="Network access">
-  Local validation checks the selected source mode and configuration shape. It does not verify a PolarDB whitelist, VPC route, account permissions, Binlog retention, or destination writes.
-</Aside>
+<ConnectorProfile category="Databases" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source, Target" capabilities="Snapshot, CDC, DDL capture and apply, Data write" compatibility="All PolarDB for MySQL versions" />
 
 ## Before you begin
 
@@ -62,7 +58,7 @@ FLUSH PRIVILEGES;
 
 **3. Enable and retain Binary Logging**
 
-Enable Binary Logging for the cluster and retain logs long enough to cover the longest planned interruption. A seven-day retention window is a useful starting point, but size it for the actual change rate and recovery objective.
+Enable [Binary Logging](https://www.alibabacloud.com/help/en/polardb/polardb-for-mysql/user-guide/enable-binary-logging) for the cluster and retain logs long enough to cover the longest planned interruption. A seven-day retention window is a useful starting point, but size it for the actual change rate and recovery objective.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -118,11 +114,20 @@ Stage a snapshot and a short CDC run before production. Verify cluster access fr
 
 ## Reference
 
+### Supported operations
+
+| Direction | Data changes | Schema changes |
+|---|---|---|
+| Source CDC | `INSERT`, `UPDATE`, `DELETE` | Add, rename, change, and drop columns; changing a column to auto-increment is not supported |
+| Target | Insert, update, and delete by the selected write mode | Add, rename, change, and drop columns when the pipeline DDL policy allows it |
+
+### Connection settings
+
 | Field | Required | Default | Use |
 |---|---:|---|---|
 | `host` | Yes | — | PolarDB cluster endpoint. |
 | `port` | Yes | — | MySQL listener port. |
 | `database` | Yes | — | Database to connect to. |
 | `username`, `password` | Username yes | — | PolarDB account credentials. |
-| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Additional JDBC parameters; retain the inherited spelling. |
+| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Additional JDBC parameters. Use this exact field spelling. |
 | `timezone` | No | Empty | UTC offset for temporal conversion. |

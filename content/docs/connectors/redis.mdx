@@ -13,7 +13,7 @@ ai:
   aliases: [redis, redis snapshot, redis cdc, redis standalone, redis sentinel, redis cluster, redis target]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Redis for supported Snapshot or CDC reads, or as a destination for pipeline data. Validate the intended key model and source semantics in a staging environment before production use.
@@ -39,7 +39,7 @@ Use **Snapshot** to read the intended key namespace once. Confirm the value enco
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** only after staging source behavior with the deployed runtime. TapState supports `cdc`, but does not expose a Redis source-selection or CDC-position setting, so this guide does not claim Redis Streams, keyspace notifications, or a replication-log mechanism.
+Use **Snapshot + CDC** only after validating inserts, updates, expirations, and deletes with representative keys. This connection does not require Redis Streams or keyspace-notification settings.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -67,7 +67,7 @@ config:
 mode: snapshot
 ```
 
-Use `mode: cdc` only after staging it. For Sentinel, set `deploymentMode: sentinel` and provide `sentinelAddress`; for cluster mode, validate the exact endpoint layout with the deployed runtime. The connection schema marks `sentinelName` as required even though it exposes all three deployment modes, so retain the field and confirm its expected value with your runtime contract.
+Use `mode: cdc` only after staging it. For Sentinel, set `deploymentMode: sentinel`, provide `sentinelAddress`, and use the configured master service name for `sentinelName`. For cluster mode, provide endpoints that cover the cluster topology. Keep `sentinelName` in every resource because the field is required by the connection format.
 
 For a target-only connection, omit `mode`.
 
@@ -79,13 +79,11 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks field shape and the selected mode. It does not authenticate to Redis, discover cluster members, validate an ACL, or read or write keys.
-
 ## Limitations
 
-- TapState supports Snapshot and CDC but does not disclose the source key model or CDC mechanism; do not assume Redis Streams, keyspace notifications, or replication-log behavior.
+- Redis Streams and keyspace notifications are not configuration options for this connector. Validate the key types and change events your pipeline depends on before production.
 - The documented target baseline is Redis 2.8–6.0. Test newer versions and managed offerings before production use.
-- TapState does not declare DDL behavior or transport-encryption fields.
+- Schema changes and transport-encryption fields are not included in this connection resource.
 
 ## Reference
 
@@ -94,7 +92,7 @@ Local validation checks field shape and the selected mode. It does not authentic
 | `deploymentMode` | No | `standalone` | `standalone`, `sentinel`, or `cluster`. |
 | `host` | Yes | — | Redis host. |
 | `port` | Yes | `6379` | Redis port; field type is string. |
-| `sentinelName` | Yes | — | Sentinel master name, as required by the current connection contract. |
+| `sentinelName` | Yes | — | Sentinel master service name. Keep the field in standalone and cluster resources as well. |
 | `sentinelAddress` | No | — | Sentinel endpoint array. |
 | `database` | Yes | `0` | Redis logical database. |
 | `username` | No | — | Redis ACL user. |

@@ -159,16 +159,14 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource, source mode, and recognized connection fields. It does not test network access, credentials, MariaDB privileges, binary-log retention, or data movement.
-
 ## Limitations
 
-- TapState supports Snapshot and CDC for MariaDB, but this connection contract does not define DDL capture or application.
+- Snapshot and CDC are supported for MariaDB; DDL capture and application are not included.
 - The documented preparation applies to MariaDB 10.x. Test the exact version, replication topology, and data types with representative data before production use.
 - CDC requires `ROW` binary logging with a full row image. Statement- or mixed-format logs do not provide the documented change record.
 - Expired binary logs break resume from the saved position. Monitor log retention and free disk space instead of relying only on a fixed number of days.
 - `server_id` collisions can disrupt replication clients. Assign a stable, unique value in every environment.
-- Transport-encryption fields are not part of this connection contract. Configure MariaDB transport security according to your environment and use only settings supplied by your TapState deployment.
+- Configure MariaDB transport security according to your environment using the connection options available in TapState.
 
 ## Reference
 
@@ -179,5 +177,5 @@ Local validation checks the resource, source mode, and recognized connection fie
 | `database` | Yes | — | Database name. |
 | `username` | Yes | — | Database account. |
 | `password` | No | — | Account password; supply through a secret-aware environment variable. |
-| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Extra connector parameters. The inherited spelling is exact. |
+| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Extra connector parameters. Use this exact field spelling. |
 | `timezone` | No | empty | UTC offset used for timezone-naive values. |

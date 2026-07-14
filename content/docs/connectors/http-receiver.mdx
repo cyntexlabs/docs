@@ -13,15 +13,11 @@ ai:
   aliases: [http receiver, webhook receiver, http event source, incoming webhook]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use HTTP Receiver when another application pushes event data into a TapState-managed source table.
 
 <ConnectorProfile category="SaaS, business & commerce APIs" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source" capabilities="Incoming HTTP events" compatibility="HTTP webhook senders" />
-
-<Aside type="note" title="Endpoint availability">
-  Local validation checks the resource, source mode, and configuration shape. It does not publish an endpoint, issue a service token, receive an HTTP request, or execute an event script.
-</Aside>
 
 ## Before you begin
 
@@ -73,7 +69,7 @@ After deployment, post a test payload through the receiver URL supplied by the r
 
 ## Limitations
 
-- The local CLI does not host an HTTP endpoint or validate a sender token.
+- Endpoint hosting and sender-token validation are provided by the TapState deployment that runs this connector.
 - Sender authentication, endpoint reachability, request size, retries, and delivery semantics depend on the deployed receiver runtime.
 - Test event scripts with insert, update, and delete examples before relying on them for production events.
 

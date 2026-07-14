@@ -13,7 +13,7 @@ ai:
   aliases: [github, github api, github source, github issues, github pull requests]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use GitHub as a supported API source for repository data.
 
@@ -25,10 +25,6 @@ Use GitHub as a supported API source for repository data.
   capabilities="API read"
   compatibility="GitHub API"
 />
-
-<Aside type="note" title="Authorization">
-  The connector ID is case-sensitive: `GitHub`. The resource requires `code`, but local validation does not exchange or verify that authorization value.
-</Aside>
 
 ## Before you begin
 
@@ -48,7 +44,7 @@ config:
 mode: api
 ```
 
-`code` is the complete connection contract. Its exchange, refresh, and scope behavior must be confirmed with the deployed runtime before production use.
+Provide the authorization code returned by the approved GitHub OAuth flow. Confirm its scopes and expiry behavior with a non-production repository before enabling the connection for production data.
 
 ## Validate the configuration
 
@@ -58,12 +54,10 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-The local check validates resource shape and API mode. It does not open a browser, authenticate to GitHub, check scopes, discover repositories, or read issues and pull requests.
-
 ## Limitations
 
-- TapState supports an API source only; target writes, Snapshot, CDC, DDL, and rate-limit behavior are not declared.
-- The connector describes an interactive authorization flow, which is not presented here as a TapState UI or CLI capability.
+- This connector reads repository data only; it does not write records or apply schema changes.
+- GitHub API rate limits and OAuth scope restrictions apply to every read.
 
 ## Reference
 

@@ -13,7 +13,7 @@ ai:
   aliases: [selectdb, selectdb cloud, apache doris, selectdb snapshot, selectdb target]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use SelectDB for point-in-time reads or as a destination for pipeline data. SelectDB Cloud is based on Apache Doris; validate the endpoint types and privileges against your deployment before production use.
 
@@ -25,10 +25,6 @@ Use SelectDB for point-in-time reads or as a destination for pipeline data. Sele
   capabilities="Snapshot, Schema discovery, Data write, Target DDL apply"
   compatibility="SelectDB Cloud 2.0.13+"
 />
-
-<Aside type="note" title="Local validation boundary">
-  The local configuration schema validates the `snapshot` mode and this connection schema. It does not connect to SelectDB, validate FE or HTTP endpoints, or prove target-write behavior against a live cluster.
-</Aside>
 
 ## Before you begin
 
@@ -91,7 +87,7 @@ This checks the YAML envelope, `snapshot` mode, and recognized field shapes only
 
 ## Limitations
 
-- TapState supports Snapshot reads and does not publish CDC for SelectDB. The target connector implements add column, rename column, alter column attributes, and drop column through the pipeline DDL policy.
+- SelectDB supports Snapshot reads, not CDC. A target can add, rename, alter, and drop columns when the pipeline DDL policy allows it.
 - Snapshot source and target roles are available. Verify live source discovery and target writes separately in staging.
 - This page does not claim TLS fields. Automatic table creation and target schema evolution must be verified against the selected SelectDB version before using them in production.
 

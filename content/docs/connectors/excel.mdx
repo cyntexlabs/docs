@@ -13,7 +13,7 @@ ai:
   aliases: [excel, xls, xlsx, excel snapshot, excel cdc, excel source, sftp excel, s3 excel]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use XLS and XLSX files from local or supported remote storage as a pipeline source.
@@ -27,10 +27,6 @@ Use XLS and XLSX files from local or supported remote storage as a pipeline sour
   compatibility="XLS, XLSX · Local, FTP, SFTP, SMB, S3FS, OSS"
 />
 
-<Aside type="note" title="Local validation boundary">
-  Local validation checks modes and connection-field shapes only. It does not inspect workbook sheets, cells, formulas, memory use, remote storage access, or file changes.
-</Aside>
-
 ## Before you begin
 
 ### Source
@@ -38,12 +34,12 @@ Use XLS and XLSX files from local or supported remote storage as a pipeline sour
 <SourceModeTabs label="Choose the Excel source read mode">
 <SourceModeTab value="snapshot">
 
-Use **Snapshot** to read the matching workbooks once. Place them where the TapState runtime can reach them, then test the intended sheet structure with a representative file. The connector accepts XLS and XLSX workbooks, including merged cells and formulas, but that is not a substitute for a TapState runtime test.
+Use **Snapshot** to read the matching workbooks once. Place them where the TapState environment can reach them, then test the intended sheet structure with a representative XLS or XLSX workbook, including any merged cells or formulas.
 
 </SourceModeTab>
 <SourceModeTab value="snapshot-cdc">
 
-Use **Snapshot + CDC** only after verifying file-change behavior with the deployed runtime. TapState supports `cdc`, but does not specify which workbook changes are detected, how rows are re-read, or how a deletion is represented.
+Use **Snapshot + CDC** when new or changed workbooks should be picked up after the initial read. The connector scans the configured path every 60 seconds. New and modified workbooks are re-read; deleting a workbook does not emit row deletions.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -75,7 +71,8 @@ tapstate validate --workdir tapstate-work
 ## Limitations
 
 - TapState supports a source only, without target writes or DDL behavior.
-- It does not define workbook-size limits, sheet selection, formula evaluation, file-change handling, or deletion behavior.
+- XLS and XLSX are supported, including workbooks with merged cells and formulas. Verify formula results and sheet layout with a representative workbook.
+- CDC detects new and modified workbooks on a 60-second scan. Workbook or row deletion is not propagated.
 - Keep credentials outside committed workspace files and test memory use with production-sized workbooks.
 
 ## Reference
@@ -89,3 +86,7 @@ tapstate validate --workdir tapstate-work
 | S3FS / OSS | `accessKey`, `secretKey`, `endpoint`, `region`, `bucket` |
 
 `protocol` accepts `local`, `ftp`, `sftp`, `smb`, `s3fs`, and `oss`; `encoding` defaults to `UTF-8`.
+
+### Data compatibility
+
+Excel schema inference supports `BOOLEAN`, `DATE`, `DOUBLE`, `STRING`, and `TEXT`.

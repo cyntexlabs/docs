@@ -10,7 +10,7 @@ ai:
   aliases: [connector directory, supported connectors, connector matrix, connector compatibility, supported databases, supported data sources]
 ---
 
-import { Aside, SupportedConnectorMatrix } from '@/components/mdx';
+import { SupportedConnectorMatrix } from '@/components/mdx';
 
 Choose the system you want TapState to read from or write to. Select a connector name to open its setup guide, including prerequisites, connection fields, supported read modes, and limitations.
 
@@ -19,17 +19,12 @@ Choose the system you want TapState to read from or write to. Select a connector
 ## Maturity labels
 
 - **GA** means the connector has a stable, generally available contract intended for production use.
-- **Preview** means the connector is ready to evaluate, but its configuration or behavior may still change before GA. Validate production workloads with the connector contract supplied by your TapState deployment.
-- **Deprecated** means the connector remains documented for existing deployments, but new work should use its named replacement.
+- **Preview** means the connector is ready to evaluate, but its configuration or behavior may still change before GA. Test representative production workloads before adopting it broadly.
 
-TapState uses **GA** and **Preview** for active connectors. **Deprecated** appears only for a legacy connector that existing deployments may still need to maintain.
+TapState uses **GA** and **Preview** for published connectors.
 
 ## How to read roles and modes
 
 - **Source** reads from the listed system. The read mode tells you whether that happens as a one-time Snapshot, Snapshot + CDC, stream, or API read.
 - **Target** means the connector can write data. Check its guide before relying on table creation, schema evolution, or a particular write behavior.
 - A dash under **Read mode** means the connector is target-only.
-
-<Aside type="note" title="Validation boundary">
-  `tapstate validate` checks the resource envelope plus recognized connector IDs, modes, and field shapes. It does not prove network reachability, credentials, permissions, API scope, data access, or a live write. Individual guides state the preparation and runtime checks required for that system.
-</Aside>

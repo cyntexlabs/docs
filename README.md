@@ -134,4 +134,11 @@ The repository produces a static `out/` directory and can be deployed to any sta
 - Build command: `npm run build`
 - Output directory: `out`
 
-The canonical public base URL in the application is `https://tapstate.com`, with documentation pages under `/docs`.
+Set the site environment at build time. This controls canonical URLs, structured data, `llms.txt`, `robots.txt`, and the sitemap.
+
+| Deployment | `TAPSTATE_SITE_URL` | `TAPSTATE_SITE_INDEXABLE` |
+|---|---|---|
+| Preview | The exact preview origin, such as `https://docs-preview.example.com` | `false` |
+| Production | `https://tapstate.com` | `true` |
+
+Indexing is opt-in: if `TAPSTATE_SITE_INDEXABLE` is absent, the exported site emits `noindex` metadata, disallows crawlers, and omits the sitemap. Set both variables in the deployment platform rather than committing them to the repository.

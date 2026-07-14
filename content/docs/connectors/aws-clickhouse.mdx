@@ -13,9 +13,9 @@ ai:
   aliases: [aws clickhouse, clickhouse cloud aws, aws clickhouse snapshot, aws clickhouse target]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
-Use ClickHouse Cloud on AWS for point-in-time reads or as an analytical destination through its dedicated connection contract.
+Use ClickHouse Cloud on AWS for point-in-time reads or as an analytical destination.
 
 <ConnectorProfile
   category="Warehouses & analytics"
@@ -25,10 +25,6 @@ Use ClickHouse Cloud on AWS for point-in-time reads or as an analytical destinat
   capabilities="Snapshot, Data write"
   compatibility="ClickHouse Cloud on AWS"
 />
-
-<Aside type="note" title="AWS connection fields">
-  This is separate from the generic ClickHouse connector because TapState supports a distinct ID and default port `8443`. It does not imply a TapState TLS control or a live connection test.
-</Aside>
 
 ## Before you begin
 
@@ -69,12 +65,10 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the Snapshot mode and recognized field shapes. It does not reach the cloud endpoint, authenticate, inspect grants, or verify a target write.
-
 ## Limitations
 
-- TapState supports Snapshot only; it does not declare CDC or DDL handling.
-- This connection contract has no explicit transport-encryption field. Do not infer one from the cloud endpoint or port.
+- Snapshot reads are supported; CDC and source schema-change capture are not included.
+- The connection resource has no separate transport-encryption field. Use the ClickHouse Cloud endpoint and security configuration supplied for your service.
 - Test table engines, sort keys, data-type mapping, and destination behavior with representative data before production writes.
 
 ## Reference

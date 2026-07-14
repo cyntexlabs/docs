@@ -13,16 +13,12 @@ ai:
   aliases: [aws rds mysql, amazon rds mysql, rds mysql cdc, rds mysql source, rds mysql target]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Amazon RDS for MySQL to copy existing rows, follow Binlog changes, or write pipeline data to an RDS database.
 
 <ConnectorProfile category="Databases" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source, Target" capabilities="Snapshot, CDC, Data write" compatibility="Amazon RDS for MySQL 5.7 and 8.0" />
-
-<Aside type="note" title="Local validation boundary">
-  Local validation checks the selected source mode and configuration shape. It does not test RDS networking, security groups, credentials, Binlog settings, or a live write.
-</Aside>
 
 ## Before you begin
 
@@ -75,7 +71,7 @@ SHOW VARIABLES WHERE Variable_name IN ('log_bin', 'binlog_format', 'binlog_row_i
 
 **4. Confirm authentication compatibility**
 
-For MySQL 8, create the account with an authentication method accepted by the RDS instance and the deployed runtime. Do not change an existing production account's authentication method without testing it first.
+For MySQL 8, create the account with an authentication method supported by both the RDS instance and the connection environment. Do not change an existing production account's authentication method without testing it first.
 
 </SourceModeTab>
 </SourceModeTabs>
@@ -127,7 +123,7 @@ Before production, run a small snapshot and then verify one insert, update, and 
 
 - Table-level cascades in a MySQL source can produce updates or deletes that are not represented as independent source events. Design target-side cascades separately where required.
 - CDC recovery depends on retained Binlog files. If the required position has expired, take a new snapshot.
-- Connection parameters and timezone values are validated locally; RDS network policy and database privileges are enforced at runtime.
+- Resource validation checks connection parameters and timezone values. Network access and database privileges are checked when the connection runs.
 
 ## Reference
 
@@ -137,5 +133,5 @@ Before production, run a small snapshot and then verify one insert, update, and 
 | `port` | Yes | — | MySQL listener port, normally `3306`. |
 | `database` | Yes | — | Database to connect to. |
 | `username`, `password` | Username yes | — | RDS database credentials. |
-| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Additional JDBC connection parameters; retain the inherited spelling. |
+| `addtionalString` | No | `useUnicode=yes&characterEncoding=UTF-8` | Additional JDBC connection parameters. Use this exact field spelling. |
 | `timezone` | No | Empty | UTC offset used for temporal conversion. |

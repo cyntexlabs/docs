@@ -18,11 +18,12 @@ const coreSections = {
   validateConfiguration: /^## Validate the configuration/m,
   limitations: /^## Limitations/m,
   reference: /^## Reference/m,
-  validationBoundary: /(?:Local validation boundary|validation checks|Local validation|does not (?:test|connect|prove|verify))/i,
   validationExamples: /<ValidationStatusGuide\s*\/>/,
 };
 
 const internalMigrationLanguage = /(?:catalog-declared|code-backed|bundled catalog|current catalog|upstream (?:guide|page|connector|platform|baseline))/i;
+const internalEvidenceLanguage = /(?:optional approval filters|local validation boundary|connector implementation|deployed runtime|runtime contract|connector contract|connection contract|product surface|does not invent|runtime representation|resource placement[^.\n]*pending|inherited spelling|documented baseline|packaged connector)/i;
+const redundantProfileCallout = /<Aside\b[^>]*\btitle="(?:Source-only connection|Target-only connection|Snapshot only|Authorization|Required field spelling|AWS connection fields|Network access|Endpoint availability|Rate limits are service-side|Use test data only|Source use needs staging validation|MySQL-compatible mode|One connection, one filesystem catalog)"[^>]*>/i;
 
 function frontmatterValue(page, key) {
   return page.match(new RegExp(`^\\s*${key}:\\s*([^\\s]+)\\s*$`, 'm'))?.[1];
@@ -58,6 +59,12 @@ for (const name of pageNames) {
   }
   if (internalMigrationLanguage.test(page)) {
     missing.push('reader-facing migration provenance');
+  }
+  if (internalEvidenceLanguage.test(page)) {
+    missing.push('reader-facing implementation evidence');
+  }
+  if (redundantProfileCallout.test(page)) {
+    missing.push('redundant connector-profile callout');
   }
   if (roles.includes('source') && !/^### Source\b/m.test(page)) missing.push('source section');
   if (roles.includes('target') && !/^### Target\b/m.test(page)) missing.push('target section');

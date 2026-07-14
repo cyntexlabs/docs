@@ -13,7 +13,7 @@ ai:
   aliases: [alibaba 1688, 1688 api, alibaba marketplace, 1688 source]
 ---
 
-import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Alibaba 1688 as an API source for marketplace data exposed to your authorized developer application.
 
@@ -25,10 +25,6 @@ Use Alibaba 1688 as an API source for marketplace data exposed to your authorize
   capabilities="API read, Resource discovery"
   compatibility="Alibaba 1688 Open Platform"
 />
-
-<Aside type="note" title="Authorization">
-  The connection requires one `code` value for authorization. App Key, App Secret, target-write, and CDC settings are not part of this resource. Use the authorization flow supplied by your TapState deployment.
-</Aside>
 
 ## Before you begin
 
@@ -60,7 +56,7 @@ config:
 mode: api
 ```
 
-Use the value accepted by your TapState deployment's Alibaba 1688 authorization flow. Do not substitute a guessed App Key or App Secret field; they are not part of the local configuration schema contract.
+Use the value accepted by your TapState deployment's Alibaba 1688 authorization flow. Do not substitute App Key or App Secret fields; this connection accepts the documented `code` field.
 
 ## Validate the configuration
 
@@ -70,12 +66,10 @@ tapstate validate --workdir tapstate-work
 
 <ValidationStatusGuide />
 
-Local validation checks the resource envelope, `api` mode, and required `code` field shape. It does not complete OAuth, authenticate to Alibaba 1688, verify permissions, or fetch marketplace data.
-
 ## Limitations
 
-- The current connection contract declares an API source only. It does not declare Snapshot, CDC, target writes, or DDL behavior.
-- Authorization scope, code expiry, API quotas, and marketplace resource access are runtime concerns enforced by Alibaba 1688.
+- This connector reads 1688 API data only. It does not write records or apply schema changes.
+- Alibaba 1688 enforces authorization scopes, code expiry, API quotas, and marketplace resource access.
 - Keep the authorization value outside committed workspace files by supplying it through an environment variable.
 
 ## Reference
