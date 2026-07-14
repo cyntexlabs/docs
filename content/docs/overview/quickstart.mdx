@@ -7,13 +7,7 @@ ai:
   aliases: [tapstate quickstart, tapstate workspace, create tapstate yml, validate workspace]
 ---
 
-import { Aside } from '@/components/mdx';
-
 This walkthrough shows how TapState resources fit together. You will define a MySQL Snapshot source, a MongoDB target connection, and a pipeline that references both.
-
-<Aside type="caution" title="Verify the artifact before running this walkthrough">
-  The command and resource names below are the current documentation contract. A TapState-branded release artifact has not yet been established as the implementation baseline for this site. Confirm the CLI version and supported commands supplied by your deployment before treating the examples as executable release instructions.
-</Aside>
 
 ## What you will create
 
@@ -30,7 +24,7 @@ The source resource reads existing MySQL rows. The target connection supplies Mo
 
 ## Before you begin
 
-- Obtain the TapState CLI artifact and command contract provided by your deployment.
+- Obtain the TapState CLI artifact and command contract provided by your deployment. These examples describe the documented resource model; use the commands and fields that your artifact supports.
 - Keep credentials in environment variables or your deployment's secret mechanism.
 - Read the [MySQL](/docs/connectors/mysql) and [MongoDB](/docs/connectors/mongodb) preparation guides.
 - Use non-production credentials and endpoints for an authoring walkthrough.

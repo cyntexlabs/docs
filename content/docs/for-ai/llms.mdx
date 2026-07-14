@@ -9,8 +9,6 @@ ai:
   aliases: [tapstate llms txt, tapstate markdown, ai documentation, llm documentation]
 ---
 
-import { Aside } from '@/components/mdx';
-
 TapState publishes reader HTML and AI-readable Markdown from the same source tree. The [llms.txt proposal](https://llmstxt.org/) provides a compact discovery layer, but it does not replace canonical HTML, page metadata, or the sitemap.
 
 ## Discovery surfaces
@@ -46,8 +44,4 @@ The public site does not currently expose standalone JSON Schema or example-corp
 
 ## MCP integration
 
-<Aside type="note" title="Planned for a later runtime phase">
-  MCP endpoints and live control are product-release facts. This site does not claim an endpoint until a published TapState artifact and deployment contract expose it.
-</Aside>
-
-When a future TapState runtime exposes MCP, an AI agent will be able to operate it through the published protocol endpoint. See [MCP Integration](/docs/for-ai/mcp) for the planned boundary.
+When a TapState runtime publishes an MCP endpoint, an AI agent can operate it through that deployment's documented protocol contract. See [MCP Integration](/docs/for-ai/mcp) for the intended boundary.

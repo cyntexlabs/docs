@@ -7,15 +7,11 @@ ai:
   aliases: [tapstate overview, operational data platform, capture transform serve, fresh operational state]
 ---
 
-import { Aside, LinkCard, CardGrid, DataPathComparison } from '@/components/mdx';
+import { LinkCard, CardGrid, DataPathComparison } from '@/components/mdx';
 
 > **Kafka moves events. Warehouses analyze history. TapState turns database truth into live operational state.**
 
 TapState is an open-source data platform built around one idea: **Capture. Transform. Serve. One deployable.** It taps your production databases with log-based change data capture, reshapes change streams in flight, and serves continuously fresh, queryable state to applications, APIs, and AI agents — one product boundary instead of a four-system assembly project.
-
-<Aside type="note" title="Product direction and release evidence">
-  This page preserves the product model and intended architecture. Confirm current executable behavior against a published TapState artifact and [Release status](/docs/overview/release-status).
-</Aside>
 
 ## The problem: the assembly project
 

@@ -9,7 +9,7 @@ ai:
   aliases: [tapstate pipeline reference, pipeline yaml, sync target]
 ---
 
-`pipeline` describes a data path: it references a source, applies documented transforms, and declares delivery intent. Verify every field and default against the TapState artifact supplied by your deployment.
+`pipeline` describes a data path: it references a source, applies documented transforms, and declares delivery intent. Confirm accepted fields and defaults against the resource schema and artifact supplied by your deployment.
 
 ```yaml
 version: tapstate/v1

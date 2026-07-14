@@ -9,7 +9,7 @@ ai:
   aliases: [tapstate source reference, source connection yaml, target connection yaml]
 ---
 
-`source` is the documented connection resource. Treat the fields below as the contract to reconcile with the next TapState-branded implementation baseline; verify acceptance and defaults against the artifact supplied by your deployment.
+`source` is the documented connection resource. Confirm accepted fields and defaults against the resource schema and artifact supplied by your deployment.
 
 ```yaml
 version: tapstate/v1

@@ -7,13 +7,9 @@ ai:
   aliases: [tapstate storage, operational state, checkpoints, materialized state]
 ---
 
-import { Aside } from '@/components/mdx';
-
 TapState's storage model is organized by responsibility rather than a promise about one database technology. A data path needs fast working state, durable recovery state, and consumer-facing materialized state.
 
-<Aside type="note" title="Target storage model">
-  Concrete storage engines, retention defaults, replication, and high-availability behavior require an identified implementation and release contract.
-</Aside>
+Choose concrete storage engines, retention, replication, and high-availability behavior for the deployment you operate.
 
 ## Operational state and analytical history
 

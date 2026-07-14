@@ -9,7 +9,7 @@ ai:
   aliases: [tapstate fields, tapstate schema, yaml field reference]
 ---
 
-This table reflects the documentation's current schema baseline. Reconcile it with the next TapState-branded implementation and published JSON Schema before treating it as machine-verifiable.
+This table is a documentation lookup. Confirm exact field acceptance against the resource schema and artifact supplied by your deployment.
 
 | Field | Type | Required | Default | Enum |
 |---|---|---|---|---|

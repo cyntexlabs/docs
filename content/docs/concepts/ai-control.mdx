@@ -7,8 +7,6 @@ ai:
   aliases: [tapstate ai, tapstate agents, tapstate mcp, ai pipeline authoring]
 ---
 
-import { Aside } from '@/components/mdx';
-
 TapState separates AI assistance from deterministic product control. An assistant can help discover documentation, draft resources, and interpret diagnostics; schema, connector contracts, runtime state, authorization, and human review remain authoritative.
 
 ## Documentation-assisted authoring
@@ -37,9 +35,7 @@ An assistant should never convert a successful syntax check into a claim that cr
 
 A future live control surface can expose discovery, apply, lifecycle, status, logs, and metrics through CLI, API, Web, or MCP clients. Those clients should call the same operation contracts and authorization layer rather than implement separate behavior.
 
-<Aside type="note" title="Interface details require a release contract">
-  MCP endpoints, tool names, authentication, and lifecycle commands are product facts. Treat them as design direction until an identified TapState release publishes and verifies them.
-</Aside>
+Until an identified TapState release publishes them, MCP endpoints, tool names, authentication, and lifecycle commands remain design direction rather than integration instructions.
 
 ## Human authorization boundary
 

@@ -9,13 +9,7 @@ ai:
   aliases: [tapstate mcp, tapstate agent tools, model context protocol]
 ---
 
-import { Aside } from '@/components/mdx';
-
 MCP is a possible client interface for a future TapState control plane. It would allow an AI assistant to call published product operations while TapState remains responsible for validation, authorization, runtime state, and audit behavior.
-
-<Aside type="caution" title="No endpoint or toolset is published by this page">
-  Server URL, transport, authentication, tool names, scopes, and lifecycle behavior require a TapState release contract. Do not use examples from an earlier product name or an internal design as deployment instructions.
-</Aside>
 
 ## Intended boundary
 
@@ -30,6 +24,10 @@ Resource and runtime operations
 ```
 
 The MCP server would contain no bundled language model. Users choose the client and model; TapState exposes deterministic operations and their results.
+
+## Before connecting a client
+
+This page does not publish an MCP server URL, transport, authentication method, tool names, scopes, or lifecycle behavior. Use only the endpoint and contract supplied by your TapState deployment.
 
 ## Candidate operation groups
 
