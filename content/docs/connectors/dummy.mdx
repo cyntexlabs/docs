@@ -13,7 +13,7 @@ ai:
   aliases: [dummy, dummydb, generated test data, test source, test target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Dummy to generate deterministic test data or exercise a target path without connecting to an external data system. It is a development and verification connector, not a production data source.
@@ -26,8 +26,6 @@ Use Dummy to generate deterministic test data or exercise a target path without 
   capabilities="Snapshot, CDC, Data write, Generated test data"
   compatibility="Built-in Dummy connector contract"
 />
-
-<ConnectorCapabilities source="Generated Snapshot and CDC data" target="Generated-test data write path" />
 
 <Aside type="note" title="Use test data only">
   Dummy is useful for validating resource shape and downstream handling. It does not validate production credentials, source privileges, data types, network routes, or production operating conditions.

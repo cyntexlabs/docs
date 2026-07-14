@@ -1,6 +1,6 @@
 ---
 title: source
-description: Documentation contract for kind:source connection resources
+description: Reference for kind:source connection resources
 sidebar:
   order: 2
 ai:
@@ -9,7 +9,7 @@ ai:
   aliases: [tapstate source reference, source connection yaml, target connection yaml]
 ---
 
-`source` is the documented connection resource. Confirm accepted fields and defaults against the resource schema and artifact supplied by your deployment.
+`source` defines a reusable source or target connection. Confirm accepted fields and defaults with the resource schema supplied with your TapState version.
 
 ```yaml
 version: tapstate/v1
@@ -43,7 +43,7 @@ experimental: {}       # experimental field zone; no compatibility guarantee
 Globally unique identifier. Rules: letters, digits, and hyphens only; no `.`; unique within the workspace.
 
 ### `connector`
-Connector ID from the bundled Catalog. The selected artifact determines how unknown IDs and incomplete Catalog entries are handled.
+Connector ID from the connector catalog used by your TapState version.
 
 ### `mode`
 
@@ -55,12 +55,12 @@ Connector ID from the bundled Catalog. The selected artifact determines how unkn
 | `api` | API / SaaS pull (polling or webhook) |
 | `file` | File scanning |
 
-The documented validation model compares `connector × mode` combinations with the capability Catalog. Verify exact enforcement against the selected artifact.
+Validation compares the selected connector and mode with the connector catalog used by your TapState version.
 
 ### `config`
-Connector-specific fields inherited through the connector contract. See the connector page for exact documented fields; verify enforcement against the selected artifact.
+Connector-specific fields. See the connector page for the documented field names, requirements, and examples.
 
-Use `${ENV_VAR}` placeholders for sensitive values when the selected artifact and deployment document that expansion behavior.
+Keep sensitive values out of committed files. Use `${ENV_VAR}` placeholders or the secret mechanism supported by your environment.
 
 ### `options.start_from`
 Data read starting point:

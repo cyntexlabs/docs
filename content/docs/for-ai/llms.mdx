@@ -32,7 +32,7 @@ Read https://tapstate.com/llms.mdx/docs/connectors/mysql/content.md,
 then help me prepare a MySQL Snapshot + CDC source.
 ```
 
-The public site does not currently expose standalone JSON Schema or example-corpus URLs. Use the DSL reference and the validation interface documented for your TapState artifact until those routes are published and verified.
+The public site does not currently expose standalone JSON Schema or example-corpus URLs. Use the [DSL reference](/docs/reference/dsl-grammar) and the validation interface supplied with your TapState environment.
 
 ## Content contract
 
@@ -42,6 +42,14 @@ The public site does not currently expose standalone JSON Schema or example-corp
 - Maturity describes the connector release level. Do not infer unverified UI, runtime, TLS, or connection-test behavior from upstream documentation.
 - An offline catalog can validate only the connector fields and modes it contains. Its absence or incompleteness does not establish what a server-side runtime supports.
 
-## MCP integration
+## What assistants can do with these docs
 
-When a TapState runtime publishes an MCP endpoint, an AI agent can operate it through that deployment's documented protocol contract. See [MCP Integration](/docs/for-ai/mcp) for the intended boundary.
+With canonical page Markdown, an assistant can:
+
+- find a connector by system, role, or capture mode;
+- explain required permissions and external-system preparation;
+- draft `.tapstate.yml` resources from documented fields;
+- compare a resource with the reference and repair validation errors;
+- preserve page links and limitations in its answer.
+
+Continue with [Authoring with AI](/docs/for-ai/authoring) for a reviewable workflow.

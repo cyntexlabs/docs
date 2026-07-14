@@ -13,7 +13,7 @@ ai:
   aliases: [oracle snapshot, oracle cdc, oracle logminer, oracle source, oracle target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
+import { ConnectorProfile } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Oracle with TapState for an initial full load, redo-log CDC, DDL capture, and destination writes.
@@ -26,16 +26,6 @@ Use Oracle with TapState for an initial full load, redo-log CDC, DDL capture, an
   capabilities="Snapshot, CDC, DDL capture, Data write"
   compatibility="Oracle 9i, 10g, 11g, 12c, 18c, 19c+ · Single instance and RAC"
 />
-
-<ConnectorCapabilities
-  source="Full load (Snapshot), CDC, and DDL capture"
-  target="Data write"
-  schema="DDL capture; apply through pipeline policy"
-/>
-
-<Aside type="note" title="Deployment contract">
-  Oracle is registered by the TapState service rather than the bundled offline connector catalog. **GA** is the lifecycle of that server-side connector contract; the field names, enabled CDC method, and target behavior come from your deployed TapState service. The local CLI can validate the resource envelope, but it cannot confirm those Oracle-specific details.
-</Aside>
 
 ## Before you begin
 

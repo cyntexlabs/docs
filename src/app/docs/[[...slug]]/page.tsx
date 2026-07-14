@@ -14,11 +14,12 @@ import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { docsBaseUrl } from '@/lib/shared';
 
 const sectionInfo: Record<string, { label: string; href: string }> = {
-  overview: { label: 'Overview', href: '/docs/overview/what-is-tapstate' },
+  overview: { label: 'Get started', href: '/docs/overview/what-is-tapstate' },
   concepts: { label: 'Concepts', href: '/docs/concepts/dsl' },
   connectors: { label: 'Connectors', href: '/docs/connectors' },
+  guides: { label: 'Guides', href: '/docs/guides/troubleshooting' },
   reference: { label: 'Reference', href: '/docs/reference/dsl-grammar' },
-  'for-ai': { label: 'AI & agents', href: '/docs/for-ai/llms' },
+  'for-ai': { label: 'AI-ready docs', href: '/docs/for-ai/llms' },
 };
 
 type DocsPageProps = {
@@ -34,6 +35,7 @@ export default async function Page(props: DocsPageProps) {
 
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
+  const isProductOverview = page.url === '/docs/overview/what-is-tapstate';
   const canonicalUrl = new URL(page.url, docsBaseUrl).toString();
   const section = sectionInfo[page.slugs[0]];
   const breadcrumbs = [
@@ -75,12 +77,16 @@ export default async function Page(props: DocsPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
       <DocsPage toc={page.data.toc} full={page.data.full}>
-        <DocsTitle>{page.data.title}</DocsTitle>
-        <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
-        <div className="flex flex-row gap-2 items-center border-b pb-6">
-          <MarkdownCopyButton markdownUrl={markdownUrl} />
-          <ViewOptionsPopover markdownUrl={markdownUrl} />
-        </div>
+        {!isProductOverview ? (
+          <>
+            <DocsTitle>{page.data.title}</DocsTitle>
+            <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
+            <div className="flex flex-row gap-2 items-center border-b pb-6">
+              <MarkdownCopyButton markdownUrl={markdownUrl} />
+              <ViewOptionsPopover markdownUrl={markdownUrl} />
+            </div>
+          </>
+        ) : null}
         <DocsBody>
           <MDX
             components={getMDXComponents({

@@ -13,7 +13,7 @@ ai:
   aliases: [legacy kafka, deprecated kafka, kafka 2.3, kafka json object, kafka source, kafka target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use this connector only to maintain an existing resource with connector ID `kafka`. For new work, use [Kafka](/docs/connectors/kafka) with connector ID `kafka_enhanced`.
 
@@ -25,8 +25,6 @@ Use this connector only to maintain an existing resource with connector ID `kafk
   capabilities="Stream read, Stream write, JSON-object messages"
   compatibility="Kafka 2.3.x"
 />
-
-<ConnectorCapabilities source="Stream read of JSON-object messages" target="Stream write" />
 
 <Aside type="caution" title="Choose the replacement for new pipelines">
   The current connection contract explicitly marks this connector as deprecated. Kafka Enhanced has a separate ID and a broader record, serializer, and Schema Registry contract. Do not change an existing resource's connector ID without staging the migration and validating downstream consumers.

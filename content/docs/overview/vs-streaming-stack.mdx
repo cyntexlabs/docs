@@ -1,5 +1,5 @@
 ---
-title: TapState and a composable streaming stack
+title: TapState vs. a streaming stack
 description: Compare a unified operational-data path with independently operated capture, broker, processing, and serving systems
 ai:
   kind: concept
@@ -18,7 +18,6 @@ Debezium, Kafka, Flink, and purpose-built serving stores form a proven, composab
 | Operations | Tune, upgrade, observe, and recover each layer | Reduce handoffs and duplicated configuration |
 | Processing depth | Broad event-time, windowing, and stateful-compute ecosystem | Focus on operational integration, reshaping, joins, and current state |
 | Authoring | Connector configuration, topics, jobs, and sink definitions | Reviewable TapState resources |
-| Evidence | Mature runtimes with vendor- and deployment-specific behavior | Must be evaluated against the published TapState artifact and runtime evidence |
 
 ## Choose a composable stack when
 

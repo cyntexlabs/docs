@@ -13,7 +13,7 @@ ai:
   aliases: [sql server snapshot, sql server cdc, mssql cdc, sql server source, sql server target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile } from '@/components/mdx';
+import { ConnectorProfile } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use SQL Server with TapState for an initial full load, table CDC, DDL capture, and destination writes.
@@ -26,16 +26,6 @@ Use SQL Server with TapState for an initial full load, table CDC, DDL capture, a
   capabilities="Snapshot, CDC, DDL capture, Data write"
   compatibility="SQL Server 2008–2022"
 />
-
-<ConnectorCapabilities
-  source="Full load (Snapshot), CDC, and DDL capture"
-  target="Data write"
-  schema="DDL capture; apply through pipeline policy"
-/>
-
-<Aside type="note" title="Deployment contract">
-  SQL Server is registered by the TapState service rather than the bundled offline connector catalog. **GA** is the lifecycle of that server-side connector contract; the field names and target behavior come from your deployed TapState service. The local CLI can validate the resource envelope, but it cannot confirm those SQL Server-specific details.
-</Aside>
 
 ## Before you begin
 

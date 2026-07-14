@@ -13,7 +13,7 @@ ai:
   aliases: [tdengine, tdengine snapshot, tdengine cdc, tdengine source, tdengine target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use TDengine to copy existing time-series data or keep a target current from the connector's declared CDC mode.
@@ -25,12 +25,6 @@ Use TDengine to copy existing time-series data or keep a target current from the
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Data write, Target DDL apply"
   compatibility="TDengine 3.x"
-/>
-
-<ConnectorCapabilities
-  source="Snapshot and CDC"
-  target="Data write"
-  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 <Aside type="note" title="Local validation boundary">

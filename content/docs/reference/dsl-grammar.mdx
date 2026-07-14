@@ -1,6 +1,6 @@
 ---
-title: DSL grammar overview
-description: Documentation contract for TapState resource files, relationships, and validation rules
+title: Resource grammar
+description: Reference for TapState resource files, relationships, and validation rules
 sidebar:
   order: 1
 ai:
@@ -9,7 +9,7 @@ ai:
   aliases: [tapstate yaml reference, tapstate dsl grammar, tapstate resource syntax]
 ---
 
-The current documentation contract uses YAML files with the extension `.tapstate.yml` and `version: tapstate/v1`.
+TapState resources use YAML files with the extension `.tapstate.yml` and `version: tapstate/v1`.
 
 Use the resource schema and command reference supplied with your deployment to confirm accepted fields and defaults. This site does not yet publish a stable JSON Schema URL.
 
@@ -61,7 +61,7 @@ tables:
 | `api` | API / SaaS pull (polling or webhook) | Salesforce, HubSpot |
 | `file` | File scanning | S3, SFTP, local directory |
 
-The documented validation model compares connector and mode combinations with a bundled capability Catalog. Verify the exact rejection behavior against the selected artifact.
+Validation compares connector and mode combinations with the connector catalog used by your TapState version.
 
 ### `tables` omission semantics
 
@@ -120,7 +120,7 @@ Each transform is a processing step in the pipeline, executed in declaration ord
 | rename | `rename: {old: new}` | Field renaming |
 | typeFilter | `type_filter: <type>` | Filter by data type |
 | unwind | `unwind: <array field>` | Array flattening |
-Additional transform designs are not part of this reference until an identified TapState artifact publishes their schema and behavior.
+Use only transform types and fields listed by the resource schema supplied with your TapState version.
 
 ### `sync` output
 
@@ -162,8 +162,8 @@ format: "{'id': record.user_id, 'ts': record.created_at}"
 ```
 
 - Compiled + type-checked at validate time (not evaluated)
-- Runtime evaluation depends on the selected implementation contract.
-- Script nodes can express logic beyond the documented expression fields when the artifact exposes them.
+- Runtime evaluation depends on the TapState version you deploy.
+- Script nodes can express logic beyond the documented expression fields when that capability is available.
 
 ---
 
@@ -192,6 +192,6 @@ The documented validation model has three layers:
 
 1. **Structural layer**: JSON Schema validation (unknown fields, types, required fields)
 2. **Reference layer**: id reference closure within this batch of resources (offline; no server connection needed)
-3. **Capability layer**: connector and mode validity plus the Catalog rules implemented by the selected artifact
+3. **Capability layer**: connector and mode validity plus the rules in the active connector catalog
 
-Verify command syntax, required fields, unknown-field behavior, exit codes, and diagnostic format against the artifact supplied by your deployment.
+For an end-to-end example, follow the [Quickstart](/docs/overview/quickstart). For connector-specific fields and preparation, use the [connector directory](/docs/connectors).

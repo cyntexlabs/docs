@@ -13,7 +13,7 @@ ai:
   aliases: [apache kafka, confluent kafka, kafka stream, kafka source, kafka target, kafka enhanced]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use the connector ID `kafka_enhanced` for new Kafka connections. The connector ID `kafka` is retained only for existing legacy resources.
 
@@ -24,11 +24,6 @@ Use the connector ID `kafka_enhanced` for new Kafka connections. The connector I
   worksAs="Source, Target"
   capabilities="Stream read, Stream write, Schema Registry"
   compatibility="Kafka 2.0–2.5 · Scala 2.12 · Single node or cluster"
-/>
-
-<ConnectorCapabilities
-  source="Stream read"
-  target="Stream write"
 />
 
 ## Before you begin

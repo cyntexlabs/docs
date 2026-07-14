@@ -13,7 +13,7 @@ ai:
   aliases: [custom connection, custom connector, script source, script target, javascript connector]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Custom Connection when the integration is defined by scripts rather than a vendor-specific connector. It is intended for controlled development and integration work where you own the script lifecycle.
@@ -26,8 +26,6 @@ Use Custom Connection when the integration is defined by scripts rather than a v
   capabilities="Snapshot, CDC, Data write, Script-defined behavior"
   compatibility="Custom JavaScript connector contract"
 />
-
-<ConnectorCapabilities source="Snapshot and CDC scripts" target="Script-defined data write" />
 
 <Aside type="caution" title="No script execution or debugger is available locally">
   Local validation checks field types and source modes. It does not execute JavaScript, test network calls, inspect a returned record, or provide an interactive script debugger.

@@ -13,7 +13,7 @@ ai:
   aliases: [redis, redis snapshot, redis cdc, redis standalone, redis sentinel, redis cluster, redis target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Redis for supported Snapshot or CDC reads, or as a destination for pipeline data. Validate the intended key model and source semantics in a staging environment before production use.
@@ -26,8 +26,6 @@ Use Redis for supported Snapshot or CDC reads, or as a destination for pipeline 
   capabilities="Snapshot, CDC, Data write"
   compatibility="Redis 2.8–6.0"
 />
-
-<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
 ## Before you begin
 

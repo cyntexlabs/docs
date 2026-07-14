@@ -7,7 +7,7 @@ ai:
   aliases: [tapstate storage, operational state, checkpoints, materialized state]
 ---
 
-TapState's storage model is organized by responsibility rather than a promise about one database technology. A data path needs fast working state, durable recovery state, and consumer-facing materialized state.
+TapState separates three kinds of state: working state used while records are processed, recovery state needed after an interruption, and materialized state read by downstream consumers.
 
 Choose concrete storage engines, retention, replication, and high-availability behavior for the deployment you operate.
 
@@ -57,4 +57,4 @@ Its correctness depends on:
 
 An audit or replay store answers different questions from a current view. Before retaining change history, define the legal basis, sensitive-field handling, retention period, access policy, and deletion process.
 
-Do not infer long-term history, replay, exactly-once behavior, or a specific storage engine from this concept page. Verify those behaviors against the deployed runtime and its published architecture.
+Choose retention, replay, and recovery settings for the workload and deployment you operate. A current-state destination does not automatically provide long-term history.

@@ -13,7 +13,7 @@ ai:
   aliases: [quickapi, quick api, postman collection source, postman api snapshot]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use QuickAPI for a one-time source read from a prepared Postman collection. The connection accepts the collection text and optional token-expiry fields, and supports Snapshot only.
 
@@ -25,8 +25,6 @@ Use QuickAPI for a one-time source read from a prepared Postman collection. The 
   capabilities="Snapshot, API collection contract"
   compatibility="Postman collection JSON"
 />
-
-<ConnectorCapabilities source="Snapshot read" target="No documented target role" />
 
 <Aside type="note" title="What local validation checks">
   QuickAPI parses `TAP_TABLE`, pagination tags, `TAP_GET_TOKEN`, token-expiry rules, and token mappings at runtime. Local `tapstate validate` checks only field shapes; it does not execute the collection or prove that a deployed runtime includes the connector package.

@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Create a source, target, and pipeline workspace, then run the documented offline validation flow
+description: Create a source, target, and pipeline workspace, then validate the resource files
 ai:
   kind: guide
   id: quickstart
@@ -24,18 +24,18 @@ The source resource reads existing MySQL rows. The target connection supplies Mo
 
 ## Before you begin
 
-- Obtain the TapState CLI artifact and command contract provided by your deployment. These examples describe the documented resource model; use the commands and fields that your artifact supports.
+- Install or obtain the TapState CLI supplied with your environment. Command availability can vary by TapState version.
 - Keep credentials in environment variables or your deployment's secret mechanism.
 - Read the [MySQL](/docs/connectors/mysql) and [MongoDB](/docs/connectors/mongodb) preparation guides.
 - Use non-production credentials and endpoints for an authoring walkthrough.
 
-Check the artifact identity first:
+Check the installed command first:
 
 ```bash
 tapstate --version
 ```
 
-If that command or its reported product name differs, stop and follow the release instructions that accompany the artifact.
+If the command is unavailable or identifies a different product, follow the installation instructions supplied with your TapState environment before continuing.
 
 ## 1. Create the MySQL source
 
@@ -88,7 +88,7 @@ Review the generated files before continuing. Confirm that IDs and references ma
 tapstate validate --workdir tapstate-work
 ```
 
-An exit code of `0` means the artifact accepted the resource structure, references, and locally known connector rules. The number and wording in success output can vary by artifact version.
+An exit code of `0` means the installed validator accepted the resource structure, references, and locally known connector rules. The number and wording in success output can vary by version.
 
 Local validation does not prove:
 
@@ -99,7 +99,7 @@ Local validation does not prove:
 
 ## 5. Inspect the resources
 
-If the artifact exposes the documented inspection commands, use them to review the workspace and field grammar:
+If your CLI version provides these inspection commands, use them to review the workspace and field grammar:
 
 ```bash
 tapstate ls --workdir tapstate-work
@@ -107,11 +107,11 @@ tapstate desc orders_to_customer_view --workdir tapstate-work
 tapstate explain source.mode
 ```
 
-Use structured output only when the selected artifact documents it. Do not infer runtime success from an authoring or inspection command.
+Use structured output only when your TapState CLI supports it. Do not infer runtime success from an authoring or inspection command.
 
 ## Next steps
 
 - Learn how [connections and connectors](/docs/concepts/connections-and-connectors) differ.
 - Choose the right [capture mode](/docs/concepts/capture-modes).
 - Use [Troubleshooting](/docs/guides/troubleshooting) to isolate authoring, deployment, and data problems.
-- Check [Release status](/docs/overview/release-status) before treating this walkthrough as a production contract.
+- Continue with the selected source and target connector guides before using the same pattern with production data.

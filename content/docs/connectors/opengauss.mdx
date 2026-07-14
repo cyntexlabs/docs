@@ -13,7 +13,7 @@ ai:
   aliases: [opengauss, open gauss, opengauss snapshot, opengauss source, opengauss target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use openGauss to copy the rows that exist now, or as a destination for data written by a TapState pipeline.
 
@@ -24,12 +24,6 @@ Use openGauss to copy the rows that exist now, or as a destination for data writ
   worksAs="Source, Target"
   capabilities="Snapshot, Schema discovery, Data write, Target DDL apply"
   compatibility="openGauss 3.0+"
-/>
-
-<ConnectorCapabilities
-  source="Snapshot read"
-  target="Data write"
-  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 <Aside type="note" title="Local validation boundary">

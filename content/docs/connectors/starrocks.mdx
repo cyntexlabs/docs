@@ -13,7 +13,7 @@ ai:
   aliases: [starrocks, starrocks snapshot, starrocks target, starrocks stream load]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use StarRocks for supported Snapshot reads or as a destination for analytical data.
 
@@ -24,12 +24,6 @@ Use StarRocks for supported Snapshot reads or as a destination for analytical da
   worksAs="Source, Target"
   capabilities="Snapshot, Data write, Target DDL apply"
   compatibility="StarRocks 3.x"
-/>
-
-<ConnectorCapabilities
-  source="Snapshot read"
-  target="Data write"
-  schema="Apply add, alter, and drop-column events through pipeline policy"
 />
 
 <Aside type="note" title="Source use needs staging validation">

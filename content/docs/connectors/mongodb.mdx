@@ -13,7 +13,7 @@ ai:
   aliases: [mongodb snapshot, mongodb full load, mongodb cdc, mongodb oplog, mongodb source, mongodb target]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Connect MongoDB replica set or sharded cluster deployments as a TapState source or target for an initial full load and Oplog-based CDC.
@@ -25,11 +25,6 @@ Connect MongoDB replica set or sharded cluster deployments as a TapState source 
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Schema discovery, Data write"
   compatibility="MongoDB 4.0+ · Replica sets and sharded clusters"
-/>
-
-<ConnectorCapabilities
-  source="Full load (Snapshot) and CDC through the Oplog"
-  target="Data write"
 />
 
 ## Before you begin

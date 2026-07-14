@@ -13,16 +13,14 @@ ai:
   aliases: [polardb mysql, polar db mysql, aliyun polardb mysql, polardb cdc]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use PolarDB for MySQL for one-time copies, Binlog-based change capture, and destination writes.
 
 <ConnectorProfile category="Databases" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source, Target" capabilities="Snapshot, CDC, Data write" compatibility="Alibaba Cloud PolarDB for MySQL" />
 
-<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
-
-<Aside type="note" title="Network and runtime boundary">
+<Aside type="note" title="Network access">
   Local validation checks the selected source mode and configuration shape. It does not verify a PolarDB whitelist, VPC route, account permissions, Binlog retention, or destination writes.
 </Aside>
 

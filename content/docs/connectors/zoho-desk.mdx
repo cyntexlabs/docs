@@ -13,7 +13,7 @@ ai:
   aliases: [zoho desk, zoho-desk, zoho desk snapshot, zoho desk source, zoho desk webhook]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Zoho Desk as a supported Snapshot source for service data.
 
@@ -25,8 +25,6 @@ Use Zoho Desk as a supported Snapshot source for service data.
   capabilities="Snapshot, API read"
   compatibility="Zoho Desk API"
 />
-
-<ConnectorCapabilities source="Snapshot read" target="No documented target role" />
 
 <Aside type="note" title="Webhook is not a supported mode">
   TapState currently publishes this connector as Snapshot only. Although the connection contains webhook-related fields, this page does not represent webhook incremental delivery as an available source mode.
@@ -40,6 +38,10 @@ Use Zoho Desk as a supported Snapshot source for service data.
 2. In the Zoho API Console, create a **Self Client** and store its client ID and client secret.
 3. Generate an authorization code for the required Desk scopes. The connector uses:
 
+![Locate the Zoho Desk organization ID](/images/connectors/zoho-desk-organization-id.png)
+
+![Create a Self Client and obtain its credentials in Zoho API Console](/images/connectors/zoho-self-client-credentials.png)
+
 ```text
 Desk.tickets.ALL,Desk.search.READ,Desk.contacts.READ,
 Desk.contacts.WRITE,Desk.contacts.UPDATE,Desk.contacts.CREATE,
@@ -47,6 +49,8 @@ Desk.tasks.ALL,Desk.basic.READ,Desk.basic.CREATE,
 Desk.settings.ALL,Desk.events.ALL,Desk.articles.READ,
 Desk.articles.CREATE,Desk.articles.UPDATE,Desk.articles.DELETE
 ```
+
+![Generate and copy the Zoho authorization code](/images/connectors/zoho-authorization-code.png)
 
 Reduce this scope list if your selected modules need less access. Authorization codes expire; generate one immediately before the deployed connection flow exchanges it. Keep every credential in a secret manager.
 

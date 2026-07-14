@@ -13,7 +13,7 @@ ai:
   aliases: [mongodb atlas snapshot, mongodb atlas cdc, atlas oplog, atlas source, atlas target]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Connect a MongoDB Atlas cluster as a TapState source or target for snapshots and CDC through the Atlas-managed Oplog.
@@ -25,11 +25,6 @@ Connect a MongoDB Atlas cluster as a TapState source or target for snapshots and
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, Schema discovery, Data write"
   compatibility="MongoDB Atlas 5.0.15+ · SRV and standard URI"
-/>
-
-<ConnectorCapabilities
-  source="Snapshot and CDC through the Atlas-managed Oplog"
-  target="Data write"
 />
 
 ## Before you begin

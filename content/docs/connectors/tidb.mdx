@@ -13,7 +13,7 @@ ai:
   aliases: [tidb, tidb snapshot, tidb cdc, tidb source, tidb target, tikv, pd]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use TiDB for an initial full load, TiCDC-based change capture, or destination writes.
@@ -25,12 +25,6 @@ Use TiDB for an initial full load, TiCDC-based change capture, or destination wr
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, DDL capture, Data write, Target DDL apply"
   compatibility="TiDB 6.0.0–8.1.9"
-/>
-
-<ConnectorCapabilities
-  source="Full load (Snapshot), CDC, and DDL capture"
-  target="Data write"
-  schema="Capture and apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 ## Before you begin

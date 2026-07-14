@@ -49,7 +49,7 @@ TAPSTATE_CATALOG_DIR=/path/to/tapstate/core/core-catalog/src/main/resources/cata
   npm run connectors:check
 ```
 
-Use the same catalog path with `npm run connectors:coverage` to verify the canonical connector-page structure: profile, role-specific preparation, mode-specific CDC paths, validation boundary, limitations, and reference.
+Use the same catalog path with `npm run connectors:coverage` to verify the canonical connector-page structure: profile, role-specific preparation, mode-specific CDC paths, validation scope, limitations, and reference.
 
 When the docs-en migration baseline is available, verify that every independent upstream connector page is migrated, covered by a consolidated guide, or explicitly deferred:
 
@@ -70,7 +70,7 @@ Then open [http://localhost:3000](http://localhost:3000), unless `serve` selects
 
 ```text
 content/docs/
-├── overview/       Product introduction, quickstart, architecture, and roadmap
+├── overview/       Product introduction, quickstart, use cases, and architecture
 ├── concepts/       Connections, capture modes, resources, state, and AI concepts
 ├── connectors/     Connector preparation, creation, limitations, and reference
 ├── guides/         Cross-connector workflows and troubleshooting

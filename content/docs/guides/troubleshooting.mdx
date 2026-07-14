@@ -7,8 +7,6 @@ ai:
   aliases: [tapstate troubleshooting, validation error, connector error, cdc not working]
 ---
 
-import { Aside } from '@/components/mdx';
-
 Start by identifying which layer produced the failure. A local validation result, a connection failure, and incorrect destination data require different evidence and different fixes.
 
 ## Identify the failing layer
@@ -24,7 +22,7 @@ Do not use evidence from one layer as proof of another. In particular, exit code
 
 ## Check the workspace first
 
-When a TapState-branded CLI artifact is available for your deployment, run its documented validation command against the workspace before investigating the external system:
+Run the validation command supplied with your TapState environment before investigating the external system:
 
 ```bash
 tapstate validate --workdir tapstate-work
@@ -60,9 +58,7 @@ If the resource shape is valid but a deployment cannot connect or discover objec
 4. Verify the database, schema, warehouse, tenant, topic, bucket, or API scope.
 5. Follow the connector page's mode-specific preparation path.
 
-<Aside type="note" title="TLS and connection tests are deployment contracts">
-  Do not invent certificate fields or a test command from an upstream product. Use the fields and workflow exposed by the TapState deployment you are operating.
-</Aside>
+For TLS and connection testing, use only the fields and workflow supported by the TapState environment you operate. Do not copy certificate fields or test commands from another product.
 
 ## Check Snapshot or CDC behavior
 
@@ -93,7 +89,7 @@ For CDC that stops or falls behind:
 
 Before escalating, collect:
 
-- TapState artifact version and deployment type;
+- TapState version and deployment type;
 - connector ID, role, and mode;
 - redacted resource files;
 - exact command and exit code;

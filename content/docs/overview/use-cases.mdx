@@ -53,9 +53,9 @@ TapState is designed for operational data that loses value when it becomes stale
 
 Assess every use case across four layers:
 
-1. **Connector contract:** Are the ID, role, mode, fields, permissions, and external-system preparation documented?
-2. **Resource contract:** Does the selected product artifact accept the resource shape and references?
+1. **Connector support:** Are the ID, role, mode, fields, permissions, and external-system preparation documented?
+2. **Resource validation:** Does the installed TapState version accept the resource shape and references?
 3. **Runtime behavior:** Does the deployment connect, move data, checkpoint, recover, and handle schema changes correctly?
 4. **Operational evidence:** Have correctness, latency, source impact, security, capacity, and failure handling been measured in the intended environment?
 
-Start with the [connector directory](/docs/connectors), then use [Release status](/docs/overview/release-status) to determine which product facts still require verification.
+Start with the [connector directory](/docs/connectors), then validate the selected path with representative data in the environment where it will run.

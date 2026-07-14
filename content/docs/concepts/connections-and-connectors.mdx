@@ -1,25 +1,25 @@
 ---
 title: Connections and connectors
-description: Understand how TapState connector contracts become reusable source and target connections
+description: Understand how connector definitions become reusable source and target connections
 ai:
   kind: concept
   id: connections-and-connectors
-  aliases: [tapstate connections, connector contract, source connection, target connection]
+  aliases: [tapstate connections, connector definition, source connection, target connection]
 ---
 
-import { Aside, LinkCard, CardGrid } from '@/components/mdx';
+import { LinkCard, CardGrid } from '@/components/mdx';
 
 A **connector** defines how TapState understands a system. A **connection** supplies the endpoint, credentials, scope, and role for one use of that connector.
 
 ```text
-Connector contract       Connection resource         Pipeline reference
+Connector definition     Connection resource         Pipeline reference
 MySQL fields + modes  →  orders_mysql            →  source: orders_mysql
-MongoDB write contract → customer_view            →  sync target
+MongoDB write support → customer_view            →  sync target
 ```
 
-## Connector contract
+## Connector definition
 
-The connector contract answers questions that should stay consistent across deployments:
+The connector definition answers questions that should stay consistent across environments:
 
 - Which connector ID identifies the integration?
 - Can it read, write, or do both?
@@ -27,11 +27,11 @@ The connector contract answers questions that should stay consistent across depl
 - Which configuration keys and value shapes are recognized?
 - Which preparation steps and limitations apply to the external system?
 
-The [connector directory](/docs/connectors) is the reader-facing index for those answers. A Catalog entry is code-backed configuration evidence, but it does not prove that a particular deployment can reach the external system or execute a pipeline successfully.
+The [connector directory](/docs/connectors) is the reader-facing index for those answers. A connector definition can validate known fields and modes; connectivity and permissions are checked when the connection is used.
 
 ## Connection resource
 
-A connection makes the connector contract specific to one endpoint and security boundary. Give each connection a stable ID that describes its job rather than its password, host, or environment.
+A connection applies the connector definition to one endpoint and set of credentials. Give each connection a stable ID that describes its job rather than its password, host, or environment.
 
 Typical source concerns include:
 
@@ -49,15 +49,13 @@ Typical target concerns include:
 - schema-change policy;
 - conflict and retry behavior.
 
-<Aside type="note" title="A role is not a user account">
-  In these docs, **Source** and **Target** describe the connection's job in a data path. They do not imply a database role with those literal names. Create database users and roles that match your organization's privilege model.
-</Aside>
+In these docs, **Source** and **Target** describe what the connection does in a data path. They are not literal database role names. Create database accounts that follow your organization's privilege model.
 
 ## Source and target use
 
 A source connection includes a read mode because TapState must know how to obtain records. A target-only connection supplies destination configuration to a pipeline and does not need a source read mode.
 
-Do not infer a target role from the existence of writable-looking fields, and do not infer CDC from a database family. Use the connector page and current product contract together.
+Do not infer a target role from writable-looking fields or CDC support from a database family. Use the roles and modes listed on the connector page.
 
 ## Scope connections narrowly
 

@@ -13,7 +13,7 @@ ai:
   aliases: [csv, csv file, csv snapshot, csv cdc, csv source, csv target, sftp csv, s3 csv]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use CSV files from local storage, FTP, SFTP, SMB, S3-compatible storage, or OSS as a pipeline source or target.
@@ -26,8 +26,6 @@ Use CSV files from local storage, FTP, SFTP, SMB, S3-compatible storage, or OSS 
   capabilities="Snapshot, CDC, Data write"
   compatibility="Local, FTP, SFTP, SMB, S3FS, OSS"
 />
-
-<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
   Local validation checks the selected mode and file-transport field shapes. It does not open a file, authenticate to remote storage, watch for changes, parse CSV, or write an output file.

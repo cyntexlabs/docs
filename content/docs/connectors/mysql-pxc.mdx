@@ -13,7 +13,7 @@ ai:
   aliases: [mysql pxc, percona xtradb cluster, mysql pxc snapshot, mysql pxc cdc, mysql pxc source, mysql pxc target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use MySQL Percona XtraDB Cluster (PXC) to copy existing rows or start with a copy and continue from binary-log changes.
@@ -26,8 +26,6 @@ Use MySQL Percona XtraDB Cluster (PXC) to copy existing rows or start with a cop
   capabilities="Snapshot, CDC, Data write"
   compatibility="MySQL PXC 5.0–8.x"
 />
-
-<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
   Local validation checks Snapshot and CDC resource shapes. It does not inspect the cluster's binlog settings, node topology, privileges, or target write path.

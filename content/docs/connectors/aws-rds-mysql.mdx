@@ -13,14 +13,12 @@ ai:
   aliases: [aws rds mysql, amazon rds mysql, rds mysql cdc, rds mysql source, rds mysql target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use Amazon RDS for MySQL to copy existing rows, follow Binlog changes, or write pipeline data to an RDS database.
 
 <ConnectorProfile category="Databases" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source, Target" capabilities="Snapshot, CDC, Data write" compatibility="Amazon RDS for MySQL 5.7 and 8.0" />
-
-<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
   Local validation checks the selected source mode and configuration shape. It does not test RDS networking, security groups, credentials, Binlog settings, or a live write.

@@ -13,7 +13,7 @@ ai:
   aliases: [aws clickhouse, clickhouse cloud aws, aws clickhouse snapshot, aws clickhouse target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use ClickHouse Cloud on AWS for point-in-time reads or as an analytical destination through its dedicated connection contract.
 
@@ -26,9 +26,7 @@ Use ClickHouse Cloud on AWS for point-in-time reads or as an analytical destinat
   compatibility="ClickHouse Cloud on AWS"
 />
 
-<ConnectorCapabilities source="Snapshot read" target="Data write" />
-
-<Aside type="note" title="Dedicated cloud contract">
+<Aside type="note" title="AWS connection fields">
   This is separate from the generic ClickHouse connector because TapState supports a distinct ID and default port `8443`. It does not imply a TapState TLS control or a live connection test.
 </Aside>
 

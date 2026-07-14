@@ -9,7 +9,7 @@ ai:
   aliases: [tapstate fields, tapstate schema, yaml field reference]
 ---
 
-This table is a documentation lookup. Confirm exact field acceptance against the resource schema and artifact supplied by your deployment.
+This table is a documentation lookup. Confirm exact field acceptance with the resource schema supplied with your TapState version.
 
 | Field | Type | Required | Default | Enum |
 |---|---|---|---|---|

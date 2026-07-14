@@ -1,6 +1,6 @@
 ---
 title: transforms
-description: Documentation contract for pipeline transform node shapes
+description: Reference for pipeline transform node shapes
 sidebar:
   order: 4
 ai:
@@ -9,7 +9,7 @@ ai:
   aliases: [tapstate transforms, pipeline filter, pipeline javascript, rename fields]
 ---
 
-`transforms` is the documented list of ordered processing nodes in a pipeline. Verify node availability, field shapes, and runtime behavior against the TapState artifact supplied by your deployment.
+`transforms` is the ordered list of processing nodes in a pipeline. Use the reference and schema supplied with your TapState version to confirm available nodes and fields.
 
 ## Node types
 

@@ -1,6 +1,6 @@
 ---
-title: Authoring with AI
-description: Use an AI assistant with TapState docs, JSON Schema, and the offline CLI
+title: Use TapState docs with AI
+description: Give an AI assistant canonical connector and resource context, then review and validate its output
 sidebar:
   order: 3
 ai:
@@ -9,7 +9,7 @@ ai:
   aliases: [tapstate ai authoring, generate tapstate yaml, repair validation errors]
 ---
 
-The documented TapState AI workflow is human-reviewable. An assistant can discover the docs, draft `.tapstate.yml` resources, use the validation interface supplied by an identified product artifact, and repair coded diagnostics. Live operations require a deployment contract that exposes them.
+An assistant can discover the TapState docs, draft `.tapstate.yml` resources, explain connector preparation, and repair validation errors. Keep the workflow human-reviewable and run commands in your own environment.
 
 ## Recommended workflow
 
@@ -17,7 +17,7 @@ The documented TapState AI workflow is human-reviewable. An assistant can discov
 1. Give the assistant llms.txt or the relevant page Markdown
 2. Describe one source, target, and desired data outcome
 3. Generate or scaffold .tapstate.yml resources
-4. Run the validation command supplied by the selected TapState artifact
+4. Run the validation command supplied with your TapState environment
 5. Feed coded diagnostics back to the assistant
 6. Review the final diff before keeping it
 ```
@@ -34,7 +34,7 @@ Then load the page-level Markdown for the connector or DSL area being edited. Co
 
 ## Prefer scaffolding over guessing
 
-When the selected TapState artifact exposes the documented non-interactive CLI, prefer scaffolding over handwritten field guesses:
+When your TapState CLI supports non-interactive scaffolding, prefer it over handwritten field guesses:
 
 ```bash
 tapstate new --non-interactive \
@@ -76,4 +76,4 @@ tapstate explain pipeline.sync
 - Do not infer fields from upstream UI screenshots or unrelated connector versions.
 - Do not let an assistant claim a connection test, data run, latency, or success state from offline validation.
 - Review generated permissions and database commands before execution.
-- Treat live MCP control as product direction until a published TapState release and running deployment expose it.
+- Do not give an assistant live control unless your TapState environment exposes an authenticated, authorized interface for it.

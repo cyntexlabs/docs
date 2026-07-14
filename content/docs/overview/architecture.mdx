@@ -1,22 +1,17 @@
 ---
-title: Architecture overview
-description: Understand TapState's target data plane, control plane, state, and external-system boundaries
+title: Architecture
+description: See how TapState organizes capture, transformation, delivery, control, and recovery
 ai:
   kind: concept
   id: architecture
   aliases: [tapstate architecture, capture transform serve architecture, tapstate control plane]
 ---
 
+import { TapStateArchitecture } from '@/components/mdx';
+
 TapState's target architecture separates the **data plane**, which moves and maintains records, from the **control plane**, which defines and operates data paths.
 
-```text
-                         Control plane
-            author · validate · apply · observe · operate
-                                │
-                                ▼
-Source systems → Capture → Transform → Materialize → Deliver → Consumers
-                       Data plane and durable recovery state
-```
+<TapStateArchitecture />
 
 ## Data plane
 

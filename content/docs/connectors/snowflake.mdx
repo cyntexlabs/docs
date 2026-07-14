@@ -13,7 +13,7 @@ ai:
   aliases: [snowflake, snowflake snapshot, snowflake source, snowflake target, snowflake pat, snowflake key pair]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Snowflake to read existing tables or to deliver pipeline data into a selected database and schema.
 
@@ -24,12 +24,6 @@ Use Snowflake to read existing tables or to deliver pipeline data into a selecte
   worksAs="Source, Target"
   capabilities="Snapshot, Schema discovery, Data write, Target DDL apply"
   compatibility="Snowflake accounts supported by JDBC"
-/>
-
-<ConnectorCapabilities
-  source="Snapshot read"
-  target="Data write"
-  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 <Aside type="note" title="Local validation boundary">

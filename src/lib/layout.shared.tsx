@@ -24,6 +24,14 @@ const logo = (
   </>
 );
 
+const docsLogo = (
+  <>
+    {logo}
+    <span aria-hidden="true" className="mx-1 h-4 w-px bg-fd-border" />
+    <span className="text-sm font-medium text-fd-muted-foreground">Docs</span>
+  </>
+);
+
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
@@ -32,7 +40,12 @@ export function baseOptions(): BaseLayoutProps {
     },
     links: [
       {
-        text: 'Getting started',
+        text: 'Docs',
+        url: '/docs',
+        active: 'url',
+      },
+      {
+        text: 'Quickstart',
         url: '/docs/overview/quickstart',
         active: 'url',
       },
@@ -46,11 +59,6 @@ export function baseOptions(): BaseLayoutProps {
         url: '/docs/reference/dsl-grammar',
         active: 'nested-url',
       },
-      {
-        text: 'AI & agents',
-        url: '/docs/for-ai/llms',
-        active: 'nested-url',
-      },
     ],
   };
 }
@@ -59,8 +67,8 @@ export function docsOptions(): BaseLayoutProps {
   return {
     ...baseOptions(),
     nav: {
-      title: logo,
-      url: '/docs',
+      title: docsLogo,
+      url: '/',
     },
     links: [],
   };

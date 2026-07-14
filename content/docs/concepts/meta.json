@@ -4,7 +4,6 @@
     "connections-and-connectors",
     "capture-modes",
     "dsl",
-    "storage",
-    "ai-control"
+    "storage"
   ]
 }

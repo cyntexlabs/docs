@@ -1,6 +1,6 @@
 ---
 title: pipeline
-description: Documentation contract for kind:pipeline resources
+description: Reference for kind:pipeline resources
 sidebar:
   order: 3
 ai:
@@ -9,7 +9,7 @@ ai:
   aliases: [tapstate pipeline reference, pipeline yaml, sync target]
 ---
 
-`pipeline` describes a data path: it references a source, applies documented transforms, and declares delivery intent. Confirm accepted fields and defaults against the resource schema and artifact supplied by your deployment.
+`pipeline` describes a data path: it references a source, applies transforms, and declares how records are delivered. Confirm accepted fields and defaults with the resource schema supplied with your TapState version.
 
 ```yaml
 version: tapstate/v1
@@ -53,10 +53,6 @@ metadata:
   labels:
     <key>: <value>
 ```
-
-## Lifecycle
-
-The product direction separates local authoring, application to a deployment, and runtime lifecycle. Exact `apply`, `run`, `start`, `stop`, and recovery semantics require a published command and server contract; they are intentionally not defined by this reference page yet.
 
 ## sync vs push
 

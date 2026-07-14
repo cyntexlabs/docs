@@ -1,6 +1,6 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, CircleAlert, CircleCheck, Database, FileText, RadioTower, Store, TableProperties, Wrench } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Bot, Braces, Cable, CircleAlert, CircleCheck, Database, FileText, GitBranch, Layers3, RadioTower, Store, TableProperties, Wrench } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { MDXComponents } from 'mdx/types';
 import {
@@ -60,6 +60,129 @@ export function LinkCard({
 
 export function CardGrid({ children }: { children: ReactNode }) {
   return <div className="my-6 grid gap-4 sm:grid-cols-2">{children}</div>;
+}
+
+/** A product-led introduction for the What is TapState page. */
+export function ProductOverviewHero() {
+  const pillars = [
+    { label: 'Capture', text: 'Read existing data and follow later changes.', icon: Database },
+    { label: 'Transform', text: 'Reshape, enrich, join, and route records in flight.', icon: GitBranch },
+    { label: 'Serve', text: 'Keep useful state current for applications and agents.', icon: Layers3 },
+  ];
+
+  return (
+    <section className="not-prose relative mb-12 overflow-hidden rounded-2xl border border-fd-border bg-fd-card px-5 py-8 shadow-sm shadow-black/[0.035] dark:shadow-black/20 sm:px-8 sm:py-10 lg:px-10">
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-48 bg-[radial-gradient(circle_at_20%_0%,color-mix(in_oklab,var(--color-fd-primary)_18%,transparent),transparent_50%)]" />
+      <div className="relative">
+        <p className="mb-4 inline-flex rounded-full border border-fd-primary/20 bg-fd-primary/[0.06] px-3 py-1 text-xs font-semibold tracking-wide text-fd-primary">
+          Open-source operational data platform
+        </p>
+        <h1 className="m-0 max-w-4xl text-balance text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-fd-foreground md:text-5xl lg:text-6xl">
+          Database truth, kept current for the systems that act on it.
+        </h1>
+        <p className="mb-0 mt-5 max-w-3xl text-pretty text-base leading-8 text-fd-muted-foreground md:text-lg">
+          TapState brings capture, in-flight transformation, and current-state delivery into one governed data path for applications, APIs, and AI agents.
+        </p>
+        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <Link href="/docs/overview/quickstart" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-fd-primary px-4 text-sm font-semibold text-fd-primary-foreground no-underline transition-colors hover:bg-fd-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
+            Start the quickstart
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+          <Link href="/docs/connectors" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-fd-border bg-fd-background/80 px-4 text-sm font-semibold text-fd-foreground no-underline transition-colors hover:border-fd-primary/30 hover:bg-fd-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
+            Browse connectors
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+        </div>
+
+        <div className="mt-9 grid gap-3 border-t border-fd-border pt-6 md:grid-cols-3">
+          {pillars.map((pillar) => {
+            const Icon = pillar.icon;
+            return (
+              <div key={pillar.label} className="rounded-xl border border-fd-border bg-fd-background/70 p-4">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex size-8 items-center justify-center rounded-lg bg-fd-primary/[0.09] text-fd-primary">
+                    <Icon aria-hidden="true" className="size-4" />
+                  </span>
+                  <h2 className="m-0 text-sm font-semibold text-fd-foreground">{pillar.label}</h2>
+                </div>
+                <p className="mb-0 mt-3 text-sm leading-6 text-fd-muted-foreground">{pillar.text}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ArchitectureNode({
+  title,
+  description,
+  icon: Icon,
+  accent = false,
+}: {
+  title: string;
+  description: string;
+  icon: typeof Database;
+  accent?: boolean;
+}) {
+  return (
+    <div className={`min-w-0 rounded-xl border p-3.5 ${accent ? 'border-fd-primary/25 bg-fd-primary/[0.07]' : 'border-fd-border bg-fd-background/85'}`}>
+      <div className="flex items-center gap-2">
+        <Icon aria-hidden="true" className={`size-4 ${accent ? 'text-fd-primary' : 'text-fd-muted-foreground'}`} />
+        <p className="m-0 text-sm font-semibold text-fd-foreground">{title}</p>
+      </div>
+      <p className="mb-0 mt-2 text-xs leading-5 text-fd-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
+/** Responsive, semantic representation of the logical TapState architecture. */
+export function TapStateArchitecture() {
+  return (
+    <figure className="not-prose my-8 overflow-hidden rounded-2xl border border-fd-border bg-fd-card shadow-sm shadow-black/[0.03] dark:shadow-none">
+      <figcaption className="border-b border-fd-border px-5 py-4">
+        <p className="m-0 text-sm font-semibold text-fd-foreground">Logical architecture</p>
+        <p className="mb-0 mt-1 text-xs leading-5 text-fd-muted-foreground">One control plane governs the data path and its recovery state.</p>
+      </figcaption>
+
+      <div className="p-4 sm:p-5">
+        <div className="rounded-xl border border-fd-primary/20 bg-fd-primary/[0.055] p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <Braces aria-hidden="true" className="size-4 text-fd-primary" />
+            <p className="m-0 text-xs font-semibold uppercase tracking-[0.12em] text-fd-primary">Control plane</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <ArchitectureNode title="Author" description="Define connections and pipelines." icon={Braces} />
+            <ArchitectureNode title="Validate" description="Check resources, references, and connector fields." icon={CircleCheck} />
+            <ArchitectureNode title="Operate" description="Apply, observe, and control lifecycle." icon={Bot} />
+          </div>
+        </div>
+
+        <div className="flex justify-center py-3" aria-hidden="true"><span className="h-6 w-px bg-fd-border" /></div>
+
+        <div className="rounded-xl border border-fd-border bg-fd-muted/20 p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <Cable aria-hidden="true" className="size-4 text-fd-primary" />
+            <p className="m-0 text-xs font-semibold uppercase tracking-[0.12em] text-fd-primary">Data plane</p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
+            <ArchitectureNode title="Sources" description="Databases, brokers, files, and APIs." icon={Database} />
+            <ArchitectureNode title="Capture" description="Initial data and later changes." icon={RadioTower} accent />
+            <ArchitectureNode title="Transform" description="Filter, map, enrich, join, and route." icon={GitBranch} accent />
+            <ArchitectureNode title="Materialize" description="Maintain destination-ready current state." icon={Layers3} accent />
+            <ArchitectureNode title="Deliver" description="Write targets or publish streams." icon={Cable} accent />
+            <ArchitectureNode title="Consumers" description="Applications, APIs, and agents." icon={Bot} />
+          </div>
+        </div>
+
+        <div className="mt-3 rounded-xl border border-dashed border-fd-border bg-fd-background/60 px-4 py-3">
+          <p className="m-0 text-xs font-semibold text-fd-foreground">Durable recovery state</p>
+          <p className="mb-0 mt-1 text-xs leading-5 text-fd-muted-foreground">Resource versions · checkpoints · schema and mapping state · retries · operational history</p>
+        </div>
+      </div>
+    </figure>
+  );
 }
 
 export function Badge({ text, children }: { text?: ReactNode; children?: ReactNode; variant?: string }) {
@@ -304,47 +427,6 @@ export function ConnectorProfile({
   );
 }
 
-/** A compact, neutral capability table. Values must be traceable to the connector evidence matrix. */
-export function ConnectorCapabilities({
-  source,
-  target,
-  schema = 'Not claimed',
-}: {
-  source: string;
-  target: string;
-  schema?: string;
-}) {
-  return (
-    <section aria-label="Connector capabilities" className="not-prose my-6">
-      <h2 className="mb-2 text-base font-semibold text-fd-foreground">Capabilities</h2>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[30rem] text-left text-sm">
-          <thead className="border-y border-fd-border text-xs uppercase tracking-wide text-fd-muted-foreground">
-            <tr>
-              <th className="px-0 py-2.5 font-semibold">Role</th>
-              <th className="px-4 py-2.5 font-semibold">What you can do</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-fd-border text-fd-card-foreground">
-            <tr>
-              <th className="px-0 py-3 font-medium">Source</th>
-              <td className="px-4 py-3">{source}</td>
-            </tr>
-            <tr>
-              <th className="px-0 py-3 font-medium">Target</th>
-              <td className="px-4 py-3">{target}</td>
-            </tr>
-            <tr>
-              <th className="px-0 py-3 font-medium">Schema changes</th>
-              <td className="px-4 py-3">{schema}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  );
-}
-
 /** Illustrative offline-validation outcomes; this does not simulate a live connection test. */
 export function ValidationStatusGuide() {
   return (
@@ -438,17 +520,16 @@ export function SupportedConnectorMatrix() {
   return (
     <section aria-label="Supported connectors" className="not-prose my-8">
       <div className="mb-8 flex flex-wrap items-center gap-2 text-sm text-fd-muted-foreground">
-        <span className="font-medium text-fd-foreground">{maturityCounts.ga + maturityCounts.preview + maturityCounts.deprecated} documented connectors</span>
+        <span className="font-medium text-fd-foreground">{maturityCounts.ga + maturityCounts.preview} active connectors</span>
         <span aria-hidden="true">·</span>
         <span className="inline-flex items-center gap-1.5"><DirectoryMaturity maturity="ga" /> {maturityCounts.ga}</span>
         <span className="inline-flex items-center gap-1.5"><DirectoryMaturity maturity="preview" /> {maturityCounts.preview}</span>
-        <span className="inline-flex items-center gap-1.5"><DirectoryMaturity maturity="deprecated" /> {maturityCounts.deprecated}</span>
       </div>
 
       <div className="space-y-9">
         {connectorCategories.map((category) => {
           const Icon = categoryPresentation[category.id].icon;
-          const connectors = getConnectorsByCategory(category.id);
+          const connectors = getConnectorsByCategory(category.id).filter((connector) => connector.maturity !== 'deprecated');
 
           return (
             <section key={category.id} aria-labelledby={`connector-category-${category.id}`} className="border-t border-fd-border pt-5">
@@ -505,6 +586,28 @@ export function SupportedConnectorMatrix() {
             </section>
           );
         })}
+
+        {maturityCounts.deprecated > 0 ? (
+          <section aria-labelledby="connector-category-legacy" className="border-t border-fd-border pt-5">
+            <header className="mb-3">
+              <h2 id="connector-category-legacy" className="m-0 text-base font-semibold tracking-tight text-fd-foreground">Legacy connectors</h2>
+              <p className="mb-0 mt-1 text-sm leading-6 text-fd-muted-foreground">Kept for existing deployments. Choose the named replacement for new pipelines.</p>
+            </header>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {connectorCategories.flatMap((category) => getConnectorsByCategory(category.id))
+                .filter((connector) => connector.maturity === 'deprecated')
+                .map((connector) => (
+                  <Link key={connector.slug} href={`/docs/connectors/${connector.slug}`} className="flex items-center justify-between gap-4 rounded-xl border border-fd-border bg-fd-card px-4 py-3 text-fd-foreground no-underline transition-colors hover:border-fd-primary/30 hover:bg-fd-muted/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring">
+                    <span>
+                      <span className="block text-sm font-semibold">{connector.title}</span>
+                      <span className="mt-1 block text-xs text-fd-muted-foreground">Migration guidance and existing configuration reference</span>
+                    </span>
+                    <DirectoryMaturity maturity="deprecated" />
+                  </Link>
+                ))}
+            </div>
+          </section>
+        ) : null}
       </div>
     </section>
   );
@@ -517,9 +620,10 @@ export function getMDXComponents(components?: MDXComponents) {
     CardGrid,
     LinkCard,
     Badge,
+    ProductOverviewHero,
+    TapStateArchitecture,
     DataPathComparison,
     ConnectorProfile,
-    ConnectorCapabilities,
     ValidationStatusGuide,
     SupportedConnectorMatrix,
     ...components,

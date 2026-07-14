@@ -13,7 +13,7 @@ ai:
   aliases: [salesforce, salesforce api, salesforce crm, salesforce source]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Salesforce as a supported API source for CRM data.
 
@@ -26,9 +26,7 @@ Use Salesforce as a supported API source for CRM data.
   compatibility="Salesforce API"
 />
 
-<ConnectorCapabilities source="API read" target="No documented target role" />
-
-<Aside type="note" title="Authorization boundary">
+<Aside type="note" title="Authorization">
   The resource requires `code`. Obtain it through the authorization flow supplied by your TapState deployment; local validation does not perform the browser exchange or refresh it.
 </Aside>
 

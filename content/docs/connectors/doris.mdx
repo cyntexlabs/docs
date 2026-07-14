@@ -13,7 +13,7 @@ ai:
   aliases: [apache doris, doris, doris snapshot, doris target, doris stream load]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Apache Doris for point-in-time reads or as an analytical destination.
 
@@ -24,12 +24,6 @@ Use Apache Doris for point-in-time reads or as an analytical destination.
   worksAs="Source, Target"
   capabilities="Snapshot, Data write, Target DDL apply"
   compatibility="Apache Doris 1.2–3.0"
-/>
-
-<ConnectorCapabilities
-  source="Full load (Snapshot)"
-  target="Data write"
-  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 ## Before you begin

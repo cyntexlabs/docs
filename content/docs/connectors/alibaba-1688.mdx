@@ -13,7 +13,7 @@ ai:
   aliases: [alibaba 1688, 1688 api, alibaba marketplace, 1688 source]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Alibaba 1688 as an API source for marketplace data exposed to your authorized developer application.
 
@@ -26,12 +26,7 @@ Use Alibaba 1688 as an API source for marketplace data exposed to your authorize
   compatibility="Alibaba 1688 Open Platform"
 />
 
-<ConnectorCapabilities
-  source="API read"
-  target="No documented target role"
-/>
-
-<Aside type="note" title="Authorization contract">
+<Aside type="note" title="Authorization">
   The connection requires one `code` value for authorization. App Key, App Secret, target-write, and CDC settings are not part of this resource. Use the authorization flow supplied by your TapState deployment.
 </Aside>
 

@@ -13,7 +13,7 @@ ai:
   aliases: [github, github api, github source, github issues, github pull requests]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use GitHub as a supported API source for repository data.
 
@@ -26,9 +26,7 @@ Use GitHub as a supported API source for repository data.
   compatibility="GitHub API"
 />
 
-<ConnectorCapabilities source="API read" target="No documented target role" />
-
-<Aside type="note" title="Authorization boundary">
+<Aside type="note" title="Authorization">
   The connector ID is case-sensitive: `GitHub`. The resource requires `code`, but local validation does not exchange or verify that authorization value.
 </Aside>
 
@@ -36,7 +34,7 @@ Use GitHub as a supported API source for repository data.
 
 ### Source
 
-Decide which organization and repositories the integration may read, then arrange the required GitHub authorization with an administrator. Keep the resulting credential out of source control and grant only the scopes needed for the objects you intend to ingest.
+Decide which organization and repositories the integration may read, then arrange the required GitHub authorization with an administrator. Keep the resulting credential out of source control and grant only the scopes needed for the objects you intend to ingest. For the browser authorization sequence, see GitHub's [OAuth app authorization documentation](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps).
 
 ## Create a connection
 

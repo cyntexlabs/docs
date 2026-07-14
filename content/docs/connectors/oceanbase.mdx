@@ -13,7 +13,7 @@ ai:
   aliases: [oceanbase, oceanbase mysql mode, oceanbase snapshot, oceanbase cdc, oceanbase source, oceanbase target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use the current OceanBase connector for MySQL-compatible OceanBase deployments. It can copy current rows or use its declared CDC mode after the required log service is prepared.
@@ -27,13 +27,7 @@ Use the current OceanBase connector for MySQL-compatible OceanBase deployments. 
   compatibility="OceanBase 4.0+ · MySQL-compatible"
 />
 
-<ConnectorCapabilities
-  source="Snapshot and CDC"
-  target="Data write"
-  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
-/>
-
-<Aside type="note" title="Mode boundary">
+<Aside type="note" title="CDC setup">
   This guide covers MySQL-compatible OceanBase only. It does not cover Oracle-compatible mode, source DDL capture, live connection testing, or deployment-specific advanced settings.
 </Aside>
 

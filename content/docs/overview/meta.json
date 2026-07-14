@@ -5,8 +5,6 @@
     "quickstart",
     "use-cases",
     "architecture",
-    "vs-streaming-stack",
-    "release-status",
-    "roadmap"
+    "vs-streaming-stack"
   ]
 }

@@ -13,14 +13,12 @@ ai:
   aliases: [mongodb 3.4, mongodb below 3.4, mongodb 3.2, mongodb oplog, mongodb legacy cdc]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use this connector for MongoDB 3.2 and 3.4. Use the standard MongoDB guide for newer deployments.
 
 <ConnectorProfile category="Databases" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source, Target" capabilities="Snapshot, CDC through the Oplog, Data write" compatibility="MongoDB 3.2 and 3.4 · Replica sets and sharded clusters" />
-
-<ConnectorCapabilities source="Snapshot and CDC through the Oplog" target="Data write" />
 
 ## Before you begin
 

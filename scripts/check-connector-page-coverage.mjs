@@ -12,7 +12,7 @@ const docsDir = new URL('../content/docs/connectors/', import.meta.url);
 const pageNames = (await readdir(docsDir)).filter((name) => name.endsWith('.mdx') && name !== 'index.mdx');
 const coreSections = {
   profile: /<ConnectorProfile\b/,
-  capabilities: /<ConnectorCapabilities\b/,
+  capabilities: /\bcapabilities="[^"]+"/,
   beforeYouBegin: /^## Before you begin/m,
   createConnection: /^## Create a connection/m,
   validateConfiguration: /^## Validate the configuration/m,

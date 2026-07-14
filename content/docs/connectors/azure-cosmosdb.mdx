@@ -13,7 +13,7 @@ ai:
   aliases: [azure cosmos db, cosmos db, cosmos snapshot, azure cosmos source]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Azure Cosmos DB to copy the records that exist now from a NoSQL account and database.
 
@@ -25,8 +25,6 @@ Use Azure Cosmos DB to copy the records that exist now from a NoSQL account and 
   capabilities="Snapshot, Resource discovery"
   compatibility="Azure Cosmos DB for NoSQL"
 />
-
-<ConnectorCapabilities source="Snapshot read" target="No documented target role" />
 
 <Aside type="note" title="Local validation boundary">
   TapState supports a Snapshot source and validates the four documented fields. It does not sign in to Azure, check account permissions, list containers, or read records.

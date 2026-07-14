@@ -13,15 +13,13 @@ ai:
   aliases: [http receiver, webhook receiver, http event source, incoming webhook]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use HTTP Receiver when another application pushes event data into a TapState-managed source table.
 
 <ConnectorProfile category="SaaS, business & commerce APIs" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source" capabilities="Incoming HTTP events" compatibility="HTTP webhook senders" />
 
-<ConnectorCapabilities source="Incoming events" target="No documented target role" />
-
-<Aside type="note" title="Runtime endpoint boundary">
+<Aside type="note" title="Endpoint availability">
   Local validation checks the resource, source mode, and configuration shape. It does not publish an endpoint, issue a service token, receive an HTTP request, or execute an event script.
 </Aside>
 

@@ -13,7 +13,7 @@ ai:
   aliases: [greenplum, greenplum snapshot, greenplum target, mpp database]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Greenplum for point-in-time table reads or as a target for analytical data.
 
@@ -24,12 +24,6 @@ Use Greenplum for point-in-time table reads or as a target for analytical data.
   worksAs="Source, Target"
   capabilities="Snapshot, Data write, Target DDL apply"
   compatibility="Greenplum"
-/>
-
-<ConnectorCapabilities
-  source="Snapshot read"
-  target="Data write"
-  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 <Aside type="note" title="Local validation boundary">

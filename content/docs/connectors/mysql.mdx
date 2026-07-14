@@ -13,7 +13,7 @@ ai:
   aliases: [mysql snapshot, mysql full load, mysql cdc, mysql binlog, mysql source, mysql target]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Connect MySQL to TapState for an initial full load, ongoing change data capture (CDC), or writes to a MySQL target.
@@ -25,12 +25,6 @@ Connect MySQL to TapState for an initial full load, ongoing change data capture 
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, DDL capture, Data write, Target DDL apply"
   compatibility="MySQL 5.0–9.x · Single node and primary-replica"
-/>
-
-<ConnectorCapabilities
-  source="Full load (Snapshot) and CDC"
-  target="Data write"
-  schema="Capture and apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 ## Before you begin

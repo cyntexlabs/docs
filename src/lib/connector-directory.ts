@@ -300,9 +300,10 @@ export function connectorMaturityCounts() {
 }
 
 export function renderSupportedConnectorMatrixForLLM() {
-  return connectorCategories
+  const active = connectorCategories
     .map((category) => {
       const rows = getConnectorsByCategory(category.id)
+        .filter((connector) => connector.maturity !== 'deprecated')
         .map((connector) => {
           const roles = connector.useAs.length > 0
             ? connector.useAs.map((role) => role[0].toUpperCase() + role.slice(1)).join(' + ')
@@ -321,4 +322,11 @@ export function renderSupportedConnectorMatrixForLLM() {
       return `## ${category.label}\n\n${category.description}\n\n| Connector | Maturity | Works as | Read mode |\n|---|---|---|---|\n${rows}`;
     })
     .join('\n\n');
+
+  const legacyRows = connectorDirectory
+    .filter((connector) => connector.maturity === 'deprecated')
+    .map((connector) => `- [${connector.title}](/docs/connectors/${connector.slug}) — Deprecated; use the named replacement for new pipelines.`)
+    .join('\n');
+
+  return legacyRows ? `${active}\n\n## Legacy connectors\n\n${legacyRows}` : active;
 }

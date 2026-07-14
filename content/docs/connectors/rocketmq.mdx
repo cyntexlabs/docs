@@ -13,7 +13,7 @@ ai:
   aliases: [apache rocketmq, rocketmq, rocketmq stream, rocketmq topic, rocketmq source, rocketmq target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Apache RocketMQ to read or write topic messages through the supported stream connector.
 
@@ -25,8 +25,6 @@ Use Apache RocketMQ to read or write topic messages through the supported stream
   capabilities="Stream read, Stream write"
   compatibility="RocketMQ 4.9.x+"
 />
-
-<ConnectorCapabilities source="Stream read" target="Stream write" />
 
 <Aside type="note" title="Local validation boundary">
   Local validation checks Stream mode and the documented fields. It does not reach a NameServer, test TLS, authenticate, discover topics, or consume/publish messages.

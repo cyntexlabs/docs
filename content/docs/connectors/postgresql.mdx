@@ -13,7 +13,7 @@ ai:
   aliases: [postgresql snapshot, postgresql cdc, postgres wal, postgresql source, postgresql target]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { PreparationStep, PreparationSteps, SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use PostgreSQL with TapState for an initial full load, WAL-based CDC, DDL capture, and destination writes.
@@ -25,12 +25,6 @@ Use PostgreSQL with TapState for an initial full load, WAL-based CDC, DDL captur
   worksAs="Source, Target"
   capabilities="Snapshot, CDC, DDL capture, Data write"
   compatibility="PostgreSQL 9.4–16"
-/>
-
-<ConnectorCapabilities
-  source="Full load (Snapshot), CDC, and DDL capture"
-  target="Data write"
-  schema="DDL capture; apply through pipeline policy"
 />
 
 ## Before you begin
@@ -103,14 +97,16 @@ GRANT SELECT ON TABLES TO tapstate;
 
 Choose before changing the server because the plugin determines the required PostgreSQL settings and privileges.
 
-| Method | PostgreSQL baseline | What to prepare |
+| Method | PostgreSQL baseline | When to choose it |
 |---|---|---|
-| `pgoutput` | PostgreSQL 10+ | Built in. The account needs publication access; partial publications also require `CREATE PUBLICATION` and ownership of the selected tables. |
-| `wal2json` | PostgreSQL 9.4+ | Install the `wal2json` output plugin on the server. Tables should have primary keys for reliable deletes. |
-| `decoderbufs` | PostgreSQL 9.6+ | Install the Debezium decoderbufs plugin and its server dependencies. |
+| [`pgoutput`](https://www.postgresql.org/docs/current/protocol-logical-replication.html) **Recommended default** | PostgreSQL 10+ | Built into PostgreSQL and requires no plugin installation. The account needs publication access; partial publications also require `CREATE PUBLICATION` and ownership of the selected tables. |
+| [`wal2json`](https://github.com/eulerto/wal2json) | PostgreSQL 9.4+ | Choose it when your existing TapState workload depends on its JSON decoding behavior and the database team can install a server plugin. Tables should have primary keys for reliable deletes. |
+| [`decoderbufs`](https://github.com/debezium/postgres-decoderbufs) | PostgreSQL 9.6+ | Choose it for an existing Protobuf-based decoding setup. Install the plugin and its server dependencies. |
 | `wal2json_rds`, `wal2json_streaming`, `wal2json_rds_streaming` | Deployment-specific | Variants for managed or streaming paths. Select one only when the deployment supplies its matching server setup. |
-| `walminer` | Deployment-specific | Reads physical WAL and requires elevated database access. Confirm availability with your TapState deployment before choosing it. |
+| [`walminer`](https://gitee.com/movead/XLogMiner/tree/master/) | Deployment-specific | Reads physical WAL and requires elevated database access. Choose it only when your TapState environment supports that path. |
 | `physical` | Deployment-specific | Uses the physical-WAL CDC path. Select it only when that path is enabled and supported in your environment. |
+
+For PostgreSQL 10 and later, start with **pgoutput** unless you already depend on another supported decoder. It is the current connector default and avoids installing an extension on the database server. Choose a different method only for a documented compatibility or topology requirement.
 
 For a primary/standby deployment, use `walminer` only when your TapState deployment supplies that path and you need to read CDC from a standby. Unlike the logical methods, it does not use `wal_level = logical` or logical replication slots, but it requires elevated database access.
 

@@ -13,7 +13,7 @@ ai:
   aliases: [hubspot, hubspot api, hubspot crm, hubspot source]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use HubSpot as a supported API source for CRM data.
 
@@ -26,9 +26,7 @@ Use HubSpot as a supported API source for CRM data.
   compatibility="HubSpot API"
 />
 
-<ConnectorCapabilities source="API read" target="No documented target role" />
-
-<Aside type="note" title="Authorization boundary">
+<Aside type="note" title="Authorization">
   The connection requires `code`. Obtain it through the authorization flow supplied by your TapState deployment; local validation does not exchange or refresh it.
 </Aside>
 

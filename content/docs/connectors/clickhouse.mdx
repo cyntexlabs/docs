@@ -13,7 +13,7 @@ ai:
   aliases: [clickhouse, clickhouse snapshot, clickhouse source, clickhouse target]
 ---
 
-import { ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use ClickHouse for point-in-time reads or as an analytical destination.
 
@@ -24,12 +24,6 @@ Use ClickHouse for point-in-time reads or as an analytical destination.
   worksAs="Source, Target"
   capabilities="Snapshot, Schema discovery, Data write, Target DDL apply"
   compatibility="ClickHouse 20.x–24.x"
-/>
-
-<ConnectorCapabilities
-  source="Full load (Snapshot)"
-  target="Data write"
-  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 ## Before you begin

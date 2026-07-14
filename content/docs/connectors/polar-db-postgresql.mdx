@@ -13,14 +13,12 @@ ai:
   aliases: [polardb postgresql, polar db postgres, aliyun polardb postgres, polardb wal]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Use PolarDB for PostgreSQL for snapshots, WAL-based change capture, and destination writes.
 
 <ConnectorProfile category="Databases" maturity="Preview" maturityLabel="Available for evaluation" worksAs="Source, Target" capabilities="Snapshot, CDC, Data write" compatibility="Alibaba Cloud PolarDB for PostgreSQL 11+" />
-
-<ConnectorCapabilities source="Snapshot and CDC" target="Data write" />
 
 <Aside type="note" title="Local validation boundary">
   Local validation checks the source mode and configuration shape. It does not test cluster networking, database credentials, replication privileges, WAL settings, publications, or a live write.

@@ -13,7 +13,7 @@ ai:
   aliases: [apache paimon, paimon, paimon snapshot, paimon cdc, paimon target, paimon s3, paimon hdfs]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 import { PreparationStep, PreparationSteps, SourceModeTab, SourceModeTabs } from '@/components/source-mode-tabs';
 
 Read existing Apache Paimon tables, follow their change stream, or write pipeline results into a Paimon warehouse.
@@ -26,8 +26,6 @@ Read existing Apache Paimon tables, follow their change stream, or write pipelin
   capabilities="Snapshot, CDC, Data write"
   compatibility="Paimon 0.6+ · 0.8.2+ recommended"
 />
-
-<ConnectorCapabilities source="Full load (Snapshot) and CDC" target="Insert, update, and delete" />
 
 <Aside type="note" title="One connection, one filesystem catalog">
   A Paimon connection opens the filesystem catalog rooted at `warehouse` and selects one `database`. It does not accept Hive, JDBC, or REST catalog settings. Create another connection for a different warehouse or database.

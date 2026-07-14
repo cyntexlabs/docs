@@ -7,9 +7,9 @@ ai:
   aliases: [tapstate dsl, tapstate resources, tapstate pipeline, tapstate yaml]
 ---
 
-TapState uses declarative resources to describe a data path. The current documentation contract uses `.tapstate.yml` files and `version: tapstate/v1`; verify those identifiers against the product artifact supplied by your deployment before execution.
+TapState uses declarative `.tapstate.yml` resources with `version: tapstate/v1` to describe a data path.
 
-For exact syntax, see the [DSL grammar reference](/docs/reference/dsl-grammar).
+If this is your first pipeline, begin with the [Quickstart](/docs/overview/quickstart). For connector-specific fields, use the [connector directory](/docs/connectors). For exact resource syntax, see the [DSL grammar reference](/docs/reference/dsl-grammar).
 
 ## Resource relationships
 
@@ -24,7 +24,7 @@ source connection ──┐
 target connection ──┘
 ```
 
-This naming reflects the current resource contract. It does not mean a target is conceptually a source or that every deployment must expose the same command surface.
+The current file format stores both source and target connection settings in a `kind: source` resource. A target connection omits the source read mode and is referenced by a pipeline output.
 
 ## Example relationship
 
@@ -43,7 +43,7 @@ sync:
       collection: user_profiles
 ```
 
-Matching connection resources with IDs `mysql-prod` and `profile-store` close the references. The selected artifact determines which pipeline fields and transform shapes it accepts.
+Connection resources with the IDs `mysql-prod` and `profile-store` complete these references.
 
 ## Why use declarative resources
 
@@ -56,7 +56,7 @@ Ordinary files provide:
 - deterministic diagnostics;
 - a common context for people, automation, and AI assistants.
 
-Declarative does not mean automatically correct. Network access, permissions, source consistency, recovery, and target data behavior still require deployment and runtime evidence.
+Validation can catch resource and reference errors before a run. Network access, permissions, and source or target behavior still need to be tested in the environment where the pipeline runs.
 
 ## Authoring lifecycle
 
@@ -66,7 +66,7 @@ A safe resource workflow is:
 2. Prepare the external source or target.
 3. Create or edit resources.
 4. Review IDs, references, fields, and secrets.
-5. Run the validation command documented for the selected artifact.
+5. Validate the workspace.
 6. Exercise connectivity and data behavior in a non-production deployment.
 
 Continue with the [Quickstart](/docs/overview/quickstart) for a complete relationship, or [Troubleshooting](/docs/guides/troubleshooting) when a resource and runtime produce different evidence.

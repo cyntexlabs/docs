@@ -165,13 +165,31 @@ function cleanMdxForLLM(markdown: string) {
 |---|---|---|
 | Assembly project | Source systems → Capture → Broker → Processing → Serving store → Apps and agents | Separate systems and operating boundaries. |
 | TapState model | Source systems → TapState (Capture, Transform, Serve) → Apps and agents | One governed Capture–Transform–Serve data path. |`)
+    .replace(/<ProductOverviewHero\s*\/>/g, `TapState is an open-source operational data platform. It brings capture, in-flight transformation, and current-state delivery into one governed data path for applications, APIs, and AI agents.
+
+- **Capture:** Read existing data and follow later changes.
+- **Transform:** Reshape, enrich, join, and route records in flight.
+- **Serve:** Keep useful state current for applications and agents.
+
+[Start the quickstart](/docs/overview/quickstart) or [browse connectors](/docs/connectors).`)
+    .replace(/<TapStateArchitecture\s*\/>/g, `## Logical architecture
+
+| Plane | Stage | Responsibility |
+|---|---|---|
+| Control | Author | Define connections and pipelines. |
+| Control | Validate | Check resources, references, and connector fields. |
+| Control | Operate | Apply, observe, and control lifecycle. |
+| Data | Sources | Databases, brokers, files, and APIs. |
+| Data | Capture | Read initial data and later changes. |
+| Data | Transform | Filter, map, enrich, join, and route. |
+| Data | Materialize | Maintain destination-ready current state. |
+| Data | Deliver | Write targets or publish streams. |
+| Data | Consumers | Applications, APIs, and agents. |
+
+Durable recovery state includes resource versions, checkpoints, schema and mapping state, retries, and operational history.`)
     .replace(/<SupportedConnectorMatrix\s*\/>/g, renderSupportedConnectorMatrixForLLM())
     .replace(/<ConnectorProfile\s+([\s\S]*?)\/>/g, (_match, attrs: string) => {
       return renderConnectorProfileForLLM(attrs);
-    })
-    .replace(/<ConnectorCapabilities\s+([\s\S]*?)\/>/g, (_match, attrs: string) => {
-      const field = (name: string, fallback: string) => readAttribute(attrs, name) ?? fallback;
-      return `## Capabilities\n\n| Role | What you can do |\n|---|---|\n| Source | ${field('source', 'Not specified')} |\n| Target | ${field('target', 'Not specified')} |\n| Schema changes | ${field('schema', 'Not claimed')} |`;
     })
     .replace(/^\s{2,}(#{1,6}\s.*)$/gm, '$1')
     .replace(/^\s{2,}(\|.*\|)$/gm, '$1')

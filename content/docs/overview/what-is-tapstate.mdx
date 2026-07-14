@@ -1,17 +1,16 @@
 ---
 title: What is TapState?
 description: Understand TapState's approach to capture, transform, and serve operational data through one governed data path
+full: true
 ai:
   kind: concept
   id: what-is-tapstate
   aliases: [tapstate overview, operational data platform, capture transform serve, fresh operational state]
 ---
 
-import { LinkCard, CardGrid, DataPathComparison } from '@/components/mdx';
+import { LinkCard, CardGrid, DataPathComparison, ProductOverviewHero } from '@/components/mdx';
 
-> **Kafka moves events. Warehouses analyze history. TapState turns database truth into live operational state.**
-
-TapState is an open-source data platform built around one idea: **Capture. Transform. Serve. One deployable.** It taps your production databases with log-based change data capture, reshapes change streams in flight, and serves continuously fresh, queryable state to applications, APIs, and AI agents — one product boundary instead of a four-system assembly project.
+<ProductOverviewHero />
 
 ## The problem: the assembly project
 
@@ -21,7 +20,7 @@ Keeping operational data fresh today usually means assembling and operating sepa
 
 Each layer in the assembled stack is good software. The cost is the glue: offsets, retries, schema drift, serialization, upgrades, and dashboards duplicated across every hop — an integration project that exists only to move your own data.
 
-Composable stacks remain the right choice for some workloads; [TapState and the streaming stack](/docs/overview/vs-streaming-stack) gives an honest decision guide. TapState targets the common case: teams whose dominant problem is keeping operational state current, not building bespoke stream topologies.
+Composable stacks remain the right choice for some workloads; [TapState vs. a streaming stack](/docs/overview/vs-streaming-stack) gives an honest decision guide. TapState targets the common case: teams whose dominant problem is keeping operational state current, not building bespoke stream topologies.
 
 ## One data path, three depths
 
@@ -49,11 +48,11 @@ For thirty years the consumer of enterprise data was a human reading a dashboard
 
 ## Provenance
 
-TapState is built for teams that need a reviewable, declarative path from operational changes to continuously fresh data. It combines an offline authoring workflow with connector contracts and runtime-oriented resource definitions, without requiring a separate stack of bespoke integration assets.
+TapState is built for teams that need a reviewable, declarative path from operational changes to continuously fresh data. It combines an offline authoring workflow with connector definitions and runtime-oriented resource files, without requiring a separate stack of bespoke integration assets.
 
-## The authoring contract in these docs
+## How to use these docs
 
-The documentation describes a reviewable authoring layer built from `.tapstate.yml` resources, connector contracts, and deterministic validation. Its current executable availability is tracked separately in [Release status](/docs/overview/release-status).
+The documentation follows the same path you use to build a pipeline: understand the product model, prepare source and target systems, describe the path as `.tapstate.yml` resources, and validate the result.
 
 - **A reviewable data contract.** Sources and pipelines are ordinary `.tapstate.yml` files that work with Git review, environment-variable substitution, and automated generation.
 - **Deterministic guardrails.** The documented `new → edit → ls / desc / explain → validate` loop checks resource structure, reference closure, connector configuration rules, and mode combinations.
@@ -74,13 +73,13 @@ The documentation describes a reviewable authoring layer built from `.tapstate.y
     href="/docs/overview/architecture"
   />
   <LinkCard
-    title="Release status"
-    description="Understand the evidence boundary for current product behavior."
-    href="/docs/overview/release-status"
+    title="Use cases"
+    description="See where current operational data changes an application outcome."
+    href="/docs/overview/use-cases"
   />
   <LinkCard
-    title="Product direction"
-    description="The intended outcomes and release principles for the full product."
-    href="/docs/overview/roadmap"
+    title="Connectors"
+    description="Choose a source or target and prepare the external system."
+    href="/docs/connectors"
   />
 </CardGrid>

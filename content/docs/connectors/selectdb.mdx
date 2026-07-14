@@ -13,7 +13,7 @@ ai:
   aliases: [selectdb, selectdb cloud, apache doris, selectdb snapshot, selectdb target]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use SelectDB for point-in-time reads or as a destination for pipeline data. SelectDB Cloud is based on Apache Doris; validate the endpoint types and privileges against your deployment before production use.
 
@@ -24,12 +24,6 @@ Use SelectDB for point-in-time reads or as a destination for pipeline data. Sele
   worksAs="Source, Target"
   capabilities="Snapshot, Schema discovery, Data write, Target DDL apply"
   compatibility="SelectDB Cloud 2.0.13+"
-/>
-
-<ConnectorCapabilities
-  source="Snapshot read"
-  target="Data write"
-  schema="Apply add, rename, alter, and drop-column events through pipeline policy"
 />
 
 <Aside type="note" title="Local validation boundary">

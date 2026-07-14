@@ -13,7 +13,7 @@ ai:
   aliases: [lark bitable, feishu bitable, feishu multi-dimensional table, lark base, bitable api]
 ---
 
-import { Aside, ConnectorCapabilities, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
+import { Aside, ConnectorProfile, ValidationStatusGuide } from '@/components/mdx';
 
 Use Lark Bitable, also known as Feishu Bitable, to read records from one Bitable table through the platform API.
 
@@ -24,11 +24,6 @@ Use Lark Bitable, also known as Feishu Bitable, to read records from one Bitable
   worksAs="Source"
   capabilities="API read, Resource discovery"
   compatibility="Lark / Feishu Bitable API"
-/>
-
-<ConnectorCapabilities
-  source="API read"
-  target="No documented target role"
 />
 
 <Aside type="note" title="Source-only connection">
@@ -43,6 +38,8 @@ Use Lark Bitable, also known as Feishu Bitable, to read records from one Bitable
 2. Record its App ID and App Secret.
 3. Grant the application access to the Bitable application and table that TapState will read.
 4. Copy the Bitable App Token and Table ID from the Bitable URL or API tooling.
+
+![Locate the App ID and App Secret in Lark or Feishu Open Platform](/images/connectors/feishu-app-credentials.png)
 
 The Bitable API enforces rate limits. Design downstream polling and retries for the limits published by Lark/Feishu, rather than assuming that a successful local YAML check has tested the API.
 
