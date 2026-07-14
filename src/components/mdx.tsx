@@ -70,6 +70,88 @@ export function Badge({ text, children }: { text?: ReactNode; children?: ReactNo
   );
 }
 
+function DataPathNode({
+  children,
+  tone = 'neutral',
+}: {
+  children: ReactNode;
+  tone?: 'neutral' | 'primary';
+}) {
+  const className = tone === 'primary'
+    ? 'border-sky-200 bg-white text-sky-950 shadow-sm dark:border-sky-800 dark:bg-slate-950 dark:text-sky-100'
+    : 'border-fd-border bg-fd-background text-fd-foreground';
+
+  return (
+    <span className={`inline-flex min-w-24 shrink-0 items-center justify-center rounded-lg border px-3 py-2 text-center text-xs font-semibold leading-5 ${className}`}>
+      {children}
+    </span>
+  );
+}
+
+function DataPathArrow({ tone = 'neutral' }: { tone?: 'neutral' | 'primary' }) {
+  return (
+    <ArrowRight
+      aria-hidden="true"
+      className={`size-4 shrink-0 ${tone === 'primary' ? 'text-sky-500 dark:text-sky-300' : 'text-fd-muted-foreground'}`}
+      strokeWidth={2}
+    />
+  );
+}
+
+/** A reader-first comparison of an assembled streaming stack and the TapState product model. */
+export function DataPathComparison() {
+  return (
+    <section aria-label="Operational data path comparison" className="not-prose my-8 overflow-hidden rounded-xl border border-fd-border bg-fd-card shadow-sm shadow-black/[0.025] dark:shadow-none">
+      <div className="grid divide-y divide-fd-border">
+        <section className="p-4 sm:p-5">
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h3 className="m-0 text-sm font-semibold text-fd-foreground">The assembly project</h3>
+            <p className="m-0 text-xs text-fd-muted-foreground">Separate systems and operating boundaries</p>
+          </div>
+          <div className="overflow-x-auto pb-1">
+            <div className="flex min-w-[48rem] items-center gap-2">
+              <DataPathNode>Source systems</DataPathNode>
+              <DataPathArrow />
+              <DataPathNode>Capture</DataPathNode>
+              <DataPathArrow />
+              <DataPathNode>Broker</DataPathNode>
+              <DataPathArrow />
+              <DataPathNode>Processing</DataPathNode>
+              <DataPathArrow />
+              <DataPathNode>Serving store</DataPathNode>
+              <DataPathArrow />
+              <DataPathNode>Apps and agents</DataPathNode>
+            </div>
+          </div>
+        </section>
+        <section className="bg-sky-50/65 p-4 dark:bg-sky-950/20 sm:p-5">
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h3 className="m-0 text-sm font-semibold text-sky-950 dark:text-sky-100">The TapState model</h3>
+            <p className="m-0 text-xs text-sky-800/80 dark:text-sky-200/80">One governed Capture–Transform–Serve path</p>
+          </div>
+          <div className="overflow-x-auto pb-1">
+            <div className="flex min-w-[36rem] items-center gap-2">
+              <DataPathNode tone="primary">Source systems</DataPathNode>
+              <DataPathArrow tone="primary" />
+              <div className="flex min-w-72 shrink-0 items-center justify-center gap-2 rounded-xl border border-sky-200 bg-sky-100/70 px-4 py-3 dark:border-sky-800 dark:bg-sky-950/45">
+                <span className="text-sm font-semibold text-sky-950 dark:text-sky-100">TapState</span>
+                <span className="h-4 w-px bg-sky-300 dark:bg-sky-700" aria-hidden="true" />
+                <span className="text-xs font-medium text-sky-800 dark:text-sky-200">Capture</span>
+                <span className="text-sky-400 dark:text-sky-500" aria-hidden="true">·</span>
+                <span className="text-xs font-medium text-sky-800 dark:text-sky-200">Transform</span>
+                <span className="text-sky-400 dark:text-sky-500" aria-hidden="true">·</span>
+                <span className="text-xs font-medium text-sky-800 dark:text-sky-200">Serve</span>
+              </div>
+              <DataPathArrow tone="primary" />
+              <DataPathNode tone="primary">Apps and agents</DataPathNode>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  );
+}
+
 type ConnectorProfileProps = {
   category: string;
   maturity: string;
@@ -435,6 +517,7 @@ export function getMDXComponents(components?: MDXComponents) {
     CardGrid,
     LinkCard,
     Badge,
+    DataPathComparison,
     ConnectorProfile,
     ConnectorCapabilities,
     ValidationStatusGuide,

@@ -104,6 +104,8 @@ function renderConnectorProfileForLLM(attrs: string) {
 function cleanMdxForLLM(markdown: string) {
   return markdown
     .replace(/^import\s+.+?;\n?/gm, '')
+    // The MDX processor can encode the first asterisk of a bold run after inline text.
+    .replace(/&#x2A;\*/g, '**')
     .replace(/<Tabs(?:\s[^>]*)?>([\s\S]*?)<\/Tabs>/g, (_match, body: string) => {
       return body.replace(/^ {4}/gm, '');
     })
@@ -157,6 +159,12 @@ function cleanMdxForLLM(markdown: string) {
 
 - **Example — validation passed:** \`valid: 3 resources in tapstate-work\`. Exit code 0 means workspace structure, references, and known mode and configuration rules passed. The resource count varies by workspace.
 - **Example — changes required:** \`invalid: orders_source.tapstate.yml:12:1 dsl.unknown-field\`. Exit code 1 means at least one local rule failed. The filename, location, error code, message, and suggested fix identify the affected resource.`)
+    .replace(/<DataPathComparison\s*\/>/g, `## The assembly project and the TapState model
+
+| Approach | Data path | Operating implication |
+|---|---|---|
+| Assembly project | Source systems → Capture → Broker → Processing → Serving store → Apps and agents | Separate systems and operating boundaries. |
+| TapState model | Source systems → TapState (Capture, Transform, Serve) → Apps and agents | One governed Capture–Transform–Serve data path. |`)
     .replace(/<SupportedConnectorMatrix\s*\/>/g, renderSupportedConnectorMatrixForLLM())
     .replace(/<ConnectorProfile\s+([\s\S]*?)\/>/g, (_match, attrs: string) => {
       return renderConnectorProfileForLLM(attrs);
