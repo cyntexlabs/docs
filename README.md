@@ -142,3 +142,9 @@ Set the site environment at build time. This controls canonical URLs, structured
 | Production | `https://tapstate.com` | `true` |
 
 Indexing is opt-in: if `TAPSTATE_SITE_INDEXABLE` is absent, the exported site emits `noindex` metadata, disallows crawlers, and omits the sitemap. Set both variables in the deployment platform rather than committing them to the repository.
+
+### Netlify
+
+The repository includes `netlify.toml`. It runs `npm run build` and publishes the static `out/` directory; do not configure Netlify to publish `dist` or add `next export` to the build script.
+
+During a Netlify build, `DEPLOY_PRIME_URL` is passed to `TAPSTATE_SITE_URL`, so canonical links and LLM URLs use the active production, branch, or Deploy Preview origin. Production deploys are indexable; branch deploys and Deploy Previews are not.
